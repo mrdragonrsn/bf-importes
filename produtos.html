@@ -2045,11 +2045,11 @@
     </div>
 
     <footer>
-        <div class="container">
-            <p>&copy; 2026 BIANCO &amp; FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA CNPJ: 03.108.169/0001-58</p>
-            <p class="legal">Todos os direitos reservados.</p>
-        </div>
-    </footer>
+         <div class="container">
+             <p id="footerInfo">&copy; 2026 BIANCO &amp; FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA CNPJ: 03.108.169/0001-58</p>
+             <p class="legal">Todos os direitos reservados.</p>
+         </div>
+     </footer>
 
     <script>
 (function(){
@@ -2096,6 +2096,48 @@
             longDesc: 'O Toner HP 58A Original (CF258A) é o suprimento oficial para impressoras HP LaserJet. Com rendimento de até 3.000 páginas, garante impressões nítidas e de qualidade profissional. A tecnologia JetIntelligence da HP assegura desempenho consistente página após página, além de proteção contra falsificações. Fácil instalação, design de troca rápida.'
         }
     };
+
+    /* ── SYNC FROM ADMIN ─────────────── */
+    try {
+        var adminStock = JSON.parse(localStorage.getItem('bf_stock')||'{}');
+        var productGrid = document.querySelector('.product-grid');
+        var defaultCatNames = {'impressoras':'Impressora','multifuncionais':'Multifuncional','pecas':'Peça','suprimentos':'Suprimento'};
+        Object.keys(adminStock).forEach(function(name){
+            if(adminStock[name]._deleted) return;
+            if(!productData[name]){
+                productData[name] = {
+                    images: ['&#128424;','&#128196;','&#128295;','&#128203;'],
+                    stock: adminStock[name].stock || 0,
+                    longDesc: adminStock[name].longDesc || adminStock[name].desc || ''
+                };
+                if(productGrid && !document.querySelector('.product-card[data-name="'+name.replace(/"/g,'&quot;')+'"]')){
+                    var p = adminStock[name];
+                    var card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.setAttribute('data-category', p.cat||'impressoras');
+                    card.setAttribute('data-name', name);
+                    var imgHtml = p.img ? '<img src="'+p.img+'" style="width:100%;height:100%;object-fit:cover;border-radius:8px 8px 0 0;">' : '&#128424;';
+                    var priceStr = 'R$ ' + (parseFloat((p.price||'0').replace(',','.'))).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+                    var inst = parseFloat((p.price||'0').replace(',','.')) / (p.installments||10);
+                    card.innerHTML = '<div class="thumb">'+imgHtml+'</div>' +
+                        '<div class="body">' +
+                            '<span class="cat">'+(defaultCatNames[p.cat]||p.cat||'Produto')+'</span>' +
+                            '<h3>'+name+'</h3>' +
+                            '<p class="desc">'+(p.desc||'')+'</p>' +
+                            '<div class="stock-info" data-product="'+name+'"></div>' +
+                            '<div class="price">'+priceStr+'</div>' +
+                            '<div class="installment">ou '+(p.installments||10)+'x de R$ '+(inst.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})).replace('.',',')+'</div>' +
+                            '<button class="btn-card add-to-cart">&#128722; Adicionar</button>' +
+                        '</div>';
+                    productGrid.appendChild(card);
+                }
+            }
+            if(productData[name]){
+                if(typeof adminStock[name].stock === 'number') productData[name].stock = adminStock[name].stock;
+                if(adminStock[name].img) productData[name].img = adminStock[name].img;
+            }
+        });
+    } catch(e){}
 
     /* ── RENDER ESTOQUE ──────────────── */
     function renderStock() {
@@ -2877,5 +2919,18 @@
 })();
 
 </script>
+
+<script>
+(function(){
+    try {
+        var cfg = JSON.parse(localStorage.getItem('bf_config')||'{}');
+        if(cfg.company){
+            var fi = document.getElementById('footerInfo');
+            if(fi) fi.textContent = '\u00A9 2026 ' + cfg.company + ' CNPJ: ' + (cfg.cnpj||'');
+        }
+    } catch(e) {}
+})();
+</script>
+
 </body>
 </html>

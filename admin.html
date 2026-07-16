@@ -6,832 +6,606 @@
     <title>Painel Admin — B&amp;F</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --bg-card: #1e293b;
-            --bg-input: #0f172a;
-            --border: #334155;
-            --text: #e2e8f0;
-            --text-muted: #94a3b8;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
-            --success: #22c55e;
-            --warn: #f59e0b;
-            --radius: 8px;
+            --bg: #0f172a; --bg-card: #1e293b; --bg-input: #0f172a;
+            --border: #334155; --text: #e2e8f0; --text-muted: #94a3b8;
+            --accent: #3b82f6; --accent-hover: #2563eb; --danger: #ef4444;
+            --success: #22c55e; --warn: #f59e0b; --radius: 8px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
-        a { color: var(--accent); text-decoration: none; }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        a{color:var(--accent);text-decoration:none;}
 
-        /* ── LOGIN ──────────────────────── */
-        .login-screen {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .login-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 40px 32px;
-            width: 380px;
-            max-width: 100%;
-        }
-        .login-card h1 { font-size: 1.3rem; text-align: center; margin-bottom: 6px; }
-        .login-card .sub { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; }
-        .login-field { margin-bottom: 14px; }
-        .login-field label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-        .login-field input {
-            width: 100%;
-            padding: 10px 12px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: 0.88rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .login-field input:focus { border-color: var(--accent); }
-        .btn-login {
-            width: 100%;
-            padding: 12px 0;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 700;
-            font-size: 0.92rem;
-            cursor: pointer;
-            font-family: inherit;
-            transition: background 0.2s;
-        }
-        .btn-login:hover { background: var(--accent-hover); }
-        .login-error { color: var(--danger); font-size: 0.78rem; text-align: center; margin-top: 8px; }
-        .back-site { text-align: center; margin-top: 16px; font-size: 0.82rem; }
+        .login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+        .login-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:40px 32px;width:380px;max-width:100%;}
+        .login-card h1{font-size:1.3rem;text-align:center;margin-bottom:6px;}
+        .login-card .sub{text-align:center;font-size:.82rem;color:var(--text-muted);margin-bottom:24px;}
+        .login-field{margin-bottom:14px;}
+        .login-field label{display:block;font-size:.78rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;}
+        .login-field input{width:100%;padding:10px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.88rem;font-family:inherit;outline:none;}
+        .login-field input:focus{border-color:var(--accent);}
+        .btn-login{width:100%;padding:12px 0;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-weight:700;font-size:.92rem;cursor:pointer;font-family:inherit;}
+        .btn-login:hover{background:var(--accent-hover);}
+        .login-error{color:var(--danger);font-size:.78rem;text-align:center;margin-top:8px;}
+        .back-site{text-align:center;margin-top:16px;font-size:.82rem;}
 
-        /* ── LAYOUT ADMIN ────────────────── */
-        .admin-layout { display: none; min-height: 100vh; }
-        .admin-layout.active { display: flex; }
-        .sidebar {
-            width: 220px;
-            background: var(--bg-card);
-            border-right: 1px solid var(--border);
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            z-index: 10;
-        }
-        .sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
-        .sidebar-logo h2 { font-size: 1.1rem; color: var(--accent); }
-        .sidebar-logo small { font-size: 0.7rem; color: var(--text-muted); }
-        .sidebar-nav { flex: 1; }
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 20px;
-            color: var(--text-muted);
-            font-size: 0.86rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-            border-left: 3px solid transparent;
-        }
-        .sidebar-nav a:hover { background: rgba(255,255,255,0.04); color: var(--text); }
-        .sidebar-nav a.active { background: rgba(59,130,246,0.1); color: var(--accent); border-left-color: var(--accent); }
-        .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
-        .btn-logout {
-            width: 100%;
-            padding: 8px 0;
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.82rem;
-            transition: all 0.2s;
-        }
-        .btn-logout:hover { color: var(--danger); border-color: var(--danger); }
-        .main-content {
-            flex: 1;
-            margin-left: 220px;
-            padding: 30px;
-        }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
+        .admin-layout{display:none;min-height:100vh;}
+        .admin-layout.active{display:flex;}
+        .sidebar{width:200px;background:var(--bg-card);border-right:1px solid var(--border);padding:16px 0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:10;}
+        .sidebar-logo{padding:0 16px 16px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+        .sidebar-logo h2{font-size:1rem;color:var(--accent);}
+        .sidebar-logo small{font-size:.68rem;color:var(--text-muted);}
+        .sidebar-nav{flex:1;}
+        .sidebar-nav a{display:flex;align-items:center;gap:8px;padding:10px 16px;color:var(--text-muted);font-size:.82rem;font-weight:500;cursor:pointer;border-left:3px solid transparent;transition:all .2s;}
+        .sidebar-nav a:hover{background:rgba(255,255,255,.04);color:var(--text);}
+        .sidebar-nav a.active{background:rgba(59,130,246,.1);color:var(--accent);border-left-color:var(--accent);}
+        .sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);}
+        .btn-logout{width:100%;padding:7px 0;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-family:inherit;font-size:.78rem;}
+        .btn-logout:hover{color:var(--danger);border-color:var(--danger);}
 
-        .page-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
-        .page-sub { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 24px; }
+        .main-content{flex:1;margin-left:200px;padding:24px 28px 24px 28px;}
+        .tab-panel{display:none;}
+        .tab-panel.active{display:block;}
+        .page-title{font-size:1.3rem;font-weight:700;margin-bottom:6px;}
+        .page-sub{font-size:.82rem;color:var(--text-muted);margin-bottom:20px;}
+        .card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;}
+        .card h3{font-size:.92rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 
-        /* ── CARDS / TABLES ─────────────── */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px 12px; text-align: left; font-size: 0.82rem; border-bottom: 1px solid var(--border); }
-        th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; }
-        td { color: var(--text); }
-        .badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.72rem;
-            font-weight: 600;
-        }
-        .badge-green { background: rgba(34,197,94,0.15); color: var(--success); }
-        .badge-yellow { background: rgba(245,158,11,0.15); color: var(--warn); }
-        .badge-red { background: rgba(239,68,68,0.15); color: var(--danger); }
+        table{width:100%;border-collapse:collapse;}
+        th,td{padding:8px 10px;text-align:left;font-size:.78rem;border-bottom:1px solid var(--border);}
+        th{color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:.7rem;letter-spacing:.5px;}
+        td{color:var(--text);}
+        .badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.68rem;font-weight:600;}
+        .badge-green{background:rgba(34,197,94,.15);color:var(--success);}
+        .badge-yellow{background:rgba(245,158,11,.15);color:var(--warn);}
+        .badge-red{background:rgba(239,68,68,.15);color:var(--danger);}
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .form-group { display: flex; flex-direction: column; gap: 4px; }
-        .form-group label { font-size: 0.76rem; font-weight: 600; color: var(--text-muted); }
-        .form-group input, .form-group select, .form-group textarea {
-            padding: 9px 12px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: 0.84rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .form-group textarea { resize: vertical; min-height: 60px; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
-        .btn {
-            padding: 10px 24px;
-            border-radius: var(--radius);
-            font-weight: 700;
-            font-size: 0.86rem;
-            cursor: pointer;
-            font-family: inherit;
-            border: none;
-            transition: all 0.2s;
-        }
-        .btn-primary { background: var(--accent); color: #fff; }
-        .btn-primary:hover { background: var(--accent-hover); }
-        .btn-danger { background: var(--danger); color: #fff; }
-        .btn-danger:hover { background: var(--danger-hover); }
-        .btn-sm { padding: 6px 14px; font-size: 0.76rem; }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-        }
-        .btn-outline:hover { border-color: var(--text-muted); color: var(--text); }
+        .form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px;}
+        .form-row .fg{flex:1;min-width:120px;}
+        .fg{display:flex;flex-direction:column;gap:3px;}
+        .fg label{font-size:.72rem;font-weight:600;color:var(--text-muted);}
+        .fg input,.fg select,.fg textarea{padding:7px 10px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;font-family:inherit;outline:none;transition:border-color .2s;}
+        .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);}
+        .fg textarea{resize:vertical;min-height:50px;}
+        .tbl-input{width:100%;padding:5px 7px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:.76rem;font-family:inherit;outline:none;}
+        .tbl-input:focus{border-color:var(--accent);}
+        .tbl-img-preview{width:36px;height:36px;border-radius:4px;object-fit:cover;border:1px solid var(--border);}
+        .tbl-img-upload{font-size:.64rem;cursor:pointer;color:var(--accent);border:1px dashed var(--border);padding:3px 6px;border-radius:4px;white-space:nowrap;}
+        .tbl-img-upload:hover{border-color:var(--accent);}
 
-        .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .btn{padding:8px 18px;border-radius:var(--radius);font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit;border:none;transition:all .2s;}
+        .btn-primary{background:var(--accent);color:#fff;}
+        .btn-primary:hover{background:var(--accent-hover);}
+        .btn-danger{background:var(--danger);color:#fff;}
+        .btn-sm{padding:4px 10px;font-size:.7rem;}
+        .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted);}
+        .btn-outline:hover{border-color:var(--text-muted);color:var(--text);}
+        .btn-icon{background:none;border:none;cursor:pointer;font-size:1.1rem;padding:2px 5px;border-radius:4px;color:var(--text-muted);transition:all .15s;}
+        .btn-icon:hover{color:var(--text);background:rgba(255,255,255,.05);}
+        .btn-icon.danger:hover{color:var(--danger);}
 
-        /* ── TOAST ──────────────────────── */
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 12px 20px;
-            border-radius: var(--radius);
-            font-size: 0.84rem;
-            font-weight: 600;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-            animation: toastIn 0.35s ease, toastOut 0.3s ease 2.2s forwards;
-            max-width: 360px;
+        .flex-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+        .empty-state{text-align:center;color:var(--text-muted);padding:40px 20px;font-size:.85rem;}
+        .toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+        .toast{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:12px 20px;border-radius:var(--radius);font-size:.8rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.4);animation:toastIn .35s ease,toastOut .3s ease 2.5s forwards;max-width:360px;}
+        @keyframes toastIn{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(80px)}}
+
+        .anuncio-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;display:flex;gap:14px;align-items:center;}
+        .anuncio-card img{width:100px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border);}
+        .anuncio-card .info{flex:1;min-width:0;}
+        .anuncio-card .info .name{font-size:.8rem;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .anuncio-card .info .actions{display:flex;gap:8px;margin-top:6px;}
+
+        .preview-bar{position:fixed;bottom:0;right:0;width:340px;height:0;background:var(--bg-card);border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;z-index:50;overflow:hidden;transition:height .3s;}
+        .preview-bar.open{height:500px;}
+        .preview-bar-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--accent);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;}
+        .preview-bar iframe{width:100%;height:calc(100% - 36px);border:none;}
+        .preview-toggle{position:fixed;bottom:12px;right:12px;z-index:51;background:var(--accent);color:#fff;border:none;border-radius:25px;padding:8px 18px;font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(0,0,0,.4);}
+        .preview-toggle:hover{background:var(--accent-hover);}
+
+        .help-text{font-size:.68rem;color:var(--text-muted);margin-top:4px;}
+        .divider{width:100%;height:1px;background:var(--border);margin:14px 0;}
+
+        @media(max-width:768px){
+            .sidebar{width:54px;}
+            .sidebar-logo{padding:0 6px 10px;text-align:center;}
+            .sidebar-logo h2{font-size:.8rem;}.sidebar-logo small{display:none;}
+            .sidebar-nav a{padding:10px 6px;justify-content:center;font-size:0;}
+            .sidebar-nav a span{font-size:1.1rem;}
+            .main-content{margin-left:54px;padding:16px;}
+            .form-row{flex-direction:column;}
+            .form-row .fg{min-width:100%;}
+            .preview-bar{width:100%;}
+            .preview-bar.open{height:350px;}
         }
-        @keyframes toastIn { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(80px); } }
-
-        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 0.88rem; }
-        .color-preview { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); display: inline-block; vertical-align: middle; }
-        .img-preview { max-width: 200px; max-height: 100px; border-radius: 6px; border: 1px solid var(--border); object-fit: cover; }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 60px; }
-            .sidebar-logo { padding: 0 8px 16px; text-align: center; }
-            .sidebar-logo h2 { font-size: 0.9rem; }
-            .sidebar-logo small { display: none; }
-            .sidebar-nav a { padding: 12px 8px; justify-content: center; font-size: 0; gap: 0; }
-            .sidebar-nav a span { font-size: 1.2rem; }
-            .sidebar-nav a::after { display: none; }
-            .main-content { margin-left: 60px; }
-            .form-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 480px) {
-            .main-content { padding: 16px; margin-left: 0; padding-bottom: 80px; }
-            .sidebar {
-                top: auto;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                height: 64px;
-                flex-direction: row;
-                padding: 0;
-                border-right: none;
-                border-top: 1px solid var(--border);
-            }
-            .sidebar-logo { display: none; }
-            .sidebar-nav { display: flex; flex: 1; }
-            .sidebar-nav a { flex: 1; justify-content: center; padding: 8px 4px; border-left: none; border-top: 3px solid transparent; font-size: 0.62rem; flex-direction: column; gap: 2px; }
-            .sidebar-nav a span { font-size: 1rem; }
-            .sidebar-nav a.active { border-left: none; border-top-color: var(--accent); }
-            .sidebar-footer { display: none; }
+        @media(max-width:480px){
+            .main-content{margin-left:0;padding:12px 12px 90px;}
+            .sidebar{top:auto;bottom:0;left:0;right:0;width:100%;height:60px;flex-direction:row;padding:0;border-right:none;border-top:1px solid var(--border);}
+            .sidebar-logo{display:none;}
+            .sidebar-nav{display:flex;flex:1;}
+            .sidebar-nav a{flex:1;justify-content:center;padding:6px 2px;border-left:none;border-top:3px solid transparent;font-size:.58rem;flex-direction:column;gap:2px;}
+            .sidebar-nav a span{font-size:.9rem;}
+            .sidebar-nav a.active{border-left:none;border-top-color:var(--accent);}
+            .sidebar-footer{display:none;}
         }
     </style>
 </head>
 <body>
 
-    <!-- ── LOGIN ────────────────────────── -->
-    <div class="login-screen" id="loginScreen">
-        <div class="login-card">
-            <h1>&#128274; Painel Admin</h1>
-            <p class="sub">B&amp;F Importes — Área restrita</p>
-            <div class="login-field"><label>Usuário</label><input type="text" id="adminUser" placeholder="admin"></div>
-            <div class="login-field"><label>Senha</label><input type="password" id="adminPass" placeholder="admin"></div>
-            <div class="login-error" id="loginError"></div>
-            <button class="btn-login" id="btnAdminLogin">Entrar</button>
-            <p class="back-site"><a href="index.html">&#8592; Voltar ao site</a></p>
+<div class="login-screen" id="loginScreen">
+    <div class="login-card">
+        <h1>&#128274; Painel Admin</h1>
+        <p class="sub">B&amp;F Importes</p>
+        <div class="login-field"><label>Usuário</label><input type="text" id="adminUser" placeholder="admin"></div>
+        <div class="login-field"><label>Senha</label><input type="password" id="adminPass" placeholder="admin"></div>
+        <div class="login-error" id="loginError"></div>
+        <button class="btn-login" id="btnAdminLogin">Entrar</button>
+        <p class="back-site"><a href="index.html">&#8592; Voltar ao site</a></p>
+    </div>
+</div>
+
+<div class="admin-layout" id="adminLayout">
+    <aside class="sidebar">
+        <div class="sidebar-logo"><h2>B&amp;F</h2><small>Painel Admin</small></div>
+        <nav class="sidebar-nav" id="sideNav">
+            <a class="active" data-tab="estoque"><span>&#128230;</span> Estoque</a>
+            <a data-tab="banners"><span>&#127912;</span> Banners</a>
+            <a data-tab="anuncios"><span>&#128444;</span> Anúncios</a>
+            <a data-tab="config"><span>&#9881;</span> Configurações</a>
+            <a data-tab="usuarios"><span>&#128101;</span> Usuários</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="btnAdminLogout">&#128682; Sair</button>
         </div>
+    </aside>
+
+    <main class="main-content">
+
+        <!-- ========== ESTOQUE (UNIFICADO) ========== -->
+        <div class="tab-panel active" id="tab-estoque">
+            <h1 class="page-title">&#128230; Estoque &amp; Produtos</h1>
+            <p class="page-sub">Adicione produtos e gerencie tudo em tempo real</p>
+
+            <!-- Add Product Form -->
+            <div class="card">
+                <h3>&#10133; Adicionar Produto</h3>
+                <div class="form-row">
+                    <div class="fg" style="flex:2;"><label>Nome*</label><input type="text" id="prodName" placeholder="Ex: HP LaserJet Pro M404dn"></div>
+                    <div class="fg"><label>Categoria*</label><select id="prodCat">
+                        <option value="impressoras">Impressoras</option><option value="multifuncionais">Multifuncionais</option>
+                        <option value="pecas">Peças</option><option value="suprimentos">Suprimentos</option>
+                    </select></div>
+                    <div class="fg"><label>Preço*</label><input type="text" id="prodPrice" placeholder="2199,00"></div>
+                    <div class="fg"><label>Parcelas</label><select id="prodInstallments"><option value="10">10x</option><option value="6">6x</option><option value="3">3x</option><option value="1">à vista</option></select></div>
+                    <div class="fg" style="max-width:80px;"><label>Estoque*</label><input type="number" id="prodStock" value="10" min="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="fg" style="flex:3;"><label>Descrição Curta</label><input type="text" id="prodDesc" placeholder="Breve descrição..."></div>
+                    <div class="fg" style="flex:2;align-items:center;">
+                        <label>Imagem do Produto</label>
+                        <input type="file" id="prodImgFile" accept="image/*" style="display:none;">
+                        <div class="flex-row" style="width:100%;">
+                            <button class="btn btn-outline btn-sm" onclick="document.getElementById('prodImgFile').click()">&#128247; Escolher</button>
+                            <span id="prodImgName" style="font-size:.72rem;color:var(--text-muted);">Nenhuma</span>
+                            <img id="prodImgPreview" style="width:36px;height:36px;object-fit:cover;border-radius:4px;display:none;">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="fg" style="flex:3;"><label>Descrição Longa</label><textarea id="prodLongDesc" placeholder="Descrição detalhada..."></textarea></div>
+                </div>
+                <div class="flex-row" style="margin-top:8px;">
+                    <button class="btn btn-primary" id="btnAddProduct">&#10133; Adicionar</button>
+                    <span id="prodAddMsg" style="font-size:.74rem;"></span>
+                </div>
+            </div>
+
+            <!-- Stock Table (Fully Editable) -->
+            <div class="card">
+                <h3>&#128202; Produtos Cadastrados</h3>
+                <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Imagem</th><th style="width:40px;">Status</th><th style="width:50px;">Ações</th></tr></thead>
+                    <tbody id="stockBody"><tr><td colspan="7" class="empty-state">Nenhum produto cadastrado.</td></tr></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== BANNERS ========== -->
+        <div class="tab-panel" id="tab-banners">
+            <h1 class="page-title">&#127912; Gerenciar Banners</h1>
+            <p class="page-sub">Altere o banner principal do site</p>
+            <div class="card">
+                <h3>Banner da Página Inicial</h3>
+                <div class="form-row">
+                    <div class="fg" style="flex:1;"><label>Título</label><input type="text" id="bannerTitle" placeholder="Título grande"></div>
+                    <div class="fg" style="flex:1;"><label>Subtítulo</label><input type="text" id="bannerSubtitle" placeholder="Texto abaixo"></div>
+                </div>
+                <div class="form-row">
+                    <div class="fg" style="flex:1;"><label>URL Imagem de Fundo</label><input type="text" id="bannerBgUrl" placeholder="https://... ou vazio"></div>
+                    <div class="fg" style="flex:1;"><label>Cor de Fundo</label><input type="text" id="bannerBgColor" placeholder="linear-gradient(170deg, #0d2f5e, #0a1f3f)"></div>
+                    <div class="fg" style="flex:1;"><label>Texto do Botão</label><input type="text" id="bannerBtnText" placeholder="Ver Produtos"></div>
+                </div>
+                <div class="flex-row" style="margin-top:10px;">
+                    <button class="btn btn-primary" id="btnSaveBanner">&#128190; Salvar</button>
+                    <button class="btn btn-outline" id="btnResetBanner">&#8635; Padrão</button>
+                    <span id="bannerMsg" style="font-size:.74rem;color:var(--text-muted);"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ANÚNCIOS ========== -->
+        <div class="tab-panel" id="tab-anuncios">
+            <h1 class="page-title">&#128444; Gerenciar Anúncios</h1>
+            <p class="page-sub">Adicione, remova ou altere as imagens de anúncio do site</p>
+            <div class="card">
+                <div class="flex-row" style="justify-content:space-between;margin-bottom:12px;">
+                    <h3 style="margin:0;">Imagens de Anúncio</h3>
+                    <button class="btn btn-primary btn-sm" id="btnAddAnuncio">&#10133; Novo Anúncio</button>
+                </div>
+                <div id="anunciosList"></div>
+                <div class="flex-row" style="margin-top:12px;">
+                    <button class="btn btn-primary" id="btnSaveAnuncios">&#128190; Salvar Tudo</button>
+                    <span id="anuncioMsg" style="font-size:.74rem;color:var(--text-muted);"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== CONFIGURAÇÕES ========== -->
+        <div class="tab-panel" id="tab-config">
+            <h1 class="page-title">&#9881; Configurações do Site</h1>
+            <p class="page-sub">Dados da empresa, contato e endereço</p>
+            <div class="card">
+                <h3>Dados da Empresa</h3>
+                <div class="form-row">
+                    <div class="fg" style="flex:2;"><label>Razão Social</label><input type="text" id="cfgCompany"></div>
+                    <div class="fg" style="flex:1;"><label>Nome Fantasia</label><input type="text" id="cfgBrand"></div>
+                    <div class="fg" style="flex:1;"><label>CNPJ</label><input type="text" id="cfgCNPJ"></div>
+                </div>
+                <div class="form-row">
+                    <div class="fg"><label>Telefone</label><input type="text" id="cfgPhone"></div>
+                    <div class="fg"><label>E-mail</label><input type="text" id="cfgEmail"></div>
+                    <div class="fg"><label>Horário</label><input type="text" id="cfgHours"></div>
+                </div>
+                <div class="form-row">
+                    <div class="fg" style="flex:2;"><label>Endereço</label><input type="text" id="cfgAddress"></div>
+                    <div class="fg"><label>CEP</label><input type="text" id="cfgCEP"></div>
+                    <div class="fg"><label>Cidade/UF</label><input type="text" id="cfgCityState"></div>
+                </div>
+                <div class="flex-row" style="margin-top:10px;">
+                    <button class="btn btn-primary" id="btnSaveConfig">&#128190; Salvar</button>
+                    <span id="configMsg" style="font-size:.74rem;color:var(--text-muted);"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== USUÁRIOS ========== -->
+        <div class="tab-panel" id="tab-usuarios">
+            <h1 class="page-title">&#128101; Gerenciar Usuários</h1>
+            <p class="page-sub">Contas cadastradas no site</p>
+            <div class="card">
+                <h3>Usuários</h3>
+                <table>
+                    <thead><tr><th>Nome</th><th>E-mail</th><th>Ações</th></tr></thead>
+                    <tbody id="usersBody"><tr><td colspan="3" class="empty-state">Nenhum usuário.</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- PREVIEW PAINEL -->
+<button class="preview-toggle" id="previewToggle" style="display:none;" title="Pré-visualizar site">&#128065; Preview</button>
+<div class="preview-bar" id="previewBar">
+    <div class="preview-bar-header" id="previewBarHeader">
+        <span>&#128065; Pré-visualização do Site</span>
+        <span style="font-size:.7rem;">(arraste para redimensionar)</span>
     </div>
+    <iframe id="previewFrame" src="index.html"></iframe>
+</div>
 
-    <!-- ── LAYOUT ADMIN ──────────────────── -->
-    <div class="admin-layout" id="adminLayout">
-        <aside class="sidebar">
-            <div class="sidebar-logo"><h2>B&amp;F</h2><small>Painel Admin</small></div>
-            <nav class="sidebar-nav" id="sideNav">
-                <a class="active" data-tab="estoque"><span>&#128230;</span> Estoque</a>
-                <a data-tab="produtos"><span>&#128722;</span> Produtos</a>
-                <a data-tab="banners"><span>&#127912;</span> Banners</a>
-                <a data-tab="anuncios"><span>&#128444;</span> Anúncios</a>
-                <a data-tab="config"><span>&#9881;</span> Configurações</a>
-                <a data-tab="usuarios"><span>&#128101;</span> Usuários</a>
-            </nav>
-            <div class="sidebar-footer">
-                <button class="btn-logout" id="btnAdminLogout">&#128682; Sair</button>
-            </div>
-        </aside>
+<div class="toast-container" id="toastContainer"></div>
 
-        <main class="main-content">
+<script>
+(function(){
+var USERS_KEY='bf_users', STOCK_KEY='bf_stock', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', ADMIN_KEY='bf_admin_session';
 
-            <!-- ── ESTOQUE ────────────────── -->
-            <div class="tab-panel active" id="tab-estoque">
-                <h1 class="page-title">&#128230; Gerenciar Estoque</h1>
-                <p class="page-sub">Controle a quantidade de cada produto em tempo real</p>
-                <div class="card">
-                    <h3>Produtos em Estoque</h3>
-                    <table id="stockTable">
-                        <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Imagem</th><th>Status</th><th>Ações</th></tr></thead>
-                        <tbody id="stockBody"><tr><td colspan="7" class="empty-state">Nenhum produto cadastrado.</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
+function load(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback}catch(e){return fallback||{}}}
+function save(key,obj){localStorage.setItem(key,JSON.stringify(obj))}
 
-            <!-- ── PRODUTOS ────────────────── -->
-            <div class="tab-panel" id="tab-produtos">
-                <h1 class="page-title">&#128722; Gerenciar Produtos</h1>
-                <p class="page-sub">Adicione, edite ou remova produtos do catálogo</p>
-                <div class="card">
-                    <h3>&#10133; Adicionar Novo Produto</h3>
-                    <div class="form-grid">
-                        <div class="form-group" style="grid-column:1/-1;"><label>Nome do Produto</label><input type="text" id="prodName" placeholder="Ex: HP LaserJet Pro M404dn"></div>
-                        <div class="form-group"><label>Categoria</label><select id="prodCat">
-                            <option value="impressoras">Impressoras</option>
-                            <option value="multifuncionais">Multifuncionais</option>
-                            <option value="pecas">Peças</option>
-                            <option value="suprimentos">Suprimentos</option>
-                        </select></div>
-                        <div class="form-group"><label>Preço (R$)</label><input type="text" id="prodPrice" placeholder="2199,00"></div>
-                        <div class="form-group"><label>Parcelas</label><select id="prodInstallments"><option value="10">10x</option><option value="6">6x</option><option value="3">3x</option><option value="1">à vista</option></select></div>
-                        <div class="form-group"><label>Estoque Inicial</label><input type="number" id="prodStock" value="10" min="0"></div>
-                        <div class="form-group"><label>URL da Imagem</label><input type="text" id="prodImg" placeholder="https://exemplo.com/imagem.jpg [opcional]"></div>
-                        <div class="form-group" style="grid-column:1/-1;"><label>Descrição Curta</label><input type="text" id="prodDesc" placeholder="Uma breve descrição..."></div>
-                        <div class="form-group" style="grid-column:1/-1;"><label>Descrição Longa</label><textarea id="prodLongDesc" placeholder="Descrição detalhada do produto..."></textarea></div>
-                    </div>
-                    <div class="flex-row" style="margin-top:14px;">
-                        <button class="btn btn-primary" id="btnAddProduct">&#10133; Adicionar Produto</button>
-                        <span style="font-size:0.76rem;color:var(--text-muted);margin-left:10px;" id="prodAddMsg"></span>
-                    </div>
-                </div>
-            </div>
+function showToast(msg){
+    var c=document.getElementById('toastContainer');
+    var t=document.createElement('div');t.className='toast';t.textContent=msg;
+    c.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},2800);
+}
 
-            <!-- ── BANNERS ─────────────────── -->
-            <div class="tab-panel" id="tab-banners">
-                <h1 class="page-title">&#127912; Gerenciar Banners</h1>
-                <p class="page-sub">Altere o banner principal do site (imagem de fundo e texto)</p>
-                <div class="card">
-                    <h3>Banner da Página Inicial</h3>
-                    <div class="form-grid">
-                        <div class="form-group" style="grid-column:1/-1;"><label>Título do Banner</label><input type="text" id="bannerTitle" placeholder="Título grande do banner"></div>
-                        <div class="form-group" style="grid-column:1/-1;"><label>Subtítulo</label><input type="text" id="bannerSubtitle" placeholder="Texto abaixo do título"></div>
-                        <div class="form-group" style="grid-column:1/-1;"><label>URL da Imagem de Fundo</label><input type="text" id="bannerBgUrl" placeholder="https://exemplo.com/banner.jpg (deixe vazio para usar cor sólida)"></div>
-                        <div class="form-group"><label>Cor de Fundo (CSS)</label><input type="text" id="bannerBgColor" placeholder="Ex: linear-gradient(170deg, #0d2f5e, #0a1f3f)"></div>
-                        <div class="form-group"><label>Texto do Botão</label><input type="text" id="bannerBtnText" placeholder="Ver Produtos"></div>
-                    </div>
-                    <div class="flex-row" style="margin-top:14px;">
-                        <button class="btn btn-primary" id="btnSaveBanner">&#128190; Salvar Banner</button>
-                        <button class="btn btn-outline" id="btnResetBanner">&#8635; Restaurar Padrão</button>
-                        <span style="font-size:0.76rem;color:var(--text-muted);margin-left:10px;" id="bannerMsg"></span>
-                    </div>
-                    <div style="margin-top:14px;" id="bannerPreview" class="card">
-                        <p style="color:var(--text-muted);font-size:0.82rem;">Pré-visualização aplicada ao vivo no site.</p>
-                    </div>
-                </div>
-            </div>
+/* === DEFAULTS === */
+function defaultStock(){return {
+'HP LaserJet Pro M404dn':{cat:'impressoras',price:'2199,00',stock:12,desc:'Monocromática, duplex automático, 40 ppm.',longDesc:'Impressora monocromática de alto desempenho, ideal para escritórios. Duplex automático, 40 ppm, Ethernet e USB.',installments:10,img:''},
+'Epson EcoTank L3250':{cat:'multifuncionais',price:'1149,00',stock:25,desc:'Tanque de tinta colorida, Wi-Fi, baixo custo.',longDesc:'Solução perfeita para economia. Tanque de tinta de alta capacidade, Wi-Fi integrado.',installments:10,img:''},
+'Elgin i9':{cat:'impressoras',price:'479,00',stock:40,desc:'Impressora de cupom não fiscal, 250 mm/s, USB.',longDesc:'Impressora térmica de cupom, 250 mm/s, USB. Ideal para PDV e comércio.',installments:10,img:''},
+'Kit Fusor HP LaserJet':{cat:'pecas',price:'349,00',stock:8,desc:'Compatível com M402/M404/M426.',longDesc:'Kit Fusor compatível com HP LaserJet. Unidade de fusão premium.',installments:10,img:''},
+'Brother DCP-L5652DN':{cat:'multifuncionais',price:'3299,00',stock:6,desc:'Laser monocromática, duplex, ADF.',longDesc:'Multifuncional laser monocromática. Duplex, ADF, rede, 40 ppm.',installments:10,img:''},
+'Placa Lógica Principal':{cat:'pecas',price:'289,00',stock:15,desc:'Placa controladora compatível com Epson.',longDesc:'Placa lógica principal compatível com diversas Epson. Revisada e testada.',installments:10,img:''},
+'Zebra ZD421':{cat:'impressoras',price:'2799,00',stock:10,desc:'Etiquetas térmicas, 203 dpi, USB/Ethernet.',longDesc:'Impressora de etiquetas térmicas. 203 dpi, USB/Ethernet, ZPL/EPL.',installments:10,img:''},
+'Toner HP 58A Original':{cat:'suprimentos',price:'419,00',stock:30,desc:'Cartucho toner preto CF258A. 3.000 pág.',longDesc:'Toner HP 58A Original. Rendimento de até 3.000 páginas. JetIntelligence.',installments:10,img:''}
+}}
 
-            <!-- ── ANÚNCIOS ─────────────────── -->
-            <div class="tab-panel" id="tab-anuncios">
-                <h1 class="page-title">&#128444; Gerenciar Anúncios</h1>
-                <p class="page-sub">Altere as imagens de anúncio exibidas no site</p>
-                <div class="card">
-                    <h3>Imagens de Anúncio (4 slots)</h3>
-                    <div class="form-grid" id="anunciosGrid">
-                        <div class="form-group">
-                            <label>Anúncio 1</label>
-                            <input type="text" id="anuncio1" placeholder="Anuncio.jpeg">
-                            <img id="preview1" class="img-preview" style="margin-top:6px;display:none;" onerror="this.style.display='none'">
-                            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">Nome do arquivo ou URL completa</p>
-                        </div>
-                        <div class="form-group">
-                            <label>Anúncio 2</label>
-                            <input type="text" id="anuncio2" placeholder="Anuncio2.jpg">
-                            <img id="preview2" class="img-preview" style="margin-top:6px;display:none;" onerror="this.style.display='none'">
-                            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">Nome do arquivo ou URL completa</p>
-                        </div>
-                        <div class="form-group">
-                            <label>Anúncio 3</label>
-                            <input type="text" id="anuncio3" placeholder="Anuncio 3.jpg">
-                            <img id="preview3" class="img-preview" style="margin-top:6px;display:none;" onerror="this.style.display='none'">
-                            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">Nome do arquivo ou URL completa</p>
-                        </div>
-                        <div class="form-group">
-                            <label>Anúncio 4</label>
-                            <input type="text" id="anuncio4" placeholder="anuncio4.jpg">
-                            <img id="preview4" class="img-preview" style="margin-top:6px;display:none;" onerror="this.style.display='none'">
-                            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">Nome do arquivo ou URL completa</p>
-                        </div>
-                    </div>
-                    <div class="flex-row" style="margin-top:14px;">
-                        <button class="btn btn-primary" id="btnSaveAnuncios">&#128190; Salvar Anúncios</button>
-                        <span style="font-size:0.76rem;color:var(--text-muted);margin-left:10px;" id="anuncioMsg"></span>
-                    </div>
-                    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:10px;">Use URL completa (https://...) para imagens externas, ou apenas o nome do arquivo se a imagem estiver no repositório.</p>
-                </div>
-            </div>
+function defaultBanner(){return{title:'Impressoras, multifuncionais e peças',title2:'com garantia e procedência',subtitle:'Desde equipamentos e suprimentos até peças originais e genéricas.',bgUrl:'',bgColor:'linear-gradient(170deg, #0d2f5e 0%, #0a1f3f 100%)',btnText:'Ver Produtos'}}
+function defaultConfig(){return{company:'BIANCO & FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA',brand:'B&F Importes',cnpj:'03.108.169/0001-58',phone:'(16) 98138-6747',email:'atendimento@biancoeferreira.com.br',hours:'Seg–Sex 8h às 18h | Sáb 8h às 13h',address:'R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090',cep:'14870-090',cityState:'Jaboticabal — SP'}}
 
-            <!-- ── CONFIGURAÇÕES ───────────── -->
-            <div class="tab-panel" id="tab-config">
-                <h1 class="page-title">&#9881; Configurações do Site</h1>
-                <p class="page-sub">Altere dados de contato, endereço e informações da empresa</p>
-                <div class="card">
-                    <h3>Dados da Empresa</h3>
-                    <div class="form-grid">
-                        <div class="form-group" style="grid-column:1/-1;"><label>Nome da Empresa</label><input type="text" id="cfgCompany" placeholder="BIANCO & FERREIRA LTDA"></div>
-                        <div class="form-group"><label>Nome Fantasia</label><input type="text" id="cfgBrand" placeholder="B&F Importes"></div>
-                        <div class="form-group"><label>CNPJ</label><input type="text" id="cfgCNPJ" placeholder="03.108.169/0001-58"></div>
-                        <div class="form-group"><label>Telefone</label><input type="text" id="cfgPhone" placeholder="(16) 98138-6747"></div>
-                        <div class="form-group"><label>E-mail</label><input type="text" id="cfgEmail" placeholder="atendimento@biancoeferreira.com.br"></div>
-                        <div class="form-group"><label>Horário de Funcionamento</label><input type="text" id="cfgHours" placeholder="Seg–Sex 8h às 18h | Sáb 8h às 13h"></div>
-                        <div class="form-group" style="grid-column:1/-1;"><label>Endereço Completo</label><input type="text" id="cfgAddress" placeholder="R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090"></div>
-                        <div class="form-group"><label>CEP</label><input type="text" id="cfgCEP" placeholder="14870-090"></div>
-                        <div class="form-group"><label>Cidade/UF</label><input type="text" id="cfgCityState" placeholder="Jaboticabal — SP"></div>
-                    </div>
-                    <div class="flex-row" style="margin-top:14px;">
-                        <button class="btn btn-primary" id="btnSaveConfig">&#128190; Salvar Configurações</button>
-                        <span style="font-size:0.76rem;color:var(--text-muted);margin-left:10px;" id="configMsg"></span>
-                    </div>
-                </div>
-            </div>
+/* === AUTH === */
+var loginScreen=document.getElementById('loginScreen'),adminLayout=document.getElementById('adminLayout'),btnLogin=document.getElementById('btnAdminLogin');
 
-            <!-- ── USUÁRIOS ────────────────── -->
-            <div class="tab-panel" id="tab-usuarios">
-                <h1 class="page-title">&#128101; Gerenciar Usuários</h1>
-                <p class="page-sub">Visualize e gerencie contas de usuários cadastrados</p>
-                <div class="card">
-                    <h3>Usuários Cadastrados</h3>
-                    <table>
-                        <thead><tr><th>Nome</th><th>E-mail</th><th>Ações</th></tr></thead>
-                        <tbody id="usersBody"><tr><td colspan="3" class="empty-state">Nenhum usuário cadastrado.</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
+function getAdminSession(){try{return JSON.parse(localStorage.getItem(ADMIN_KEY))}catch(e){return null}}
+function login(user,pass){
+    var users=load(USERS_KEY,[]);
+    if(!users.length){users.push({name:'Admin',email:'admin',pass:'admin'});save(USERS_KEY,users)}
+    var found=users.find(function(u){return u.email===user&&u.pass===pass});
+    if(found&&found.email==='admin'){localStorage.setItem(ADMIN_KEY,JSON.stringify(found));showDashboard();return}
+    document.getElementById('loginError').textContent=found?'Apenas admin pode acessar.':'Usuário ou senha incorreto.';
+}
+function showDashboard(){loginScreen.style.display='none';adminLayout.classList.add('active');document.getElementById('previewToggle').style.display='block';renderAll()}
+function logout(){localStorage.removeItem(ADMIN_KEY);loginScreen.style.display='flex';adminLayout.classList.remove('active');document.getElementById('previewToggle').style.display='none';document.getElementById('previewBar').classList.remove('open')}
 
-        </main>
-    </div>
+if(getAdminSession())showDashboard();
+btnLogin.addEventListener('click',function(){login(document.getElementById('adminUser').value.trim()||'admin',document.getElementById('adminPass').value||'admin')});
+document.getElementById('adminPass').addEventListener('keydown',function(e){if(e.key==='Enter')btnLogin.click()});
+document.getElementById('btnAdminLogout').addEventListener('click',logout);
 
-    <div class="toast-container" id="toastContainer"></div>
+/* === TABS === */
+document.querySelectorAll('#sideNav a').forEach(function(a){
+    a.addEventListener('click',function(){
+        document.querySelectorAll('#sideNav a').forEach(function(l){l.classList.remove('active')});
+        a.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+        document.getElementById('tab-'+a.getAttribute('data-tab')).classList.add('active');
+    });
+});
 
-    <script>
-    (function(){
-        var USERS_KEY = 'bf_users';
-        var STOCK_KEY = 'bf_stock';
-        var PRODUCTS_KEY = 'bf_products';
-        var BANNER_KEY = 'bf_banner';
-        var CONFIG_KEY = 'bf_config';
-        var ADMIN_KEY = 'bf_admin_session';
+/* === PRODUCT IMAGE UPLOAD === */
+var prodImgData='';
+document.getElementById('prodImgFile').addEventListener('change',function(e){
+    var file=e.target.files[0];if(!file)return;
+    document.getElementById('prodImgName').textContent=file.name;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+        prodImgData=ev.target.result;
+        document.getElementById('prodImgPreview').src=prodImgData;
+        document.getElementById('prodImgPreview').style.display='block';
+        showToast('&#128247; Imagem carregada!');
+    };
+    reader.readAsDataURL(file);
+});
 
-        function load(key, fallback){ try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e){ return fallback || {}; } }
-        function save(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
+/* === RENDER ALL === */
+function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers()}
 
-        function showToast(msg){
-            var c = document.getElementById('toastContainer');
-            var t = document.createElement('div');
-            t.className = 'toast';
-            t.textContent = msg;
-            c.appendChild(t);
-            setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 2500);
-        }
+/* === STOCK TABLE + ADD === */
+function renderStock(){
+    var stock=load(STOCK_KEY,{});
+    var def=defaultStock();
+    var merged={};
+    Object.keys(def).forEach(function(k){merged[k]=Object.assign({},def[k],stock[k]||{})});
+    Object.keys(stock).forEach(function(k){if(!merged[k])merged[k]=stock[k]});
+    save(STOCK_KEY,merged);
 
-        /* ── DEFAULT STOCK ─────────────── */
-        function defaultStock(){
-            return {
-                'HP LaserJet Pro M404dn': {cat:'impressoras', price:'2199,00', stock:12, desc:'Monocromática, duplex automático, 40 ppm.', longDesc:'A HP LaserJet Pro M404dn é uma impressora monocromática de alto desempenho, ideal para escritórios. Duplex automático, 40 ppm, Ethernet e USB.', installments:10},
-                'Epson EcoTank L3250': {cat:'multifuncionais', price:'1149,00', stock:25, desc:'Tanque de tinta colorida, Wi-Fi, baixo custo por página.', longDesc:'A Epson EcoTank L3250 é a solução para quem busca economia. Tanque de tinta de alta capacidade, Wi-Fi integrado.', installments:10},
-                'Elgin i9': {cat:'impressoras', price:'479,00', stock:40, desc:'Impressora de cupom não fiscal, 250 mm/s, USB.', longDesc:'A Elgin i9 é uma impressora térmica de cupom de alta velocidade, 250 mm/s, USB. Ideal para PDV.', installments:10},
-                'Kit Fusor HP LaserJet': {cat:'pecas', price:'349,00', stock:8, desc:'Compatível com M402/M404/M426. Alta durabilidade.', longDesc:'Kit Fusor compatível com HP LaserJet M402/M404/M426. Unidade de fusão premium.', installments:10},
-                'Brother DCP-L5652DN': {cat:'multifuncionais', price:'3299,00', stock:6, desc:'Laser monocromática, duplex, rede, scanner ADF.', longDesc:'Brother DCP-L5652DN multifuncional laser monocromática. Duplex, ADF, rede, 40 ppm.', installments:10},
-                'Placa Lógica Principal': {cat:'pecas', price:'289,00', stock:15, desc:'Placa controladora compatível com impressoras Epson.', longDesc:'Placa lógica principal compatível com diversas Epson. Revisada e testada. 90 dias de garantia.', installments:10},
-                'Zebra ZD421': {cat:'impressoras', price:'2799,00', stock:10, desc:'Etiquetas térmicas, 203 dpi, USB/Ethernet.', longDesc:'Zebra ZD421 impressora de etiquetas térmicas. 203 dpi, USB/Ethernet, ZPL/EPL.', installments:10},
-                'Toner HP 58A Original': {cat:'suprimentos', price:'419,00', stock:30, desc:'Cartucho toner preto CF258A. 3.000 páginas.', longDesc:'Toner HP 58A Original (CF258A). Rendimento de até 3.000 páginas. JetIntelligence.', installments:10}
-            };
-        }
+    var tbody=document.getElementById('stockBody'),html='';
+    Object.keys(merged).forEach(function(name){
+        var p=merged[name],statusBadge=p.stock>20?'badge-green':p.stock>5?'badge-yellow':'badge-red';
+        var statusText=p.stock>20?'OK':p.stock>5?'Baixo':'Crítico';
+        var imgHtml=p.img?'<img src="'+p.img+'" class="tbl-img-preview">':'<span style="font-size:.64rem;color:var(--text-muted);">sem img</span>';
+        html+='<tr data-name="'+name.replace(/"/g,'&quot;')+'">'+
+            '<td><input class="tbl-input" value="'+name.replace(/"/g,'&quot;')+'" data-field="name" style="min-width:140px;"></td>'+
+            '<td><select class="tbl-input" data-field="cat" style="min-width:110px;">'+
+                ['impressoras','multifuncionais','pecas','suprimentos'].map(function(c){return '<option value="'+c+'"'+(p.cat===c?' selected':'')+'>'+c+'</option>'}).join('')+
+            '</select></td>'+
+            '<td><input class="tbl-input" value="'+(p.price||'')+'" data-field="price" style="width:90px;"></td>'+
+            '<td><input class="tbl-input" type="number" value="'+p.stock+'" data-field="stock" min="0" style="width:65px;"></td>'+
+            '<td><div class="flex-row" style="gap:6px;">'+imgHtml+'<label class="tbl-img-upload" title="Alterar imagem"><input type="file" accept="image/*" style="display:none;" onchange="uploadTblImg(this,\''+name.replace(/'/g,"\\'")+'\')">&#128247;</label></div></td>'+
+            '<td><span class="badge '+statusBadge+'">'+statusText+'</span></td>'+
+            '<td><button class="btn-icon danger" onclick="deleteProduct(\''+name.replace(/'/g,"\\'")+'\')" title="Remover">&#128465;</button></td>'+
+        '</tr>';
+    });
+    tbody.innerHTML=html||'<tr><td colspan="7" class="empty-state">Nenhum produto.</td></tr>';
 
-        function defaultBanner(){
-            return {
-                title: 'Impressoras, multifuncionais e peças',
-                title2: 'com garantia e procedência',
-                subtitle: 'Desde equipamentos e suprimentos até peças originais e genéricas.',
-                bgUrl: '',
-                bgColor: 'linear-gradient(170deg, #0d2f5e 0%, #0a1f3f 100%)',
-                btnText: 'Ver Produtos'
-            };
-        }
-
-        function defaultConfig(){
-            return {
-                company: 'BIANCO & FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA',
-                brand: 'B&F Importes',
-                cnpj: '03.108.169/0001-58',
-                phone: '(16) 98138-6747',
-                email: 'atendimento@biancoeferreira.com.br',
-                hours: 'Seg–Sex 8h às 18h | Sáb 8h às 13h',
-                address: 'R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090',
-                cep: '14870-090',
-                cityState: 'Jaboticabal — SP'
-            };
-        }
-
-        /* ── AUTH ───────────────────────── */
-        var loginScreen = document.getElementById('loginScreen');
-        var adminLayout = document.getElementById('adminLayout');
-        var btnLogin = document.getElementById('btnAdminLogin');
-
-        function getAdminSession(){ try { return JSON.parse(localStorage.getItem(ADMIN_KEY)); } catch(e){ return null; } }
-        function login(user, pass){
-            var users = load(USERS_KEY, []);
-            if (users.length === 0) {
-                users.push({name:'Admin', email:'admin', pass:'admin'});
-                save(USERS_KEY, users);
+    tbody.querySelectorAll('.tbl-input').forEach(function(inp){
+        inp.addEventListener('change',function(){
+            var row=inp.closest('tr'),oldName=row.getAttribute('data-name');
+            var field=inp.getAttribute('data-field'),val=inp.value.trim();
+            var stock=load(STOCK_KEY,{});
+            if(field==='name'){
+                if(!val||val===oldName)return;
+                stock[val]=Object.assign({},stock[oldName]||{});
+                delete stock[oldName];
+                row.setAttribute('data-name',val);
+            }else if(field==='stock'){
+                if(!stock[oldName])stock[oldName]={};
+                stock[oldName].stock=parseInt(val)||0;
+            }else{
+                if(!stock[oldName])stock[oldName]={};
+                stock[oldName][field]=val;
             }
-            var found = users.find(function(u){ return u.email === user && u.pass === pass; });
-            if (found && found.email === 'admin') {
-                localStorage.setItem(ADMIN_KEY, JSON.stringify(found));
-                showDashboard();
-                return;
-            }
-            if (!found) {
-                var existing = users.find(function(u){ return u.email === user; });
-                if (existing) {
-                    document.getElementById('loginError').textContent = 'Senha incorreta.';
-                } else {
-                    document.getElementById('loginError').textContent = 'Acesso restrito ao administrador.';
-                }
-            } else {
-                document.getElementById('loginError').textContent = 'Acesso restrito ao administrador.';
-            }
-        }
-
-        function showDashboard(){
-            loginScreen.style.display = 'none';
-            adminLayout.classList.add('active');
-            renderAll();
-        }
-
-        function logout(){
-            localStorage.removeItem(ADMIN_KEY);
-            loginScreen.style.display = 'flex';
-            adminLayout.classList.remove('active');
-            document.getElementById('adminUser').value = '';
-            document.getElementById('adminPass').value = '';
-            document.getElementById('loginError').textContent = '';
-        }
-
-        if (getAdminSession()) { showDashboard(); }
-
-        btnLogin.addEventListener('click', function(){
-            var user = document.getElementById('adminUser').value.trim() || 'admin';
-            var pass = document.getElementById('adminPass').value || 'admin';
-            document.getElementById('loginError').textContent = '';
-            login(user, pass);
+            save(STOCK_KEY,stock);
+            showToast('&#9989; Alteração salva!');
+            if(field==='stock')renderStock();
         });
-        document.getElementById('adminPass').addEventListener('keydown', function(e){
-            if (e.key === 'Enter') btnLogin.click();
+    });
+}
+
+window.uploadTblImg=function(input,name){
+    var file=input.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+        var stock=load(STOCK_KEY,{});
+        if(!stock[name])stock[name]={};
+        stock[name].img=ev.target.result;
+        save(STOCK_KEY,stock);
+        showToast('&#128247; Imagem de "'+name+'" atualizada!');
+        renderStock();
+    };
+    reader.readAsDataURL(file);
+};
+
+window.deleteProduct=function(name){
+    if(!confirm('Remover "'+name+'" permanentemente?'))return;
+    var stock=load(STOCK_KEY,{});
+    var def=defaultStock();
+    if(def[name]){if(!stock[name])stock[name]={};stock[name]._deleted=true;save(STOCK_KEY,stock)}
+    else{delete stock[name];save(STOCK_KEY,stock)}
+    showToast('&#128465; "'+name+'" removido.');
+    renderStock();
+};
+
+document.getElementById('btnAddProduct').addEventListener('click',function(){
+    var name=document.getElementById('prodName').value.trim();
+    var cat=document.getElementById('prodCat').value;
+    var price=document.getElementById('prodPrice').value.trim();
+    var stock=parseInt(document.getElementById('prodStock').value)||0;
+    var desc=document.getElementById('prodDesc').value.trim();
+    var longDesc=document.getElementById('prodLongDesc').value.trim();
+    var installments=parseInt(document.getElementById('prodInstallments').value)||10;
+    var msg=document.getElementById('prodAddMsg');
+    if(!name){msg.textContent='Informe o nome.';msg.style.color='var(--danger)';return}
+    if(!price){msg.textContent='Informe o preço.';msg.style.color='var(--danger)';return}
+    var stockData=load(STOCK_KEY,{});
+    if(stockData[name]&&!stockData[name]._deleted){msg.textContent='Já existe.';msg.style.color='var(--danger)';return}
+    stockData[name]={cat:cat,price:price.replace(',','.'),stock:stock,desc:desc||name,longDesc:longDesc||desc||name,installments:installments,img:prodImgData};
+    delete stockData[name]._deleted;
+    save(STOCK_KEY,stockData);
+    showToast('&#9989; "'+name+'" adicionado!');
+    renderStock();
+    ['prodName','prodPrice','prodDesc','prodLongDesc','prodImgFile'].forEach(function(id){document.getElementById(id).value=''});
+    document.getElementById('prodImgName').textContent='Nenhuma';
+    document.getElementById('prodImgPreview').style.display='none';
+    prodImgData='';
+    document.getElementById('prodStock').value='10';
+    msg.textContent='Adicionado com sucesso!';msg.style.color='var(--success)';
+    setTimeout(function(){msg.textContent=''},3000);
+});
+
+/* === ANÚNCIOS === */
+var anunciosTemp=[];
+function renderAnuncios(){
+    var list=document.getElementById('anunciosList'),html='';
+    anunciosTemp=load(ANUNCIOS_KEY,[]);
+    if(!anunciosTemp.length){anunciosTemp=[{name:'Anúncio 1',data:''},{name:'Anúncio 2',data:''},{name:'Anúncio 3',data:''},{name:'Anúncio 4',data:''}]}
+    anunciosTemp.forEach(function(a,idx){
+        var imgTag=a.data?'<img src="'+a.data+'">':'<div style="width:100px;height:80px;background:var(--bg-input);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.7rem;">Sem imagem</div>';
+        html+='<div class="anuncio-card" data-idx="'+idx+'">'+
+            imgTag+
+            '<div class="info">'+
+                '<input class="tbl-input" value="'+(a.name||'')+'" placeholder="Nome do anúncio" data-idx="'+idx+'" data-field="name" style="margin-bottom:4px;">'+
+                '<div class="actions">'+
+                    '<label class="tbl-img-upload" style="cursor:pointer;"><input type="file" accept="image/*" style="display:none;" onchange="uploadAnuncioImg(this,'+idx+')">&#128247; Trocar Imagem</label>'+
+                    '<button class="btn btn-outline btn-sm" onclick="removeAnuncio('+idx+')">&#128465; Remover</button>'+
+                '</div>'+
+            '</div>'+
+        '</div>';
+    });
+    list.innerHTML=html||'<div class="empty-state">Nenhum anúncio.</div>';
+
+    list.querySelectorAll('.tbl-input').forEach(function(inp){
+        inp.addEventListener('change',function(){
+            var idx=parseInt(inp.getAttribute('data-idx'));
+            if(anunciosTemp[idx])anunciosTemp[idx].name=inp.value.trim();
         });
+    });
+}
 
-        document.getElementById('btnAdminLogout').addEventListener('click', logout);
+window.uploadAnuncioImg=function(input,idx){
+    var file=input.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+        if(anunciosTemp[idx])anunciosTemp[idx].data=ev.target.result;
+        showToast('&#128247; Imagem carregada!');
+        renderAnuncios();
+    };
+    reader.readAsDataURL(file);
+};
 
-        /* ── TAB NAVIGATION ─────────────── */
-        var sideLinks = document.querySelectorAll('#sideNav a');
-        var tabPanels = document.querySelectorAll('.tab-panel');
-        sideLinks.forEach(function(link){
-            link.addEventListener('click', function(){
-                sideLinks.forEach(function(l){ l.classList.remove('active'); });
-                link.classList.add('active');
-                var tab = link.getAttribute('data-tab');
-                tabPanels.forEach(function(p){ p.classList.remove('active'); });
-                document.getElementById('tab-' + tab).classList.add('active');
-            });
-        });
+window.removeAnuncio=function(idx){
+    if(!confirm('Remover este anúncio?'))return;
+    anunciosTemp.splice(idx,1);
+    renderAnuncios();
+    showToast('&#128465; Anúncio removido. Salve para confirmar.');
+};
 
-        /* ── RENDER ALL ─────────────────── */
-        function renderAll(){
-            renderStock();
-            renderUsers();
-            loadBannerForm();
-            loadConfigForm();
-        }
+document.getElementById('btnAddAnuncio').addEventListener('click',function(){
+    anunciosTemp.push({name:'Novo Anúncio',data:''});
+    renderAnuncios();
+    showToast('&#10133; Novo slot adicionado.');
+});
 
-        /* ── STOCK ──────────────────────── */
-        function renderStock(){
-            var stock = load(STOCK_KEY, {});
-            var def = defaultStock();
-            var merged = {};
-            Object.keys(def).forEach(function(k){ merged[k] = Object.assign({}, def[k], stock[k] || {}); });
-            Object.keys(stock).forEach(function(k){ if(!merged[k]) merged[k] = stock[k]; });
-            save(STOCK_KEY, merged);
+document.getElementById('btnSaveAnuncios').addEventListener('click',function(){
+    anunciosTemp.forEach(function(a){if(!a.name)a.name='Anúncio'});
+    save(ANUNCIOS_KEY,anunciosTemp);
+    document.getElementById('anuncioMsg').textContent='Salvos! Recarregue o site.';document.getElementById('anuncioMsg').style.color='var(--success)';
+    showToast('&#9989; Anúncios salvos!');
+});
 
-            var tbody = document.getElementById('stockBody');
-            var html = '';
-            Object.keys(merged).forEach(function(name){
-                var p = merged[name];
-                var statusBadge = p.stock > 20 ? 'badge-green' : p.stock > 5 ? 'badge-yellow' : 'badge-red';
-                var statusText = p.stock > 20 ? 'OK' : p.stock > 5 ? 'Baixo' : 'Crítico';
-                html += '<tr>' +
-                    '<td><strong>' + name + '</strong></td>' +
-                    '<td>' + (p.cat || '---') + '</td>' +
-                    '<td>R$ ' + (p.price||'0,00') + '</td>' +
-                    '<td><input type="number" value="' + p.stock + '" min="0" style="width:60px;padding:4px 6px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:inherit;" data-product="' + name.replace(/"/g,'&quot;') + '" onchange="updateStock(this)"></td>' +
-                    '<td><input type="text" value="' + (p.img||'') + '" placeholder="URL da imagem" style="width:110px;padding:4px 6px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:inherit;font-size:0.72rem;" data-product="' + name.replace(/"/g,'&quot;') + '" data-field="img" onchange="updateField(this)"></td>' +
-                    '<td><span class="badge ' + statusBadge + '">' + statusText + '</span></td>' +
-                    '<td><button class="btn btn-danger btn-sm" onclick="deleteProduct(\'' + name.replace(/'/g,"\\'") + '\')" title="Remover">&#128465;</button></td>' +
-                '</tr>';
-            });
-            tbody.innerHTML = html || '<tr><td colspan="6" class="empty-state">Nenhum produto cadastrado.</td></tr>';
-        }
+/* === BANNERS === */
+function loadBannerForm(){
+    var b=load(BANNER_KEY,defaultBanner());
+    ['bannerTitle','bannerSubtitle','bannerBgUrl','bannerBgColor','bannerBtnText'].forEach(function(id){document.getElementById(id).value=b[id.replace('banner','').replace(/([A-Z])/g,'-$1').toLowerCase().replace(/^-/,'')]||''});
+    document.getElementById('bannerTitle').value=b.title||'';
+    document.getElementById('bannerSubtitle').value=b.subtitle||'';
+    document.getElementById('bannerBgUrl').value=b.bgUrl||'';
+    document.getElementById('bannerBgColor').value=b.bgColor||'';
+    document.getElementById('bannerBtnText').value=b.btnText||'';
+}
 
-        window.updateStock = function(el){
-            var name = el.getAttribute('data-product');
-            var val = parseInt(el.value) || 0;
-            var stock = load(STOCK_KEY, {});
-            if (!stock[name]) stock[name] = {};
-            stock[name].stock = val;
-            save(STOCK_KEY, stock);
-            showToast('&#9989; Estoque de "' + name + '" atualizado para ' + val + ' un.');
-            setTimeout(renderStock, 300);
-        };
+document.getElementById('btnSaveBanner').addEventListener('click',function(){
+    save(BANNER_KEY,{title:document.getElementById('bannerTitle').value,title2:'',subtitle:document.getElementById('bannerSubtitle').value,bgUrl:document.getElementById('bannerBgUrl').value,bgColor:document.getElementById('bannerBgColor').value,btnText:document.getElementById('bannerBtnText').value});
+    document.getElementById('bannerMsg').textContent='Salvo!';document.getElementById('bannerMsg').style.color='var(--success)';
+    showToast('&#9989; Banner salvo!');
+});
+document.getElementById('btnResetBanner').addEventListener('click',function(){save(BANNER_KEY,defaultBanner());loadBannerForm();showToast('&#8635; Restaurado ao padrão.')});
 
-        window.updateField = function(el){
-            var name = el.getAttribute('data-product');
-            var field = el.getAttribute('data-field');
-            var val = el.value.trim();
-            var stock = load(STOCK_KEY, {});
-            if (!stock[name]) stock[name] = {};
-            stock[name][field] = val;
-            save(STOCK_KEY, stock);
-            showToast('&#9989; Campo atualizado para "' + name + '".');
-        };
+/* === CONFIG === */
+function loadConfigForm(){
+    var c=load(CONFIG_KEY,defaultConfig());
+    ['cfgCompany','cfgBrand','cfgCNPJ','cfgPhone','cfgEmail','cfgHours','cfgAddress','cfgCEP','cfgCityState','cfgPhone','cfgEmail','cfgHours'].forEach(function(id){document.getElementById(id).value=''});
+    document.getElementById('cfgCompany').value=c.company||'';
+    document.getElementById('cfgBrand').value=c.brand||'';
+    document.getElementById('cfgCNPJ').value=c.cnpj||'';
+    document.getElementById('cfgPhone').value=c.phone||'';
+    document.getElementById('cfgEmail').value=c.email||'';
+    document.getElementById('cfgHours').value=c.hours||'';
+    document.getElementById('cfgAddress').value=c.address||'';
+    document.getElementById('cfgCEP').value=c.cep||'';
+    document.getElementById('cfgCityState').value=c.cityState||'';
+}
+document.getElementById('btnSaveConfig').addEventListener('click',function(){
+    save(CONFIG_KEY,{company:document.getElementById('cfgCompany').value,brand:document.getElementById('cfgBrand').value,cnpj:document.getElementById('cfgCNPJ').value,phone:document.getElementById('cfgPhone').value,email:document.getElementById('cfgEmail').value,hours:document.getElementById('cfgHours').value,address:document.getElementById('cfgAddress').value,cep:document.getElementById('cfgCEP').value,cityState:document.getElementById('cfgCityState').value});
+    document.getElementById('configMsg').textContent='Salvo!';document.getElementById('configMsg').style.color='var(--success)';
+    showToast('&#9989; Configurações salvas!');
+});
 
-        window.deleteProduct = function(name){
-            if (!confirm('Remover "' + name + '" do catálogo?')) return;
-            var stock = load(STOCK_KEY, {});
-            delete stock[name];
-            save(STOCK_KEY, stock);
-            showToast('&#128465; Produto "' + name + '" removido.');
-            renderStock();
-        };
+/* === USERS === */
+function renderUsers(){
+    var users=load(USERS_KEY,[]),html='';
+    users.forEach(function(u,i){html+='<tr><td>'+u.name+'</td><td>'+u.email+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')">&#128465;</button></td></tr>'});
+    document.getElementById('usersBody').innerHTML=html||'<tr><td colspan="3" class="empty-state">Nenhum.</td></tr>';
+}
+window.deleteUser=function(i){
+    var users=load(USERS_KEY,[]);
+    if(users[i]&&users[i].email==='admin'){showToast('&#9888; Não pode remover admin.');return}
+    if(!confirm('Remover?'))return;
+    users.splice(i,1);save(USERS_KEY,users);renderUsers();showToast('&#9989; Removido.');
+};
 
-        /* ── ADD PRODUCT ────────────────── */
-        var btnAdd = document.getElementById('btnAddProduct');
-        if (btnAdd) {
-            btnAdd.addEventListener('click', function(){
-                var name = document.getElementById('prodName').value.trim();
-                var cat = document.getElementById('prodCat').value;
-                var price = document.getElementById('prodPrice').value.trim();
-                var stock = parseInt(document.getElementById('prodStock').value) || 0;
-                var desc = document.getElementById('prodDesc').value.trim();
-                var longDesc = document.getElementById('prodLongDesc').value.trim();
-                var img = document.getElementById('prodImg').value.trim();
-                var installments = parseInt(document.getElementById('prodInstallments').value) || 10;
-                var msg = document.getElementById('prodAddMsg');
+/* === PREVIEW === */
+var previewBar=document.getElementById('previewBar'),previewToggle=document.getElementById('previewToggle');
+previewToggle.addEventListener('click',function(){
+    previewBar.classList.toggle('open');
+    if(previewBar.classList.contains('open')){document.getElementById('previewFrame').src='index.html?t='+Date.now()}
+});
+document.getElementById('previewBarHeader').addEventListener('click',function(){previewBar.classList.toggle('open')});
 
-                if (!name) { msg.textContent = 'Informe o nome do produto.'; msg.style.color = 'var(--danger)'; return; }
-                if (!price) { msg.textContent = 'Informe o preço.'; msg.style.color = 'var(--danger)'; return; }
-
-                var stockData = load(STOCK_KEY, {});
-                if (stockData[name]) { msg.textContent = 'Já existe um produto com este nome.'; msg.style.color = 'var(--danger)'; return; }
-
-                stockData[name] = {
-                    cat: cat,
-                    price: price.replace(',', '.'),
-                    stock: stock,
-                    desc: desc || name,
-                    longDesc: longDesc || desc || name,
-                    installments: installments,
-                    img: img
-                };
-                save(STOCK_KEY, stockData);
-                showToast('&#9989; Produto "' + name + '" adicionado!');
-                renderStock();
-                document.getElementById('prodName').value = '';
-                document.getElementById('prodPrice').value = '';
-                document.getElementById('prodDesc').value = '';
-                document.getElementById('prodLongDesc').value = '';
-                document.getElementById('prodImg').value = '';
-                document.getElementById('prodStock').value = '10';
-                msg.textContent = 'Produto adicionado com sucesso!';
-                msg.style.color = 'var(--success)';
-                setTimeout(function(){ msg.textContent = ''; }, 3000);
-            });
-        }
-
-        /* ── USERS ──────────────────────── */
-        function renderUsers(){
-            var users = load(USERS_KEY, []);
-            var tbody = document.getElementById('usersBody');
-            var html = '';
-            users.forEach(function(u, idx){
-                html += '<tr><td>' + u.name + '</td><td>' + u.email + '</td>' +
-                    '<td><button class="btn btn-danger btn-sm" onclick="deleteUser(' + idx + ')">&#128465; Remover</button></td></tr>';
-            });
-            tbody.innerHTML = html || '<tr><td colspan="3" class="empty-state">Nenhum usuário cadastrado.</td></tr>';
-        }
-
-        window.deleteUser = function(idx){
-            if (!confirm('Remover este usuário?')) return;
-            var users = load(USERS_KEY, []);
-            if (users[idx] && users[idx].email === 'admin') {
-                showToast('&#9888; Não é possível remover o administrador.');
-                return;
-            }
-            users.splice(idx, 1);
-            save(USERS_KEY, users);
-            showToast('&#9989; Usuário removido.');
-            renderUsers();
-        };
-
-        /* ── BANNERS ────────────────────── */
-        function loadBannerForm(){
-            var banner = load(BANNER_KEY, defaultBanner());
-            document.getElementById('bannerTitle').value = banner.title || '';
-            document.getElementById('bannerSubtitle').value = banner.subtitle || '';
-            document.getElementById('bannerBgUrl').value = banner.bgUrl || '';
-            document.getElementById('bannerBgColor').value = banner.bgColor || '';
-            document.getElementById('bannerBtnText').value = banner.btnText || '';
-        }
-
-        document.getElementById('btnSaveBanner').addEventListener('click', function(){
-            var banner = {
-                title: document.getElementById('bannerTitle').value,
-                title2: '',
-                subtitle: document.getElementById('bannerSubtitle').value,
-                bgUrl: document.getElementById('bannerBgUrl').value,
-                bgColor: document.getElementById('bannerBgColor').value,
-                btnText: document.getElementById('bannerBtnText').value
-            };
-            save(BANNER_KEY, banner);
-            document.getElementById('bannerMsg').textContent = 'Banner salvo! Recarregue o site para ver as mudanças.';
-            document.getElementById('bannerMsg').style.color = 'var(--success)';
-            showToast('&#9989; Banner atualizado com sucesso!');
-        });
-
-        document.getElementById('btnResetBanner').addEventListener('click', function(){
-            save(BANNER_KEY, defaultBanner());
-            loadBannerForm();
-            document.getElementById('bannerMsg').textContent = 'Banner restaurado ao padrão.';
-            document.getElementById('bannerMsg').style.color = 'var(--text-muted)';
-            showToast('&#8635; Banner restaurado ao padrão.');
-        });
-
-        /* ── CONFIG ─────────────────────── */
-        function loadConfigForm(){
-            var config = load(CONFIG_KEY, defaultConfig());
-            document.getElementById('cfgCompany').value = config.company || '';
-            document.getElementById('cfgBrand').value = config.brand || '';
-            document.getElementById('cfgCNPJ').value = config.cnpj || '';
-            document.getElementById('cfgPhone').value = config.phone || '';
-            document.getElementById('cfgEmail').value = config.email || '';
-            document.getElementById('cfgHours').value = config.hours || '';
-            document.getElementById('cfgAddress').value = config.address || '';
-            document.getElementById('cfgCEP').value = config.cep || '';
-            document.getElementById('cfgCityState').value = config.cityState || '';
-        }
-
-        document.getElementById('btnSaveConfig').addEventListener('click', function(){
-            var config = {
-                company: document.getElementById('cfgCompany').value,
-                brand: document.getElementById('cfgBrand').value,
-                cnpj: document.getElementById('cfgCNPJ').value,
-                phone: document.getElementById('cfgPhone').value,
-                email: document.getElementById('cfgEmail').value,
-                hours: document.getElementById('cfgHours').value,
-                address: document.getElementById('cfgAddress').value,
-                cep: document.getElementById('cfgCEP').value,
-                cityState: document.getElementById('cfgCityState').value
-            };
-            save(CONFIG_KEY, config);
-            document.getElementById('configMsg').textContent = 'Configurações salvas! Recarregue o site para ver as mudanças.';
-            document.getElementById('configMsg').style.color = 'var(--success)';
-            showToast('&#9989; Configurações salvas!');
-        });
-
-        /* ── ANÚNCIOS ──────────────────── */
-        var ANUNCIOS_KEY = 'bf_anuncios';
-
-        function defaultAnuncios(){
-            return {
-                a1: 'Anuncio.jpeg',
-                a2: 'Anuncio2.jpg',
-                a3: 'Anuncio 3.jpg',
-                a4: 'anuncio4.jpg'
-            };
-        }
-
-        function loadAnunciosForm(){
-            var anun = load(ANUNCIOS_KEY, defaultAnuncios());
-            document.getElementById('anuncio1').value = anun.a1 || '';
-            document.getElementById('anuncio2').value = anun.a2 || '';
-            document.getElementById('anuncio3').value = anun.a3 || '';
-            document.getElementById('anuncio4').value = anun.a4 || '';
-            for(var i=1;i<=4;i++){
-                var val = anun['a'+i] || '';
-                var prev = document.getElementById('preview'+i);
-                if(prev && val){
-                    if(val.startsWith('http')) { prev.src = val; prev.style.display = 'block'; }
-                    else { prev.src = val; prev.style.display = 'block'; }
-                }
-            }
-        }
-
-        ['anuncio1','anuncio2','anuncio3','anuncio4'].forEach(function(id){
-            var el = document.getElementById(id);
-            if(el){
-                el.addEventListener('input', function(){
-                    var i = id.replace('anuncio','');
-                    var prev = document.getElementById('preview'+i);
-                    var val = el.value.trim();
-                    if(prev && val && val.length > 2){
-                        prev.src = val;
-                        prev.style.display = 'block';
-                    } else if(prev) {
-                        prev.style.display = 'none';
-                    }
-                });
-            }
-        });
-
-        document.getElementById('btnSaveAnuncios').addEventListener('click', function(){
-            var anun = {
-                a1: document.getElementById('anuncio1').value.trim(),
-                a2: document.getElementById('anuncio2').value.trim(),
-                a3: document.getElementById('anuncio3').value.trim(),
-                a4: document.getElementById('anuncio4').value.trim()
-            };
-            save(ANUNCIOS_KEY, anun);
-            document.getElementById('anuncioMsg').textContent = 'Anúncios salvos! Recarregue o site para ver as mudanças.';
-            document.getElementById('anuncioMsg').style.color = 'var(--success)';
-            showToast('&#9989; Imagens de anúncio atualizadas!');
-        });
-
-        loadAnunciosForm();
-
-    })();
-    </script>
+})();
+</script>
 </body>
 </html>

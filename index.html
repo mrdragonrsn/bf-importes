@@ -1670,29 +1670,29 @@
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container">
-            <h2>Impressoras, multifuncionais e peças<br>com garantia e procedência</h2>
-            <p>
-                Desde equipamentos e suprimentos até peças originais e genéricas.
-                Atendemos empresas de todos os portes com entrega rápida e suporte técnico especializado.
-            </p>
-            <a href="produtos.html" class="btn-hero">Ver Produtos</a>
-        </div>
-    </section>
+     <section class="hero" id="heroSection">
+         <div class="container">
+             <h2 id="heroTitle">Impressoras, multifuncionais e peças<br>com garantia e procedência</h2>
+             <p id="heroSub">
+                 Desde equipamentos e suprimentos até peças originais e genéricas.
+                 Atendemos empresas de todos os portes com entrega rápida e suporte técnico especializado.
+             </p>
+             <a href="produtos.html" class="btn-hero" id="heroBtn">Ver Produtos</a>
+         </div>
+     </section>
 
-    <!-- ── ANÚNCIOS ──────────────────────────── -->
-    <section style="padding:40px 0; background:var(--cinza-claro);">
-        <div class="container">
+     <!-- ── ANÚNCIOS ──────────────────────────── -->
+     <section style="padding:40px 0; background:var(--cinza-claro);">
+         <div class="container">
 
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px;">
-                <img src="Anuncio.jpeg" alt="Anúncio 1" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                <img src="Anuncio2.jpg" alt="Anúncio 2" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                <img src="Anuncio 3.jpg" alt="Anúncio 3" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                <img src="anuncio4.jpg" alt="Anúncio 4" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-            </div>
-        </div>
-    </section>
+             <div id="anunciosGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px;">
+                 <img src="Anuncio.jpeg" alt="Anúncio 1" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                 <img src="Anuncio2.jpg" alt="Anúncio 2" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                 <img src="Anuncio 3.jpg" alt="Anúncio 3" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                 <img src="anuncio4.jpg" alt="Anúncio 4" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+             </div>
+         </div>
+     </section>
 
     <section style="background:var(--branco);padding:60px 0;">
         <div class="container">
@@ -1756,11 +1756,11 @@
     </section>
 
     <footer>
-        <div class="container">
-            <p>&copy; 2026 BIANCO &amp; FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA CNPJ: 03.108.169/0001-58</p>
-            <p class="legal">Todos os direitos reservados.</p>
-        </div>
-    </footer>
+         <div class="container">
+             <p id="footerInfo">&copy; 2026 BIANCO &amp; FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA CNPJ: 03.108.169/0001-58</p>
+             <p class="legal">Todos os direitos reservados.</p>
+         </div>
+     </footer>
 
     <!-- ── LIGHTBOX ───────────────────────────── -->
     <div class="lightbox-overlay" id="lightbox" onclick="this.classList.remove('active')">
@@ -2789,6 +2789,57 @@
         </div>
         <button class="chat-toggle" id="chatToggle">&#128172;</button>
     </div>
+
+<script>
+(function(){
+    try {
+        /* ── SYNC: BANNER ─────────────── */
+        var banner = JSON.parse(localStorage.getItem('bf_banner')||'{}');
+        if(banner.title){
+            var ht = document.getElementById('heroTitle');
+            if(ht) ht.innerHTML = (banner.title2 ? banner.title + '<br>' + banner.title2 : banner.title);
+        }
+        if(banner.subtitle){
+            var hs = document.getElementById('heroSub');
+            if(hs) hs.textContent = banner.subtitle;
+        }
+        if(banner.btnText){
+            var hb = document.getElementById('heroBtn');
+            if(hb) hb.textContent = banner.btnText;
+        }
+        if(banner.bgUrl){
+            var heroSec = document.getElementById('heroSection');
+            if(heroSec) heroSec.style.backgroundImage = 'url(' + banner.bgUrl + ')';
+        }
+        if(banner.bgColor){
+            var heroSec = document.getElementById('heroSection');
+            if(heroSec) heroSec.style.background = banner.bgColor;
+        }
+
+        /* ── SYNC: ANÚNCIOS ────────────── */
+        var anun = JSON.parse(localStorage.getItem('bf_anuncios')||'[]');
+        if(anun && anun.length > 0){
+            var grid = document.getElementById('anunciosGrid');
+            if(grid){
+                var html = '';
+                anun.forEach(function(a){
+                    if(a.data){
+                        html += '<img src="'+a.data+'" alt="'+(a.name||'Anúncio')+'" style="width:100%;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);cursor:pointer;transition:transform .3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform=\'scale(1.03)\'" onmouseout="this.style.transform=\'scale(1)\'">';
+                    }
+                });
+                if(html) grid.innerHTML = html;
+            }
+        }
+
+        /* ── SYNC: CONFIG ──────────────── */
+        var cfg = JSON.parse(localStorage.getItem('bf_config')||'{}');
+        if(cfg.company){
+            var fi = document.getElementById('footerInfo');
+            if(fi) fi.textContent = '\u00A9 2026 ' + cfg.company + ' CNPJ: ' + (cfg.cnpj||'');
+        }
+    } catch(e) {}
+})();
+</script>
 
 </body>
 </html>
