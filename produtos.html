@@ -1079,6 +1079,20 @@
             transition: all 0.25s;
         }
         .btn-checkout:hover { background: var(--azul-medio); }
+        .btn-clear-cart {
+            background: none;
+            border: 1px solid #e2e8f0;
+            color: #94a3b8;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.74rem;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-clear-cart:hover { background: #fef2f2; border-color: #fecaca; color: #ef4444; }
 
         /* ── AUTH MODAL ─────────────────────── */
         .auth-overlay {
@@ -1148,6 +1162,41 @@
         .auth-switch a { color: var(--azul-padrao); cursor: pointer; font-weight: 600; }
         .auth-switch a:hover { text-decoration: underline; }
         .auth-error { color: #ef4444; font-size: 0.78rem; text-align: center; margin-top: 8px; }
+        .auth-error.success { color: #16a34a; }
+        .forgot-link { display: block; text-align: right; font-size: 0.78rem; color: var(--azul-padrao); font-weight: 600; cursor: pointer; margin-top: 4px; margin-bottom: 6px; }
+        .forgot-link:hover { text-decoration: underline; }
+        .reset-steps { display: none; }
+        .reset-steps.active { display: block; }
+        .reset-code-box {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin: 8px 0;
+        }
+        .reset-code-box input {
+            width: 36px;
+            height: 42px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            font-family: inherit;
+        }
+        .reset-code-box input:focus { border-color: var(--azul-padrao); }
+        .btn-resend {
+            background: none;
+            border: none;
+            color: var(--azul-padrao);
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-top: 6px;
+            font-family: inherit;
+        }
+        .btn-resend:hover { text-decoration: underline; }
+        .btn-resend:disabled { color: #94a3b8; cursor: not-allowed; }
 
         /* ── TOAST ──────────────────────────── */
         .toast-container {
@@ -1865,7 +1914,7 @@
                     <h4 style="margin-top:8px;">&#128179; Forma de Pagamento</h4>
                     <div class="payment-tabs">
                         <button class="payment-tab active" data-pay="card"><span class="icon">&#128179;</span> Cartão</button>
-                        <button class="payment-tab" data-pay="pix"><span class="icon">&#128247;</span> PIX</button>
+                        <button class="payment-tab" data-pay="pix"><span class="icon"><svg width="22" height="22" viewBox="0 0 512 512" style="vertical-align:middle"><circle cx="256" cy="256" r="240" fill="#32BCAD"/><text x="256" y="336" font-size="290" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">P</text></svg></span> PIX</button>
                         <button class="payment-tab" data-pay="boleto"><span class="icon">&#128196;</span> Boleto</button>
                     </div>
                     <div class="payment-body active" id="payCard">
@@ -1878,7 +1927,7 @@
                         <div class="checkout-field"><label>Parcelas</label><select id="cardInstallments"></select></div>
                     </div>
                     <div class="payment-body" id="payPix">
-                        <div class="pix-qrcode">&#128247;</div>
+                        <div class="pix-qrcode"><svg width="120" height="120" viewBox="0 0 512 512"><circle cx="256" cy="256" r="245" fill="#32BCAD"/><text x="256" y="340" font-size="310" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">P</text></svg></div>
                         <div class="pix-key" id="pixKey" title="Clique para copiar">bf-pagamento-550e8400-e29b-41d4-a716-446655440000</div>
                         <p style="font-size:0.76rem;color:#64748b;text-align:center;">Clique na chave PIX acima para copiar</p>
                     </div>
@@ -1916,7 +1965,10 @@
     <div class="cart-sidebar" id="cartSidebar">
         <div class="cart-header-bar">
             <h3>&#128722; Carrinho</h3>
-            <button class="cart-close" id="cartClose">&times;</button>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <button class="btn-clear-cart" id="btnClearCart" title="Limpar carrinho">&#128465; Limpar</button>
+                <button class="cart-close" id="cartClose">&times;</button>
+            </div>
         </div>
         <div class="cart-items" id="cartItems">
             <div class="cart-empty">Seu carrinho está vazio.</div>
@@ -1935,6 +1987,39 @@
             <div class="auth-error" id="loginError"></div>
             <button class="btn-auth" id="btnLogin">Entrar</button>
             <div class="auth-switch">Não tem conta? <a id="switchToRegister">Cadastre-se</a></div>
+            <a class="forgot-link" id="forgotLink">Esqueci a senha?</a>
+        </div>
+        <div class="auth-box" id="authBoxReset" style="display:none;">
+            <h3>&#128274; Recuperar Senha</h3>
+            <div id="resetStep1" class="reset-steps active">
+                <p style="font-size:0.84rem;color:#475569;margin-bottom:14px;text-align:center;">Informe seu e-mail cadastrado para receber o código de recuperação.</p>
+                <div class="auth-field"><label>E-mail</label><input type="text" id="resetEmail" placeholder="seu@email.com"></div>
+                <div class="auth-error" id="resetError"></div>
+                <button class="btn-auth" id="btnSendReset">Enviar Código</button>
+            </div>
+            <div id="resetStep2" class="reset-steps">
+                <p style="font-size:0.84rem;color:#475569;margin-bottom:14px;text-align:center;">Enviamos um código de 6 dígitos para <strong id="resetEmailDisplay"></strong>.</p>
+                <label style="display:block;text-align:center;font-size:0.78rem;font-weight:600;color:#475569;margin-bottom:6px;">Código de verificação</label>
+                <div class="reset-code-box" id="resetCodeInputs">
+                    <input type="text" maxlength="1" pattern="[0-9]">
+                    <input type="text" maxlength="1" pattern="[0-9]">
+                    <input type="text" maxlength="1" pattern="[0-9]">
+                    <input type="text" maxlength="1" pattern="[0-9]">
+                    <input type="text" maxlength="1" pattern="[0-9]">
+                    <input type="text" maxlength="1" pattern="[0-9]">
+                </div>
+                <div class="auth-error" id="resetCodeError"></div>
+                <button class="btn-auth" id="btnVerifyCode">Verificar Código</button>
+                <button class="btn-resend" id="btnResendCode">Reenviar código</button>
+            </div>
+            <div id="resetStep3" class="reset-steps">
+                <p style="font-size:0.84rem;color:#475569;margin-bottom:14px;text-align:center;">Código verificado! Defina sua nova senha.</p>
+                <div class="auth-field"><label>Nova senha</label><input type="password" id="resetNewPass" placeholder="Mínimo 4 caracteres"></div>
+                <div class="auth-field"><label>Confirmar nova senha</label><input type="password" id="resetNewPass2" placeholder="Repita a senha"></div>
+                <div class="auth-error" id="resetPassError"></div>
+                <button class="btn-auth" id="btnResetPassword">Redefinir Senha</button>
+            </div>
+            <div class="auth-switch"><a id="switchResetToLogin">&#8592; Voltar ao login</a></div>
         </div>
         <div class="auth-box" id="authBoxRegister" style="display:none;">
             <h3>&#128100; Criar Conta</h3>
@@ -2115,6 +2200,16 @@
     function closeCart(){ if(cartOverlay){cartOverlay.classList.remove('active');} if(cartSidebar){cartSidebar.classList.remove('active');} document.body.style.overflow = ''; }
     var cartCloseBtn = document.getElementById('cartClose');
     if (cartCloseBtn) cartCloseBtn.addEventListener('click', closeCart);
+    let btnClearCart = document.getElementById('btnClearCart');
+    if (btnClearCart) btnClearCart.addEventListener('click', function(){
+        if (cart.length === 0) return;
+        if (confirm('Tem certeza que deseja limpar todos os itens do carrinho?')) {
+            cart = [];
+            renderCart();
+            saveCart(cart);
+            showToast('&#128465; Carrinho limpo.');
+        }
+    });
     if (cartOverlay) cartOverlay.addEventListener('click', function(e){ if (e.target === cartOverlay) closeCart(); });
     var btnCartH = document.getElementById('btnCartHeader');
     if (btnCartH) btnCartH.addEventListener('click', openCart);
@@ -2336,6 +2431,7 @@
                 boxRegister.style.display = 'none';
                 var le = document.getElementById('loginError'); if (le) le.textContent = '';
                 var re = document.getElementById('regError'); if (re) re.textContent = '';
+                if(boxReset) boxReset.style.display = 'none';
             });
         }
         authOverlay.addEventListener('click', function(e){ if (e.target === authOverlay) authOverlay.classList.remove('active'); });
@@ -2387,6 +2483,128 @@
             authOverlay.classList.remove('active');
             showToast('&#127881; Conta criada com sucesso!');
             setTimeout(function(){ location.reload(); }, 600);
+        });
+
+        /* ── FORGOT PASSWORD ───────────── */
+        var boxReset = document.getElementById('authBoxReset');
+        var RESET_KEY = 'bf_reset';
+
+        function getReset(){ try { return JSON.parse(localStorage.getItem(RESET_KEY)) || {}; } catch(e){ return {}; } }
+        function saveReset(r){ localStorage.setItem(RESET_KEY, JSON.stringify(r)); }
+
+        function showResetPanel(cur, next){
+            document.querySelectorAll('.reset-steps').forEach(function(el){ el.classList.remove('active'); });
+            if(document.getElementById(next)) document.getElementById(next).classList.add('active');
+        }
+
+        var forgotLink = document.getElementById('forgotLink');
+        if(forgotLink) {
+            forgotLink.addEventListener('click', function(){
+                boxLogin.style.display = 'none';
+                boxRegister.style.display = 'none';
+                if(boxReset) boxReset.style.display = 'block';
+                showResetPanel('', 'resetStep1');
+                var errs = ['resetError','resetCodeError','resetPassError'];
+                errs.forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=''; el.classList.remove('success'); });
+            });
+        }
+
+        var switchR2L = document.getElementById('switchResetToLogin');
+        if(switchR2L) switchR2L.addEventListener('click', function(){
+            if(boxReset) boxReset.style.display = 'none';
+            boxLogin.style.display = 'block';
+            boxRegister.style.display = 'none';
+        });
+
+        var btnSendReset = document.getElementById('btnSendReset');
+        if(btnSendReset) btnSendReset.addEventListener('click', function(){
+            var email = (document.getElementById('resetEmail')||{}).value.trim();
+            var err = document.getElementById('resetError');
+            if (!email) { if(err) err.textContent = 'Informe o e-mail.'; return; }
+            var u = users.find(function(u){ return u.email === email; });
+            if (!u) { if(err) err.textContent = 'E-mail não encontrado.'; return; }
+            if(err) err.textContent = '';
+            var code = String(Math.floor(100000 + Math.random() * 900000));
+            var rd = getReset();
+            rd[email] = {code: code, ts: Date.now()};
+            saveReset(rd);
+            document.getElementById('resetEmailDisplay').textContent = email;
+            showResetPanel('resetStep1', 'resetStep2');
+            showToast('&#128231; Código de 6 dígitos: ' + code + ' (enviado para ' + email + ')');
+            var ci = document.getElementById('resetCodeInputs');
+            if(ci) {
+                ci.querySelectorAll('input').forEach(function(inp){ inp.value = ''; });
+                var first = ci.querySelector('input');
+                if(first) first.focus();
+            }
+        });
+
+        var resetCodeInputs = document.getElementById('resetCodeInputs');
+        if(resetCodeInputs) {
+            resetCodeInputs.addEventListener('input', function(e){
+                var inp = e.target;
+                if(inp.value && inp.nextElementSibling) inp.nextElementSibling.focus();
+            });
+            resetCodeInputs.addEventListener('keydown', function(e){
+                if(e.key === 'Backspace' && !e.target.value && e.target.previousElementSibling) {
+                    e.target.previousElementSibling.focus();
+                }
+                if(e.key === 'Enter') {
+                    var btnV = document.getElementById('btnVerifyCode');
+                    if(btnV) btnV.click();
+                }
+            });
+        }
+
+        var btnVerify = document.getElementById('btnVerifyCode');
+        if(btnVerify) btnVerify.addEventListener('click', function(){
+            var email = document.getElementById('resetEmailDisplay').textContent.trim();
+            var rd = getReset();
+            var entry = rd[email];
+            var err = document.getElementById('resetCodeError');
+            if(!entry) { if(err) err.textContent = 'Código expirado. Solicite novamente.'; return; }
+            if(Date.now() - entry.ts > 600000) { if(err) err.textContent = 'Código expirado (10 min). Solicite novo.'; return; }
+            var inputs = document.querySelectorAll('#resetCodeInputs input');
+            var entered = '';
+            inputs.forEach(function(inp){ entered += inp.value; });
+            if(entered.length !== 6) { if(err) err.textContent = 'Digite os 6 dígitos.'; return; }
+            if(entered !== entry.code) { if(err) err.textContent = 'Código incorreto.'; return; }
+            if(err) err.textContent = '';
+            showResetPanel('resetStep2', 'resetStep3');
+            document.getElementById('resetNewPass').value = '';
+            document.getElementById('resetNewPass2').value = '';
+        });
+
+        var btnResend = document.getElementById('btnResendCode');
+        if(btnResend) btnResend.addEventListener('click', function(){
+            var email = document.getElementById('resetEmailDisplay').textContent.trim();
+            var code = String(Math.floor(100000 + Math.random() * 900000));
+            var rd = getReset();
+            rd[email] = {code: code, ts: Date.now()};
+            saveReset(rd);
+            showToast('&#128231; Novo código: ' + code);
+            var ci = document.getElementById('resetCodeInputs');
+            if(ci) ci.querySelectorAll('input').forEach(function(inp){ inp.value = ''; });
+        });
+
+        var btnResetPass = document.getElementById('btnResetPassword');
+        if(btnResetPass) btnResetPass.addEventListener('click', function(){
+            var email = document.getElementById('resetEmailDisplay').textContent.trim();
+            var p1 = document.getElementById('resetNewPass').value;
+            var p2 = document.getElementById('resetNewPass2').value;
+            var err = document.getElementById('resetPassError');
+            if(!p1 || p1.length < 4) { if(err) err.textContent = 'Senha deve ter ao menos 4 caracteres.'; return; }
+            if(p1 !== p2) { if(err) err.textContent = 'Senhas não conferem.'; return; }
+            if(err) err.textContent = '';
+            var u = users.find(function(u){ return u.email === email; });
+            if(u) { u.pass = p1; saveUsers(users); }
+            var rd = getReset();
+            delete rd[email];
+            saveReset(rd);
+            authOverlay.classList.remove('active');
+            if(boxReset) boxReset.style.display = 'none';
+            showToast('&#9989; Senha redefinida com sucesso!');
+            var le = document.getElementById('loginError'); if(le) le.textContent = '';
         });
     }
 
