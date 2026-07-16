@@ -280,6 +280,7 @@
                 <a class="active" data-tab="estoque"><span>&#128230;</span> Estoque</a>
                 <a data-tab="produtos"><span>&#128722;</span> Produtos</a>
                 <a data-tab="banners"><span>&#127912;</span> Banners</a>
+                <a data-tab="anuncios"><span>&#128444;</span> Anúncios</a>
                 <a data-tab="config"><span>&#9881;</span> Configurações</a>
                 <a data-tab="usuarios"><span>&#128101;</span> Usuários</a>
             </nav>
@@ -297,8 +298,8 @@
                 <div class="card">
                     <h3>Produtos em Estoque</h3>
                     <table id="stockTable">
-                        <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th>Ações</th></tr></thead>
-                        <tbody id="stockBody"><tr><td colspan="6" class="empty-state">Nenhum produto cadastrado.</td></tr></tbody>
+                        <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Imagem</th><th>Status</th><th>Ações</th></tr></thead>
+                        <tbody id="stockBody"><tr><td colspan="7" class="empty-state">Nenhum produto cadastrado.</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -320,6 +321,7 @@
                         <div class="form-group"><label>Preço (R$)</label><input type="text" id="prodPrice" placeholder="2199,00"></div>
                         <div class="form-group"><label>Parcelas</label><select id="prodInstallments"><option value="10">10x</option><option value="6">6x</option><option value="3">3x</option><option value="1">à vista</option></select></div>
                         <div class="form-group"><label>Estoque Inicial</label><input type="number" id="prodStock" value="10" min="0"></div>
+                        <div class="form-group"><label>URL da Imagem</label><input type="text" id="prodImg" placeholder="https://exemplo.com/imagem.jpg [opcional]"></div>
                         <div class="form-group" style="grid-column:1/-1;"><label>Descrição Curta</label><input type="text" id="prodDesc" placeholder="Uma breve descrição..."></div>
                         <div class="form-group" style="grid-column:1/-1;"><label>Descrição Longa</label><textarea id="prodLongDesc" placeholder="Descrição detalhada do produto..."></textarea></div>
                     </div>
@@ -351,6 +353,46 @@
                     <div style="margin-top:14px;" id="bannerPreview" class="card">
                         <p style="color:var(--text-muted);font-size:0.82rem;">Pré-visualização aplicada ao vivo no site.</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- ── ANÚNCIOS ─────────────────── -->
+            <div class="tab-panel" id="tab-anuncios">
+                <h1 class="page-title">&#128444; Gerenciar Anúncios</h1>
+                <p class="page-sub">Altere as imagens de anúncio exibidas no site</p>
+                <div class="card">
+                    <h3>Imagens de Anúncio (4 slots)</h3>
+                    <div class="form-grid" id="anunciosGrid">
+                        <div class="form-group">
+                            <label>Anúncio 1</label>
+                            <input type="text" id="anuncio1" placeholder="Anuncio.jpeg">
+                            <img id="preview1" class="img-preview" style="margin-top:6px;display:none;" onerror="this.style.display='none'">
+                            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">Nome do arquivo ou URL completa</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Anúncio 2</label>
+                            <input type="text" id="anuncio2" placeholder="Anuncio2.jpg">
+                            <img id="preview2" class="img-preview" style="margin-top:6px;display:none;" onerror="this.style.display='none'">
+                            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">Nome do arquivo ou URL completa</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Anúncio 3</label>
+                            <input type="text" id="anuncio3" placeholder="Anuncio 3.jpg">
+                            <img id="preview3" class="img-preview" style="margin-top:6px;display:none;" onerror="this.style.display='none'">
+                            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">Nome do arquivo ou URL completa</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Anúncio 4</label>
+                            <input type="text" id="anuncio4" placeholder="anuncio4.jpg">
+                            <img id="preview4" class="img-preview" style="margin-top:6px;display:none;" onerror="this.style.display='none'">
+                            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">Nome do arquivo ou URL completa</p>
+                        </div>
+                    </div>
+                    <div class="flex-row" style="margin-top:14px;">
+                        <button class="btn btn-primary" id="btnSaveAnuncios">&#128190; Salvar Anúncios</button>
+                        <span style="font-size:0.76rem;color:var(--text-muted);margin-left:10px;" id="anuncioMsg"></span>
+                    </div>
+                    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:10px;">Use URL completa (https://...) para imagens externas, ou apenas o nome do arquivo se a imagem estiver no repositório.</p>
                 </div>
             </div>
 
@@ -556,6 +598,7 @@
                     '<td>' + (p.cat || '---') + '</td>' +
                     '<td>R$ ' + (p.price||'0,00') + '</td>' +
                     '<td><input type="number" value="' + p.stock + '" min="0" style="width:60px;padding:4px 6px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:inherit;" data-product="' + name.replace(/"/g,'&quot;') + '" onchange="updateStock(this)"></td>' +
+                    '<td><input type="text" value="' + (p.img||'') + '" placeholder="URL da imagem" style="width:110px;padding:4px 6px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:inherit;font-size:0.72rem;" data-product="' + name.replace(/"/g,'&quot;') + '" data-field="img" onchange="updateField(this)"></td>' +
                     '<td><span class="badge ' + statusBadge + '">' + statusText + '</span></td>' +
                     '<td><button class="btn btn-danger btn-sm" onclick="deleteProduct(\'' + name.replace(/'/g,"\\'") + '\')" title="Remover">&#128465;</button></td>' +
                 '</tr>';
@@ -572,6 +615,17 @@
             save(STOCK_KEY, stock);
             showToast('&#9989; Estoque de "' + name + '" atualizado para ' + val + ' un.');
             setTimeout(renderStock, 300);
+        };
+
+        window.updateField = function(el){
+            var name = el.getAttribute('data-product');
+            var field = el.getAttribute('data-field');
+            var val = el.value.trim();
+            var stock = load(STOCK_KEY, {});
+            if (!stock[name]) stock[name] = {};
+            stock[name][field] = val;
+            save(STOCK_KEY, stock);
+            showToast('&#9989; Campo atualizado para "' + name + '".');
         };
 
         window.deleteProduct = function(name){
@@ -593,6 +647,7 @@
                 var stock = parseInt(document.getElementById('prodStock').value) || 0;
                 var desc = document.getElementById('prodDesc').value.trim();
                 var longDesc = document.getElementById('prodLongDesc').value.trim();
+                var img = document.getElementById('prodImg').value.trim();
                 var installments = parseInt(document.getElementById('prodInstallments').value) || 10;
                 var msg = document.getElementById('prodAddMsg');
 
@@ -608,7 +663,8 @@
                     stock: stock,
                     desc: desc || name,
                     longDesc: longDesc || desc || name,
-                    installments: installments
+                    installments: installments,
+                    img: img
                 };
                 save(STOCK_KEY, stockData);
                 showToast('&#9989; Produto "' + name + '" adicionado!');
@@ -617,6 +673,7 @@
                 document.getElementById('prodPrice').value = '';
                 document.getElementById('prodDesc').value = '';
                 document.getElementById('prodLongDesc').value = '';
+                document.getElementById('prodImg').value = '';
                 document.getElementById('prodStock').value = '10';
                 msg.textContent = 'Produto adicionado com sucesso!';
                 msg.style.color = 'var(--success)';
@@ -713,6 +770,66 @@
             document.getElementById('configMsg').style.color = 'var(--success)';
             showToast('&#9989; Configurações salvas!');
         });
+
+        /* ── ANÚNCIOS ──────────────────── */
+        var ANUNCIOS_KEY = 'bf_anuncios';
+
+        function defaultAnuncios(){
+            return {
+                a1: 'Anuncio.jpeg',
+                a2: 'Anuncio2.jpg',
+                a3: 'Anuncio 3.jpg',
+                a4: 'anuncio4.jpg'
+            };
+        }
+
+        function loadAnunciosForm(){
+            var anun = load(ANUNCIOS_KEY, defaultAnuncios());
+            document.getElementById('anuncio1').value = anun.a1 || '';
+            document.getElementById('anuncio2').value = anun.a2 || '';
+            document.getElementById('anuncio3').value = anun.a3 || '';
+            document.getElementById('anuncio4').value = anun.a4 || '';
+            for(var i=1;i<=4;i++){
+                var val = anun['a'+i] || '';
+                var prev = document.getElementById('preview'+i);
+                if(prev && val){
+                    if(val.startsWith('http')) { prev.src = val; prev.style.display = 'block'; }
+                    else { prev.src = val; prev.style.display = 'block'; }
+                }
+            }
+        }
+
+        ['anuncio1','anuncio2','anuncio3','anuncio4'].forEach(function(id){
+            var el = document.getElementById(id);
+            if(el){
+                el.addEventListener('input', function(){
+                    var i = id.replace('anuncio','');
+                    var prev = document.getElementById('preview'+i);
+                    var val = el.value.trim();
+                    if(prev && val && val.length > 2){
+                        prev.src = val;
+                        prev.style.display = 'block';
+                    } else if(prev) {
+                        prev.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        document.getElementById('btnSaveAnuncios').addEventListener('click', function(){
+            var anun = {
+                a1: document.getElementById('anuncio1').value.trim(),
+                a2: document.getElementById('anuncio2').value.trim(),
+                a3: document.getElementById('anuncio3').value.trim(),
+                a4: document.getElementById('anuncio4').value.trim()
+            };
+            save(ANUNCIOS_KEY, anun);
+            document.getElementById('anuncioMsg').textContent = 'Anúncios salvos! Recarregue o site para ver as mudanças.';
+            document.getElementById('anuncioMsg').style.color = 'var(--success)';
+            showToast('&#9989; Imagens de anúncio atualizadas!');
+        });
+
+        loadAnunciosForm();
 
     })();
     </script>
