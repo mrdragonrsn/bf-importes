@@ -1,0 +1,2662 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos — B&amp;F</title>
+    <style>
+        :root {
+            --azul-escuro: #0a1f3f;
+            --azul-medio: #0d2f5e;
+            --azul-padrao: #1a56b8;
+            --azul-claro: #3b82f6;
+            --azul-brilho: #60a5fa;
+            --branco: #ffffff;
+            --cinza-claro: #f1f5f9;
+            --cinza-medio: #cbd5e1;
+            --sombra: 0 2px 12px rgba(0,0,0,0.08);
+            --sombra-hover: 0 6px 24px rgba(0,0,0,0.14);
+            --raio: 10px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            background: var(--cinza-claro);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* ── TOPO ──────────────────────────── */
+        .top-bar {
+            background: var(--azul-escuro);
+            color: var(--branco);
+            font-size: 0.82rem;
+            padding: 6px 0;
+        }
+        .top-bar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .top-bar span { display: flex; align-items: center; gap: 6px; }
+
+        /* ── CABEÇALHO ──────────────────────── */
+        .header {
+            background: linear-gradient(135deg, var(--azul-medio) 0%, var(--azul-padrao) 100%);
+            color: var(--branco);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+        }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .logo-area img {
+            height: 56px;
+            border-radius: 8px;
+            background: var(--branco);
+            padding: 3px;
+        }
+        .logo-area h1 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            line-height: 1.25;
+        }
+        .logo-area small {
+            font-size: 0.72rem;
+            font-weight: 400;
+            opacity: 0.85;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .nav-links a {
+            color: var(--branco);
+            padding: 6px 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.25s;
+        }
+        .nav-links a:hover { border-color: var(--azul-brilho); }
+        .btn-contato {
+            background: var(--branco);
+            color: var(--azul-padrao);
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.25s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .btn-contato:hover {
+            background: var(--azul-brilho);
+            color: var(--branco);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+        }
+        /* ── LAYOUT ──────────────────────────── */
+        .container {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 22px;
+        }
+        section { padding: 60px 0; }
+        .section-title {
+            text-align: center;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 10px;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+        }
+        .divide {
+            width: 60px;
+            height: 4px;
+            background: var(--azul-padrao);
+            margin: 0 auto 30px;
+            border-radius: 2px;
+        }
+
+        /* ── HERO ────────────────────────────── */
+        .hero {
+            background: linear-gradient(170deg, var(--azul-medio) 0%, var(--azul-escuro) 100%);
+            color: var(--branco);
+            text-align: center;
+            padding: 90px 0 100px;
+        }
+        .hero h2 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            opacity: 0.88;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        .btn-hero {
+            display: inline-block;
+            background: var(--branco);
+            color: var(--azul-padrao);
+            padding: 14px 38px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .btn-hero:hover {
+            background: var(--azul-brilho);
+            color: var(--branco);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        }
+
+        /* ── CARD DE PRODUTO ─────────────────── */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 26px;
+        }
+        .product-card {
+            background: var(--branco);
+            border-radius: var(--raio);
+            overflow: hidden;
+            box-shadow: var(--sombra);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-hover);
+        }
+        .product-card .thumb {
+            height: 200px;
+            background: linear-gradient(135deg, #e0edff 0%, var(--cinza-claro) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.6rem;
+        }
+        .product-card .body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card .body h3 {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 6px;
+        }
+        .product-card .body .cat {
+            font-size: 0.78rem;
+            color: var(--azul-padrao);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 10px;
+        }
+        .product-card .body .desc {
+            font-size: 0.88rem;
+            color: #475569;
+            margin-bottom: 16px;
+            flex: 1;
+        }
+        .product-card .body .price {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--azul-escuro);
+            margin-bottom: 4px;
+        }
+        .product-card .body .installment {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-bottom: 14px;
+        }
+        .btn-card {
+            display: block;
+            text-align: center;
+            background: var(--azul-padrao);
+            color: var(--branco);
+            padding: 10px 0;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.25s;
+        }
+        .btn-card:hover { background: var(--azul-medio); }
+
+        /* ── SERVIÇOS ────────────────────────── */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 26px;
+        }
+        .service-card {
+            background: var(--branco);
+            border-radius: var(--raio);
+            padding: 32px 22px;
+            text-align: center;
+            box-shadow: var(--sombra);
+            transition: all 0.3s;
+            border-top: 4px solid var(--azul-padrao);
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-hover);
+        }
+        .service-card .icon {
+            font-size: 2.6rem;
+            margin-bottom: 14px;
+        }
+        .service-card h3 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 8px;
+        }
+        .service-card p {
+            font-size: 0.86rem;
+            color: #475569;
+        }
+
+        /* ── DEPOIMENTOS ──────────────────────── */
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 26px;
+        }
+        .testimonial {
+            background: var(--branco);
+            border-radius: var(--raio);
+            padding: 28px;
+            box-shadow: var(--sombra);
+            position: relative;
+        }
+        .testimonial::before {
+            content: '\201C';
+            font-size: 4rem;
+            color: var(--azul-brilho);
+            position: absolute;
+            top: 8px;
+            left: 16px;
+            line-height: 1;
+            opacity: 0.5;
+        }
+        .testimonial .text {
+            font-style: italic;
+            font-size: 0.93rem;
+            color: #334155;
+            margin-bottom: 16px;
+            padding-top: 10px;
+        }
+        .testimonial .author {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--azul-escuro);
+        }
+        .testimonial .role {
+            font-size: 0.76rem;
+            color: #64748b;
+        }
+
+        /* ── CONTATO ─────────────────────────── */
+        .contact-section {
+            background: linear-gradient(135deg, var(--azul-medio) 0%, var(--azul-padrao) 100%);
+            color: var(--branco);
+        }
+        .contact-section .section-title,
+        .contact-section .section-subtitle { color: var(--branco); }
+        .contact-section .divide { background: var(--azul-brilho); }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+        .contact-item .icon-ctt {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .contact-item h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .contact-item p { font-size: 0.9rem; opacity: 0.9; }
+
+        /* ── RODAPÉ ──────────────────────────── */
+        footer {
+            background: var(--azul-escuro);
+            color: var(--branco);
+            padding: 30px 0 20px;
+            font-size: 0.84rem;
+        }
+        footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        footer .legal { opacity: 0.7; }
+
+        /* ── FILTRO ───────────────────────────── */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 36px;
+        }
+        .filter-btn {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .filter-btn.active {
+            background: var(--azul-padrao);
+            color: #fff;
+        }
+        .filter-btn:hover:not(.active) {
+            background: #cbd5e1;
+        }
+        .product-card.hidden { display: none; }
+
+        /* ── CHAT WIDGET ──────────────────────── */
+        .chat-widget {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+        }
+        .chat-toggle {
+            width: 56px;
+            height: 56px;
+            background: var(--azul-padrao);
+            color: var(--branco);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.6rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-toggle:hover {
+            background: var(--azul-medio);
+            transform: scale(1.08);
+        }
+        .chat-panel {
+            display: none;
+            width: 340px;
+            height: 440px;
+            background: var(--branco);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            flex-direction: column;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .chat-panel.open { display: flex; }
+        .chat-header {
+            background: var(--azul-padrao);
+            color: var(--branco);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chat-header .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--azul-brilho);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .chat-header .info { flex: 1; }
+        .chat-header .info .name {
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+        .chat-header .info .status {
+            font-size: 0.72rem;
+            opacity: 0.8;
+        }
+        .chat-header .close-chat {
+            background: none;
+            border: none;
+            color: var(--branco);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+        .chat-body {
+            flex: 1;
+            padding: 14px;
+            overflow-y: auto;
+            background: var(--cinza-claro);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-msg {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-msg.bot {
+            background: var(--branco);
+            color: #1e293b;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .chat-msg.user {
+            background: var(--azul-padrao);
+            color: var(--branco);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-footer {
+            padding: 10px 14px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .chat-footer input {
+            flex: 1;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.84rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .chat-footer input:focus { border-color: var(--azul-padrao); }
+        .chat-footer button {
+            background: var(--azul-padrao);
+            color: var(--branco);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.25s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-footer button:hover { background: var(--azul-medio); }
+
+        @media (max-width: 420px) {
+            .chat-panel { width: calc(100vw - 40px); height: 400px; }
+        }
+
+        /* ── RESPONSIVO ──────────────────────── */
+        /* ── MODAL DE PRODUTO ────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeOverlay 0.25s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-container {
+            background: var(--branco);
+            border-radius: 14px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+            animation: slideUp 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: #64748b;
+            z-index: 10;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .modal-close:hover { color: #1e293b; }
+
+        /* ── MODAL TABS ──────────────────── */
+        .modal-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 20px;
+            background: #f8fafc;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .modal-tab {
+            padding: 14px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #94a3b8;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-bottom: -1px;
+        }
+        .modal-tab:hover { color: var(--azul-padrao); }
+        .modal-tab.active { color: var(--azul-padrao); border-bottom-color: var(--azul-padrao); }
+
+        /* ── MODAL TAB PANEL ─────────────── */
+        .modal-tab-panel { display: none; padding: 24px 22px; overflow-y: auto; flex: 1; }
+        .modal-tab-panel.active { display: block; }
+
+        /* painel galeria */
+        .modal-main-img {
+            width: 100%;
+            height: 260px;
+            background: linear-gradient(135deg, #e0edff 0%, var(--cinza-claro) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        .modal-thumbs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .modal-thumb {
+            width: 58px;
+            height: 58px;
+            background: linear-gradient(135deg, #e0edff 0%, var(--cinza-claro) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .modal-thumb:hover { border-color: var(--azul-brilho); transform: scale(1.08); }
+        .modal-thumb.active { border-color: var(--azul-padrao); }
+
+        /* painel descrição */
+        .modal-cat {
+            font-size: 0.78rem;
+            color: var(--azul-padrao);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+        }
+        .modal-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--azul-escuro);
+            margin-bottom: 14px;
+            line-height: 1.3;
+        }
+        .modal-desc {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.65;
+        }
+        .modal-stock-info {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.84rem;
+            font-weight: 600;
+        }
+
+        /* ── MODAL FOOTER ────────────────── */
+        .modal-footer-bar {
+            border-top: 1px solid #e2e8f0;
+            padding: 16px 22px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-shrink: 0;
+            background: #fafbfc;
+        }
+        .modal-footer-price { flex-shrink: 0; }
+        .modal-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--azul-escuro);
+            line-height: 1.2;
+        }
+        .modal-installment {
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+        .modal-footer-actions {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+        .btn-modal-cart {
+            background: var(--azul-padrao);
+            color: var(--branco);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.84rem;
+            font-family: inherit;
+            white-space: nowrap;
+            transition: all 0.25s;
+        }
+        .btn-modal-cart:hover {
+            background: var(--azul-medio);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+        }
+        .btn-modal-quote {
+            background: var(--branco);
+            color: var(--azul-padrao);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--azul-padrao);
+            font-weight: 700;
+            font-size: 0.84rem;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.25s;
+            text-align: center;
+        }
+        .btn-modal-quote:hover {
+            background: var(--azul-padrao);
+            color: var(--branco);
+        }
+
+        @media (max-width: 500px) {
+            .modal-main-img { height: 180px; font-size: 3.6rem; }
+            .modal-footer-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+            .modal-footer-actions { flex-direction: column; }
+            .btn-modal-cart, .btn-modal-quote { text-align: center; }
+        }
+
+        @media (max-width: 768px) {
+            .header .container { flex-direction: column; gap: 12px; }
+            .nav-links { gap: 16px; flex-wrap: wrap; justify-content: center; }
+            .hero h2 { font-size: 1.9rem; }
+            .hero p { font-size: 1rem; }
+        }
+
+        /* ── MOBILE GERAL (≤600px) ────────── */
+        @media (max-width: 600px) {
+            .container { padding: 0 14px; }
+            .top-bar .container { font-size: 0.7rem; gap: 4px; justify-content: center; }
+            .top-bar span { font-size: 0.68rem; }
+            .logo-area img { height: 40px; }
+            .logo-area h1 { font-size: 1.15rem; }
+            .logo-area small { font-size: 0.64rem; }
+            .nav-links { gap: 8px; font-size: 0.8rem; }
+            .header-actions { gap: 6px; }
+            .btn-login, .btn-cart-header, .btn-contato { font-size: 0.72rem; padding: 7px 12px; }
+            .hero { padding: 50px 0 60px; }
+            .hero h2 { font-size: 1.45rem; }
+            .hero p { font-size: 0.88rem; }
+            .section-title { font-size: 1.35rem; }
+            .section-subtitle { font-size: 0.84rem; margin-bottom: 24px; }
+            .product-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+            .product-card .thumb { height: 140px; font-size: 2.6rem; }
+            .product-card .body { padding: 14px; }
+            .product-card .body h3 { font-size: 0.95rem; }
+            .product-card .body .price { font-size: 1.1rem; }
+            .product-card .body .desc { font-size: 0.78rem; }
+            .service-grid { grid-template-columns: 1fr; }
+            .testimonial-grid { grid-template-columns: 1fr; }
+            .contact-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+            .brands-grid { gap: 16px; }
+            .brand-item { padding: 14px 18px; }
+            .brand-icon { font-size: 1.8rem; }
+            .brand-item span { font-size: 0.7rem; }
+            section { padding: 40px 0; }
+            footer .container { flex-direction: column; text-align: center; font-size: 0.74rem; }
+        }
+
+        @media (max-width: 400px) {
+            .contact-grid { grid-template-columns: 1fr; }
+            .product-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .product-card .thumb { height: 110px; font-size: 2rem; }
+            .product-card .body { padding: 10px; }
+            .product-card .body h3 { font-size: 0.82rem; }
+            .product-card .body .price { font-size: 1rem; }
+            .filter-btn { padding: 4px 12px; font-size: 0.7rem; }
+            .hero h2 { font-size: 1.2rem; }
+            .btn-hero { padding: 12px 24px; font-size: 0.88rem; }
+        }
+
+        /* ── HEADER ACTIONS ────────────────── */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .about-photos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .about-photo {
+            background: linear-gradient(135deg, #e0edff 0%, var(--cinza-claro) 100%);
+            border-radius: 12px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        .diferenciais-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 26px;
+            text-align: center;
+        }
+        .diferencial-card {
+            background: var(--branco);
+            border-radius: 12px;
+            padding: 28px 18px;
+            box-shadow: var(--sombra);
+        }
+        @media (max-width: 600px) {
+            .about-grid { grid-template-columns: 1fr; gap: 24px; }
+            .about-photos { grid-template-columns: 1fr 1fr; }
+            .about-photo { height: 100px; font-size: 2rem; }
+            .diferenciais-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+            .diferencial-card { padding: 18px 12px; }
+        }
+        .header-actions { display: flex; align-items: center; gap: 14px; }
+        .btn-login, .btn-cart-header {
+            background: rgba(255,255,255,0.15);
+            color: var(--branco);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 9px 16px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.84rem;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+        .btn-login:hover, .btn-cart-header:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.6); }
+        .btn-cart-header { position: relative; }
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 800;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .cart-badge.pop { transform: scale(1.35); }
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .user-name-header {
+            background: rgba(255,255,255,0.15);
+            color: var(--branco);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 9px 16px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.84rem;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 6px;
+            background: var(--branco);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+            min-width: 160px;
+            z-index: 200;
+            overflow: hidden;
+        }
+        .user-menu.open { display: block; }
+        .user-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px 18px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.84rem;
+            color: #334155;
+            text-align: left;
+            font-family: inherit;
+            transition: background 0.15s;
+        }
+        .user-menu button:hover { background: var(--cinza-claro); }
+
+        /* ── ESTOQUE ────────────────────────── */
+        .stock-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .stock-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .stock-dot.high { background: #16a34a; }
+        .stock-dot.medium { background: #f59e0b; }
+        .stock-dot.low { background: #ef4444; }
+        .stock-text.high { color: #16a34a; }
+        .stock-text.medium { color: #b45309; }
+        .stock-text.low { color: #dc2626; }
+
+        /* ── CARRINHO SIDEBAR ──────────────── */
+        .cart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1100;
+            display: none;
+        }
+        .cart-overlay.active { display: block; }
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 400px;
+            max-width: 100vw;
+            height: 100vh;
+            background: var(--branco);
+            z-index: 1101;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s ease;
+        }
+        .cart-sidebar.active { right: 0; }
+        .cart-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .cart-header-bar h3 { font-size: 1.12rem; font-weight: 700; color: var(--azul-escuro); }
+        .cart-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+            padding: 4px;
+            line-height: 1;
+        }
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 22px;
+        }
+        .cart-empty {
+            text-align: center;
+            color: #94a3b8;
+            padding: 60px 20px;
+            font-size: 0.92rem;
+        }
+        .cart-item {
+            display: flex;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .cart-item-img {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #e0edff 0%, var(--cinza-claro) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-info h4 { font-size: 0.88rem; font-weight: 700; color: var(--azul-escuro); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cart-item-info .cart-item-price { font-size: 0.84rem; color: #64748b; margin-bottom: 6px; }
+        .cart-qty {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cart-qty button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #cbd5e1;
+            background: var(--branco);
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .cart-qty button:hover { background: var(--cinza-claro); }
+        .cart-qty span { font-weight: 700; font-size: 0.88rem; min-width: 20px; text-align: center; }
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+            align-self: flex-start;
+            transition: color 0.15s;
+        }
+        .cart-item-remove:hover { color: #ef4444; }
+        .cart-footer-bar {
+            padding: 16px 22px 22px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 14px;
+        }
+        .btn-checkout {
+            display: block;
+            width: 100%;
+            background: var(--azul-padrao);
+            color: var(--branco);
+            padding: 14px 0;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.25s;
+        }
+        .btn-checkout:hover { background: var(--azul-medio); }
+
+        /* ── AUTH MODAL ─────────────────────── */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-overlay.active { display: flex; }
+        .auth-box {
+            background: var(--branco);
+            border-radius: 14px;
+            width: 380px;
+            max-width: 100%;
+            padding: 32px 28px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+            animation: slideUp 0.3s ease;
+        }
+        .auth-box h3 { font-size: 1.25rem; font-weight: 800; color: var(--azul-escuro); margin-bottom: 20px; text-align: center; }
+        .auth-field {
+            margin-bottom: 14px;
+        }
+        .auth-field label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .auth-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .auth-field input:focus { border-color: var(--azul-padrao); }
+        .btn-auth {
+            display: block;
+            width: 100%;
+            background: var(--azul-padrao);
+            color: var(--branco);
+            padding: 12px 0;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.92rem;
+            font-family: inherit;
+            margin-top: 8px;
+            transition: background 0.25s;
+        }
+        .btn-auth:hover { background: var(--azul-medio); }
+        .auth-switch {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.82rem;
+            color: #64748b;
+        }
+        .auth-switch a { color: var(--azul-padrao); cursor: pointer; font-weight: 600; }
+        .auth-switch a:hover { text-decoration: underline; }
+        .auth-error { color: #ef4444; font-size: 0.78rem; text-align: center; margin-top: 8px; }
+
+        /* ── TOAST ──────────────────────────── */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            background: var(--azul-escuro);
+            color: var(--branco);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            animation: toastIn 0.35s ease, toastOut 0.3s ease 2s forwards;
+            max-width: 340px;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(80px); } }
+
+        /* ── CERTIFICAÇÕES ──────────────────── */
+        .brands-section { background: var(--branco); text-align: center; }
+        .brands-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
+        .brand-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 28px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            background: var(--cinza-claro);
+        }
+        .brand-item:hover { transform: translateY(-4px); box-shadow: var(--sombra-hover); }
+        .brand-icon {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--azul-escuro);
+        }
+        .brand-item span {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── CONTATO INTERATIVO ────────────── */
+        .contact-clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            position: relative;
+        }
+        .contact-clickable:hover { color: var(--azul-brilho); }
+        .contact-clickable.copied::after {
+            content: '✓ Copiado!';
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--azul-escuro);
+            color: var(--branco);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            white-space: nowrap;
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn { from { opacity: 0; transform: translateX(-50%) scale(0.8); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+
+        /* ── CHECKOUT ──────────────────────── */
+        .checkout-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1150;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .checkout-overlay.active { display: flex; }
+        .checkout-panel {
+            background: var(--branco);
+            border-radius: 14px;
+            width: 900px;
+            max-width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+            animation: slideUp 0.3s ease;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+        }
+        .checkout-panel h3 { font-size: 1.1rem; font-weight: 800; color: var(--azul-escuro); }
+        .checkout-header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 22px;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            background: var(--branco);
+            z-index: 5;
+            border-radius: 14px 14px 0 0;
+        }
+        .checkout-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+            padding: 4px;
+            line-height: 1;
+        }
+        .checkout-close:hover { color: #1e293b; }
+        .checkout-summary {
+            background: #f8fafc;
+            padding: 20px;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+        .checkout-summary h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .checkout-item-mini {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+        }
+        .checkout-item-mini .checkout-item-img {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e0edff 0%, var(--cinza-claro) 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .checkout-item-mini .info { flex: 1; }
+        .checkout-item-mini .info strong { display: block; color: var(--azul-escuro); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .checkout-item-mini .info span { color: #64748b; }
+        .checkout-totals {
+            margin-top: auto;
+            padding-top: 14px;
+            border-top: 2px solid #cbd5e1;
+        }
+        .checkout-totals .row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.84rem;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .checkout-totals .row.total {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--azul-escuro);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #cbd5e1;
+        }
+        .checkout-form {
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+        .checkout-form h4 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 2px;
+        }
+        .checkout-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .checkout-field label {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        .checkout-field input, .checkout-field select {
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 0.84rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .checkout-field input:focus, .checkout-field select:focus { border-color: var(--azul-padrao); }
+        .checkout-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .checkout-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+        .payment-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .payment-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.78rem;
+            background: var(--branco);
+            transition: all 0.2s;
+            font-family: inherit;
+            color: #475569;
+        }
+        .payment-tab:hover { border-color: var(--azul-brilho); }
+        .payment-tab.active { border-color: var(--azul-padrao); color: var(--azul-padrao); background: #eff6ff; }
+        .payment-tab .icon { display: block; font-size: 1.4rem; margin-bottom: 4px; }
+        .payment-body { display: none; }
+        .payment-body.active { display: block; }
+        .pix-qrcode {
+            width: 150px;
+            height: 150px;
+            background: repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 8px, #e2e8f0 8px, #e2e8f0 10px);
+            margin: 0 auto 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        .pix-key {
+            background: #f1f5f9;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            word-break: break-all;
+            text-align: center;
+            color: #475569;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .pix-key:hover { background: #e2e8f0; }
+        .boleto-info {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 0.82rem;
+            color: #92400e;
+            line-height: 1.5;
+        }
+        .btn-confirm {
+            display: block;
+            width: 100%;
+            background: #16a34a;
+            color: var(--branco);
+            padding: 14px 0;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.25s;
+            text-align: center;
+        }
+        .btn-confirm:hover { background: #15803d; transform: translateY(-1px); }
+        .btn-back-cart {
+            display: block;
+            width: 100%;
+            background: none;
+            border: 1px solid #cbd5e1;
+            color: #64748b;
+            padding: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.84rem;
+            font-family: inherit;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-back-cart:hover { background: var(--cinza-claro); }
+        .order-success {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .order-success .icon-success {
+            font-size: 4rem;
+            margin-bottom: 12px;
+        }
+        .order-success h3 { font-size: 1.3rem; margin-bottom: 6px; }
+        .order-success p { color: #64748b; font-size: 0.88rem; }
+
+        /* ── NOTA FISCAL ─────────────────── */
+        .nf-container {
+            background: #fff;
+            border: 2px solid #333;
+            padding: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #1e293b;
+        }
+        .nf-header {
+            background: #f8fafc;
+            padding: 16px 20px;
+            border-bottom: 2px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nf-company h4 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--azul-escuro);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .nf-company p { font-size: 0.72rem; color: #64748b; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .nf-title {
+            text-align: right;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .nf-title h5 { font-size: 0.85rem; color: #333; }
+        .nf-title .nf-num { font-size: 1.1rem; font-weight: 800; color: var(--azul-escuro); }
+        .nf-body { padding: 16px 20px; }
+        .nf-section-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #64748b;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 4px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .nf-info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 20px;
+            margin-bottom: 12px;
+        }
+        .nf-info-row span { display: block; }
+        .nf-info-row .lbl { font-size: 0.7rem; color: #64748b; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .nf-info-row .val { font-weight: 600; font-size: 0.78rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .nf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .nf-table th {
+            background: #f1f5f9;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+            border-bottom: 2px solid #cbd5e1;
+        }
+        .nf-table td {
+            padding: 8px;
+            font-size: 0.78rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .nf-table .num { text-align: right; }
+        .nf-totals {
+            text-align: right;
+            border-top: 2px solid #333;
+            padding-top: 10px;
+            margin-top: 8px;
+        }
+        .nf-totals .nf-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            font-size: 0.8rem;
+        }
+        .nf-totals .nf-row.total {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+        .nf-footer {
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-top: 2px solid #333;
+            text-align: center;
+            font-size: 0.74rem;
+            color: #64748b;
+        }
+        .btn-print-nf {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            background: #333;
+            color: #fff;
+            padding: 10px 0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.84rem;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            transition: background 0.2s;
+        }
+        .btn-print-nf:hover { background: #1e293b; }
+        @media print {
+            body * { visibility: hidden; }
+            .nf-container, .nf-container * { visibility: visible; }
+            .nf-container { position: absolute; left: 0; top: 0; width: 100%; border: none; }
+            .btn-print-nf { display: none; }
+        }
+
+        @media (max-width: 680px) {
+            .checkout-panel { grid-template-columns: 1fr; }
+            .checkout-summary { border-right: none; border-bottom: 1px solid #e2e8f0; }
+            .checkout-row { grid-template-columns: 1fr; }
+            .checkout-row.triple { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* ── LIGHTBOX ─────────────────────── */
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-overlay img {
+            max-width: 92vw;
+            max-height: 92vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+            animation: zoomIn 0.25s ease;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 16px;
+            right: 24px;
+            color: #fff;
+            font-size: 2.2rem;
+            cursor: pointer;
+            z-index: 10;
+            background: none;
+            border: none;
+            line-height: 1;
+        }
+        .lightbox-close:hover { opacity: 0.7; }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+
+</style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="container">
+            <span>&#128222; (16) 98138-6747</span>
+            <span>&#128231; atendimento@biancoeferreira.com.br</span>
+            <span>&#128339; Seg–Sex 8h às 18h | Sáb 8h às 13h</span>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <div class="logo-area">
+                <img src="logo.jpeg" alt="Logo" onerror="this.style.display='none'">
+                <div>
+                    <h1>B&amp;F</h1>
+                    <small>Importes</small>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">&#127968; Início</a></li>
+                    <li><a href="produtos.html" style="border-bottom-color:var(--azul-brilho);">&#128722; Produtos</a></li>
+                    <li><a href="servicos.html">&#128295; Serviços</a></li>
+                    <li><a href="contato.html">&#128222; Contato</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button class="btn-cart-header" id="btnCartHeader" title="Carrinho">
+                    &#128722; Carrinho
+                    <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+                </button>
+                <button class="btn-login" id="btnLoginHeader">&#128100; Entrar</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── PRODUTOS ──────────────────────────── -->
+    <section id="produtos">
+        <div class="container">
+            <h2 class="section-title" style="padding-top:40px;">Nossos Produtos</h2>
+            <p class="section-subtitle">Impressoras, multifuncionais e peças de reposição</p>
+            <div class="divide"></div>
+
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-btn active" data-filter="todas">Todas</button>
+                <button class="filter-btn" data-filter="impressoras">Impressoras</button>
+                <button class="filter-btn" data-filter="multifuncionais">Multifuncionais</button>
+                <button class="filter-btn" data-filter="pecas">Peças</button>
+                <button class="filter-btn" data-filter="suprimentos">Suprimentos</button>
+            </div>
+
+            <div class="product-grid">
+
+                <div class="product-card" data-category="impressoras">
+                    <div class="thumb">&#128424;</div>
+                    <div class="body">
+                        <span class="cat">Impressora</span>
+                        <h3>HP LaserJet Pro M404dn</h3>
+                        <p class="desc">Monocromática, duplex automático, 40 ppm. Ideal para escritórios de médio porte.</p>
+                        <div class="stock-info" data-product="HP LaserJet Pro M404dn"></div>
+                        <div class="price">R$ 2.199,00</div>
+                        <div class="installment">ou 10x de R$ 219,90</div>
+                        <button class="btn-card add-to-cart">&#128722; Adicionar</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="multifuncionais">
+                    <div class="thumb">&#128424;</div>
+                    <div class="body">
+                        <span class="cat">Multifuncional</span>
+                        <h3>Epson EcoTank L3250</h3>
+                        <p class="desc">Tanque de tinta colorida, Wi-Fi, impressão frente e verso manual. Baixo custo por página.</p>
+                        <div class="stock-info" data-product="Epson EcoTank L3250"></div>
+                        <div class="price">R$ 1.149,00</div>
+                        <div class="installment">ou 10x de R$ 114,90</div>
+                        <button class="btn-card add-to-cart">&#128722; Adicionar</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="impressoras">
+                    <div class="thumb">&#128424;</div>
+                    <div class="body">
+                        <span class="cat">Impressora Térmica</span>
+                        <h3>Elgin i9</h3>
+                        <p class="desc">Impressora de cupom não fiscal, 250 mm/s, USB. Ideal para PDV e comércio.</p>
+                        <div class="stock-info" data-product="Elgin i9"></div>
+                        <div class="price">R$ 479,00</div>
+                        <div class="installment">ou 10x de R$ 47,90</div>
+                        <button class="btn-card add-to-cart">&#128722; Adicionar</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="pecas">
+                    <div class="thumb">&#9881;</div>
+                    <div class="body">
+                        <span class="cat">Peça</span>
+                        <h3>Kit Fusor HP LaserJet</h3>
+                        <p class="desc">Compatível com M402/M404/M426. Unidade de fusão de alta durabilidade.</p>
+                        <div class="stock-info" data-product="Kit Fusor HP LaserJet"></div>
+                        <div class="price">R$ 349,00</div>
+                        <div class="installment">ou 10x de R$ 34,90</div>
+                        <button class="btn-card add-to-cart">&#128722; Adicionar</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="multifuncionais">
+                    <div class="thumb">&#128424;</div>
+                    <div class="body">
+                        <span class="cat">Multifuncional</span>
+                        <h3>Brother DCP-L5652DN</h3>
+                        <p class="desc">Laser monocromática, duplex, rede, scanner ADF. Alta produtividade.</p>
+                        <div class="stock-info" data-product="Brother DCP-L5652DN"></div>
+                        <div class="price">R$ 3.299,00</div>
+                        <div class="installment">ou 10x de R$ 329,90</div>
+                        <button class="btn-card add-to-cart">&#128722; Adicionar</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="pecas">
+                    <div class="thumb">&#9881;</div>
+                    <div class="body">
+                        <span class="cat">Peça</span>
+                        <h3>Placa Lógica Principal</h3>
+                        <p class="desc">Placa controladora compatível com diversas impressoras Epson. Revisada e testada.</p>
+                        <div class="stock-info" data-product="Placa Lógica Principal"></div>
+                        <div class="price">R$ 289,00</div>
+                        <div class="installment">ou 10x de R$ 28,90</div>
+                        <button class="btn-card add-to-cart">&#128722; Adicionar</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="impressoras">
+                    <div class="thumb">&#128424;</div>
+                    <div class="body">
+                        <span class="cat">Impressora</span>
+                        <h3>Zebra ZD421</h3>
+                        <p class="desc">Etiquetas térmicas, 203 dpi, USB/Ethernet. Ideal para logística e almoxarifado.</p>
+                        <div class="stock-info" data-product="Zebra ZD421"></div>
+                        <div class="price">R$ 2.799,00</div>
+                        <div class="installment">ou 10x de R$ 279,90</div>
+                        <button class="btn-card add-to-cart">&#128722; Adicionar</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="suprimentos">
+                    <div class="thumb">&#128367;</div>
+                    <div class="body">
+                        <span class="cat">Suprimento</span>
+                        <h3>Toner HP 58A Original</h3>
+                        <p class="desc">Cartucho toner preto CF258A. Rendimento de até 3.000 páginas.</p>
+                        <div class="stock-info" data-product="Toner HP 58A Original"></div>
+                        <div class="price">R$ 419,00</div>
+                        <div class="installment">ou 10x de R$ 41,90</div>
+                        <button class="btn-card add-to-cart">&#128722; Adicionar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODAL DE PRODUTO ────────────────────── -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-container">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="galeria">&#128247; Imagens</button>
+                <button class="modal-tab" data-tab="descricao">&#128196; Descrição</button>
+            </div>
+            <div class="modal-tab-panel active" id="tabGaleria">
+                <div class="modal-main-img" id="modalMainImg"></div>
+                <div class="modal-thumbs" id="modalThumbs"></div>
+            </div>
+            <div class="modal-tab-panel" id="tabDescricao">
+                <span class="modal-cat" id="modalCat"></span>
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <p class="modal-desc" id="modalDesc"></p>
+                <div class="modal-stock-info" id="modalStock"></div>
+            </div>
+            <div class="modal-footer-bar">
+                <div class="modal-footer-price">
+                    <div class="modal-price" id="modalPrice"></div>
+                    <div class="modal-installment" id="modalInstallment"></div>
+                </div>
+                <div class="modal-footer-actions">
+                    <button class="btn-modal-cart" id="modalAddCart">&#128722; Adicionar</button>
+                    <a href="contato.html" class="btn-modal-quote" id="modalBtn">Solicitar Orçamento</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── CHECKOUT ────────────────────────────── -->
+    <div class="checkout-overlay" id="checkoutOverlay">
+        <div class="checkout-panel" id="checkoutPanel">
+            <div class="checkout-header">
+                <h3>&#128179; Finalizar Compra</h3>
+                <button class="checkout-close" id="checkoutClose">&times;</button>
+            </div>
+            <div class="checkout-summary" id="checkoutSummary"></div>
+            <div class="checkout-form" id="checkoutForm">
+                <div id="checkoutFormFields">
+                    <h4>&#128666; Dados de Entrega</h4>
+                    <div class="checkout-field"><label>Nome completo</label><input type="text" id="coName" placeholder="Seu nome completo"></div>
+                    <div class="checkout-row">
+                        <div class="checkout-field"><label>CPF</label><input type="text" id="coCPF" placeholder="000.000.000-00"></div>
+                        <div class="checkout-field"><label>Telefone</label><input type="text" id="coPhone" placeholder="(11) 90000-0000"></div>
+                    </div>
+                    <div class="checkout-field"><label>E-mail</label><input type="text" id="coEmail" placeholder="seu@email.com"></div>
+                    <div class="checkout-row">
+                        <div class="checkout-field"><label>CEP</label><input type="text" id="coCEP" placeholder="00000-000"></div>
+                        <div class="checkout-field"><label>Estado</label><select id="coState"><option value="">Selecione</option><option>SP</option><option>RJ</option><option>MG</option><option>RS</option><option>PR</option><option>SC</option><option>BA</option><option>PE</option><option>CE</option><option>DF</option><option>GO</option><option>MT</option><option>MS</option><option>ES</option><option>AM</option><option>PA</option><option>MA</option><option>PB</option><option>RN</option><option>AL</option><option>SE</option><option>RO</option><option>TO</option><option>AC</option><option>AP</option><option>RR</option></select></div>
+                    </div>
+                    <div class="checkout-row">
+                        <div class="checkout-field"><label>Cidade</label><input type="text" id="coCity" placeholder="Sua cidade"></div>
+                        <div class="checkout-field"><label>Bairro</label><input type="text" id="coNeighborhood" placeholder="Bairro"></div>
+                    </div>
+                    <div class="checkout-row">
+                        <div class="checkout-field" style="flex:3;"><label>Endereço</label><input type="text" id="coAddress" placeholder="Rua, Avenida..."></div>
+                        <div class="checkout-field" style="flex:1;"><label>Nº</label><input type="text" id="coNumber" placeholder="123"></div>
+                    </div>
+                    <div class="checkout-field"><label>Complemento</label><input type="text" id="coComplement" placeholder="Apto, bloco, etc. (opcional)"></div>
+                    <h4 style="margin-top:8px;">&#128179; Forma de Pagamento</h4>
+                    <div class="payment-tabs">
+                        <button class="payment-tab active" data-pay="card"><span class="icon">&#128179;</span> Cartão</button>
+                        <button class="payment-tab" data-pay="pix"><span class="icon">&#128247;</span> PIX</button>
+                        <button class="payment-tab" data-pay="boleto"><span class="icon">&#128196;</span> Boleto</button>
+                    </div>
+                    <div class="payment-body active" id="payCard">
+                        <div class="checkout-field"><label>Número do cartão</label><input type="text" id="cardNumber" placeholder="0000 0000 0000 0000"></div>
+                        <div class="checkout-field"><label>Nome no cartão</label><input type="text" id="cardName" placeholder="Nome impresso no cartão"></div>
+                        <div class="checkout-row">
+                            <div class="checkout-field"><label>Validade</label><input type="text" id="cardExpiry" placeholder="MM/AA"></div>
+                            <div class="checkout-field"><label>CVV</label><input type="text" id="cardCVV" placeholder="123"></div>
+                        </div>
+                        <div class="checkout-field"><label>Parcelas</label><select id="cardInstallments"></select></div>
+                    </div>
+                    <div class="payment-body" id="payPix">
+                        <div class="pix-qrcode">&#128247;</div>
+                        <div class="pix-key" id="pixKey" title="Clique para copiar">bf-pagamento-550e8400-e29b-41d4-a716-446655440000</div>
+                        <p style="font-size:0.76rem;color:#64748b;text-align:center;">Clique na chave PIX acima para copiar</p>
+                    </div>
+                    <div class="payment-body" id="payBoleto">
+                        <div class="boleto-info">&#128196; O boleto será gerado e enviado para o seu e-mail após a confirmação do pedido. Vencimento em 3 dias úteis.</div>
+                    </div>
+                </div>
+                <div id="checkoutSuccess" style="display:none;">
+                    <div class="nf-container">
+                        <div class="nf-header">
+                            <div class="nf-company"><h4>B&amp;F Ltda</h4><p>CNPJ: 03.108.169/0001-58</p><p>R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090</p></div>
+                            <div class="nf-title"><h5>DANFE</h5><div class="nf-num" id="nfOrderNum"></div><span style="font-size:0.72rem;color:#64748b;" id="nfDate"></span></div>
+                        </div>
+                        <div class="nf-body">
+                            <div class="nf-section-title">Dados do Cliente</div>
+                            <div class="nf-info-row" id="nfCustomerInfo"></div>
+                            <div class="nf-section-title">Itens</div>
+                            <table class="nf-table"><thead><tr><th>Produto</th><th class="num">Qtd</th><th class="num">Unitário</th><th class="num">Total</th></tr></thead><tbody id="nfItemsBody"></tbody></table>
+                            <div class="nf-totals" id="nfTotals"></div>
+                            <div class="nf-section-title">Pagamento</div>
+                            <p style="margin-bottom:8px;" id="nfPayment"></p>
+                        </div>
+                        <div class="nf-footer">Agradecemos a preferência! | B&amp;F<br>atendimento@biancoeferreira.com.br | (16) 98138-6747</div>
+                    </div>
+                    <button class="btn-print-nf" id="btnPrintNF">&#128424; Imprimir Nota Fiscal</button>
+                </div>
+                <button class="btn-confirm" id="btnConfirmOrder">Confirmar Pedido</button>
+                <button class="btn-back-cart" id="btnBackToCart">&#8592; Voltar ao carrinho</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── CARRINHO SIDEBAR ──────────────────── -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header-bar">
+            <h3>&#128722; Carrinho</h3>
+            <button class="cart-close" id="cartClose">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">Seu carrinho está vazio.</div>
+        </div>
+        <div class="cart-footer-bar" id="cartFooter" style="display:none;">
+            <div class="cart-total"><span>Total:</span><span id="cartTotal">R$ 0,00</span></div>
+            <button class="btn-checkout" id="btnCheckout">Finalizar Pedido</button>
+        </div>
+    </div>
+
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-box" id="authBoxLogin">
+            <h3>&#128274; Entrar</h3>
+            <div class="auth-field"><label>E-mail</label><input type="text" id="loginEmail" placeholder="admin"></div>
+            <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" placeholder="admin"></div>
+            <div class="auth-error" id="loginError"></div>
+            <button class="btn-auth" id="btnLogin">Entrar</button>
+            <div class="auth-switch">Não tem conta? <a id="switchToRegister">Cadastre-se</a></div>
+        </div>
+        <div class="auth-box" id="authBoxRegister" style="display:none;">
+            <h3>&#128100; Criar Conta</h3>
+            <div class="auth-field"><label>Nome</label><input type="text" id="regName" placeholder="Seu nome"></div>
+            <div class="auth-field"><label>E-mail</label><input type="text" id="regEmail" placeholder="seu@email.com"></div>
+            <div class="auth-field"><label>Senha</label><input type="password" id="regPass" placeholder="Mínimo 4 caracteres"></div>
+            <div class="auth-error" id="regError"></div>
+            <button class="btn-auth" id="btnRegister">Cadastrar</button>
+            <div class="auth-switch">Já tem conta? <a id="switchToLogin">Entrar</a></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="chat-widget">
+        <div class="chat-panel" id="chatPanel">
+            <div class="chat-header"><div class="avatar">B&amp;F</div><div class="info"><div class="name">B&amp;F</div><div class="status">Online agora</div></div><button class="close-chat" id="closeChat">&times;</button></div>
+            <div class="chat-body" id="chatBody"><div class="chat-msg bot">Ol&aacute;! Somos a B&amp;F. Como posso ajudar?</div></div>
+            <div class="chat-footer"><input type="text" id="chatInput" placeholder="Digite sua mensagem..." maxlength="300"><button id="chatSend">&#10148;</button></div>
+        </div>
+        <button class="chat-toggle" id="chatToggle">&#128172;</button>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 BIANCO &amp; FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA CNPJ: 03.108.169/0001-58</p>
+            <p class="legal">Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+(function(){
+    /* ── DADOS DOS PRODUTOS ─────────── */
+    var productData = {
+        'HP LaserJet Pro M404dn': {
+            images: ['&#128424;','&#128196;','&#128295;','&#128203;'],
+            stock: 12,
+            longDesc: 'A HP LaserJet Pro M404dn é uma impressora monocromática de alto desempenho, ideal para escritórios que precisam de velocidade e qualidade. Com impressão duplex automática e velocidade de até 40 ppm, oferece produtividade sem abrir mão da segurança. Conexão Ethernet e USB, compatível com HP Smart e soluções de gerenciamento em nuvem. Bandeja de 250 folhas e bandeja multiuso para 100 folhas adicionais.'
+        },
+        'Epson EcoTank L3250': {
+            images: ['&#128424;','&#127912;','&#128167;','&#128203;'],
+            stock: 25,
+            longDesc: 'A Epson EcoTank L3250 é a solução perfeita para quem busca economia. Com tanque de tinta de alta capacidade, imprime até 4.500 páginas em preto e 7.500 em cores sem se preocupar com cartuchos. Conexão Wi-Fi integrada, compatível com Epson Smart Panel. Impressão frente e verso manual, velocidade de 10 ppm em preto e 5 ppm em cores. Ideal para uso doméstico e pequenos escritórios.'
+        },
+        'Elgin i9': {
+            images: ['&#129534;','&#128722;','&#128179;','&#128203;'],
+            stock: 40,
+            longDesc: 'A Elgin i9 é uma impressora térmica de cupom não fiscal de alta velocidade, atingindo até 250 mm/s. Com conexão USB, é perfeita para pontos de venda, comércios e estabelecimentos que exigem agilidade na emissão de comprovantes. Design robusto, guilhotina integrada e compatível com os principais sistemas de automação comercial do mercado.'
+        },
+        'Kit Fusor HP LaserJet': {
+            images: ['&#9881;','&#128296;','&#128295;','&#128203;'],
+            stock: 8,
+            longDesc: 'O Kit Fusor para HP LaserJet é compatível com os modelos M402, M404, M426 e similares. Esta unidade de fusão de alta durabilidade garante impressões nítidas e sem falhas. Fabricado com materiais de qualidade premium, oferece vida útil estendida comparado aos fusores convencionais. Fácil instalação com guia passo a passo incluso. Testado individualmente antes do envio.'
+        },
+        'Brother DCP-L5652DN': {
+            images: ['&#128424;','&#128224;','&#128196;','&#128203;'],
+            stock: 6,
+            longDesc: 'A Brother DCP-L5652DN é uma multifuncional laser monocromática completa. Com impressão duplex automática, scanner ADF para múltiplas páginas e conexão de rede, é a escolha certa para grupos de trabalho que precisam de alta produtividade. Velocidade de 40 ppm, bandeja de 250 folhas, display LCD touchscreen de 3,5". Ideal para escritórios de médio a grande porte.'
+        },
+        'Placa Lógica Principal': {
+            images: ['&#128268;','&#128295;','&#128187;','&#128203;'],
+            stock: 15,
+            longDesc: 'Placa lógica principal compatível com diversas impressoras Epson. Revisada e testada individualmente antes do envio. Esta placa controladora é responsável pelo processamento central da impressora, gerenciando desde a comunicação com o computador até o controle dos motores e cabeçotes de impressão. Acompanha manual de instalação e garantia de 90 dias.'
+        },
+        'Zebra ZD421': {
+            images: ['&#127991;','&#128230;','&#128203;','&#128295;'],
+            stock: 10,
+            longDesc: 'A Zebra ZD421 é uma impressora de etiquetas térmicas de alto desempenho com resolução de 203 dpi. Ideal para logística, almoxarifado e varejo. Conexão USB e Ethernet, compatível com as principais linguagens de impressão como ZPL e EPL. Design compacto e construção robusta para ambientes exigentes. Velocidade de impressão de até 152 mm/s.'
+        },
+        'Toner HP 58A Original': {
+            images: ['&#128424;','&#128137;','&#128267;','&#128203;'],
+            stock: 30,
+            longDesc: 'O Toner HP 58A Original (CF258A) é o suprimento oficial para impressoras HP LaserJet. Com rendimento de até 3.000 páginas, garante impressões nítidas e de qualidade profissional. A tecnologia JetIntelligence da HP assegura desempenho consistente página após página, além de proteção contra falsificações. Fácil instalação, design de troca rápida.'
+        }
+    };
+
+    /* ── RENDER ESTOQUE ──────────────── */
+    function renderStock() {
+        document.querySelectorAll('.stock-info').forEach(function(el){
+            var name = el.getAttribute('data-product');
+            var data = productData[name];
+            if (!data) return;
+            var s = data.stock;
+            var cls, txt;
+            if (s > 20) { cls = 'high'; txt = 'Em estoque (' + s + ' un.)'; }
+            else if (s > 5) { cls = 'medium'; txt = 'Estoque baixo (' + s + ' un.)'; }
+            else { cls = 'low'; txt = 'Últimas unidades (' + s + ' un.)'; }
+            el.innerHTML = '<span class="stock-dot ' + cls + '"></span><span class="stock-text ' + cls + '">' + txt + '</span>';
+        });
+    }
+    renderStock();
+
+    /* ── CARRINHO ────────────────────── */
+    var CART_KEY = 'bf_cart';
+    function loadCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
+    function saveCart(arr){ localStorage.setItem(CART_KEY, JSON.stringify(arr)); }
+    var cart = loadCart();
+
+    var cartSidebar = document.getElementById('cartSidebar');
+    var cartOverlay = document.getElementById('cartOverlay');
+    var cartItemsEl = document.getElementById('cartItems');
+    var cartTotalEl = document.getElementById('cartTotal');
+    var cartFooter = document.getElementById('cartFooter');
+    var cartBadge = document.getElementById('cartBadge');
+
+    function cartCount(){ return cart.reduce(function(s,i){ return s + i.qty; }, 0); }
+
+    function updateBadge(){
+        if (!cartBadge) return;
+        var c = cartCount();
+        if (c > 0) { cartBadge.style.display = 'flex'; cartBadge.textContent = c; cartBadge.classList.add('pop'); setTimeout(function(){ cartBadge.classList.remove('pop'); }, 200); }
+        else { cartBadge.style.display = 'none'; }
+    }
+
+    function cartPrice(str){
+        return parseFloat((str||'').replace(/[^\d,]/g,'').replace(',','.')) || 0;
+    }
+
+    function cartTotal(){
+        return cart.reduce(function(s,i){ return s + (cartPrice(i.price) * i.qty); }, 0);
+    }
+
+    function fmtReal(v){ return 'R$ ' + v.toFixed(2).replace('.',','); }
+
+    function renderCart(){
+        if (!cartItemsEl || !cartFooter || !cartTotalEl) return;
+        if (cart.length === 0) {
+            cartItemsEl.innerHTML = '<div class="cart-empty">Seu carrinho est&aacute; vazio.</div>';
+            cartFooter.style.display = 'none';
+        } else {
+            var h = '';
+            cart.forEach(function(item, idx){
+                var thumb = productData[item.title] && productData[item.title].images ? productData[item.title].images[0] : '&#128424;';
+                h += '<div class="cart-item">' +
+                    '<div class="cart-item-img">' + thumb + '</div>' +
+                    '<div class="cart-item-info">' +
+                        '<h4>' + item.title + '</h4>' +
+                        '<div class="cart-item-price">' + item.price + '</div>' +
+                        '<div class="cart-qty">' +
+                            '<button data-idx="'+idx+'" data-act="dec">&minus;</button>' +
+                            '<span>' + item.qty + '</span>' +
+                            '<button data-idx="'+idx+'" data-act="inc">+</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button class="cart-item-remove" data-idx="'+idx+'" data-act="del">&times;</button>' +
+                '</div>';
+            });
+            cartItemsEl.innerHTML = h;
+            cartFooter.style.display = 'block';
+            cartTotalEl.textContent = fmtReal(cartTotal());
+        }
+        saveCart(cart);
+        updateBadge();
+    }
+
+    if (cartItemsEl) {
+        cartItemsEl.addEventListener('click', function(e){
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            var idx = parseInt(btn.getAttribute('data-idx'));
+            var act = btn.getAttribute('data-act');
+            if (act === 'inc') { cart[idx].qty++; }
+            else if (act === 'dec') { cart[idx].qty--; if (cart[idx].qty <= 0) cart.splice(idx,1); }
+            else if (act === 'del') { cart.splice(idx,1); }
+            renderCart();
+        });
+    }
+
+    function addToCart(title, price){
+        var exist = cart.find(function(i){ return i.title === title; });
+        if (exist) { exist.qty++; }
+        else { cart.push({title: title, price: price, qty: 1}); }
+        renderCart();
+        showToast('&#9989; ' + title + ' adicionado ao carrinho!');
+    }
+
+    function openCart(){ if(cartOverlay){cartOverlay.classList.add('active');} if(cartSidebar){cartSidebar.classList.add('active');} document.body.style.overflow = 'hidden'; }
+    function closeCart(){ if(cartOverlay){cartOverlay.classList.remove('active');} if(cartSidebar){cartSidebar.classList.remove('active');} document.body.style.overflow = ''; }
+    var cartCloseBtn = document.getElementById('cartClose');
+    if (cartCloseBtn) cartCloseBtn.addEventListener('click', closeCart);
+    if (cartOverlay) cartOverlay.addEventListener('click', function(e){ if (e.target === cartOverlay) closeCart(); });
+    var btnCartH = document.getElementById('btnCartHeader');
+    if (btnCartH) btnCartH.addEventListener('click', openCart);
+
+    /* ── CHECKOUT ────────────────────── */
+    var checkoutOverlay = document.getElementById('checkoutOverlay');
+    var checkoutSummary = document.getElementById('checkoutSummary');
+
+    if (checkoutOverlay && checkoutSummary) {
+        function renderCheckoutSummary(){
+            var h = '<h4>&#128722; Resumo do Pedido</h4>';
+            cart.forEach(function(item){
+                var thumb = productData[item.title] && productData[item.title].images ? productData[item.title].images[0] : '&#128424;';
+                h += '<div class="checkout-item-mini">' +
+                    '<div class="checkout-item-img">' + thumb + '</div>' +
+                    '<div class="info"><strong>' + item.title + '</strong><span>' + item.qty + 'x ' + item.price + '</span></div>' +
+                '</div>';
+            });
+            var subtotal = cartTotal();
+            var shipping = subtotal > 500 ? 0 : 29.90;
+            var total = subtotal + shipping;
+            h += '<div class="checkout-totals">' +
+                '<div class="row"><span>Subtotal</span><span>' + fmtReal(subtotal) + '</span></div>' +
+                '<div class="row"><span>Frete</span><span>' + (shipping === 0 ? 'Grátis' : fmtReal(shipping)) + '</span></div>' +
+                '<div class="row total"><span>Total</span><span id="checkoutTotalValue" data-total="' + total + '">' + fmtReal(total) + '</span></div>' +
+            '</div>';
+            checkoutSummary.innerHTML = h;
+            renderInstallments(total);
+        }
+
+        function renderInstallments(total){
+            var sel = document.getElementById('cardInstallments');
+            if (!sel) return;
+            var h = '';
+            for (var i = 1; i <= 10; i++) {
+                var val = total / i;
+                h += '<option value="' + i + '">' + i + 'x de ' + fmtReal(val) + (i === 1 ? ' (à vista)' : '') + '</option>';
+            }
+            sel.innerHTML = h;
+        }
+
+        function openCheckout(){
+            renderCheckoutSummary();
+            var ff = document.getElementById('checkoutFormFields');
+            var cs = document.getElementById('checkoutSuccess');
+            var bc = document.getElementById('btnConfirmOrder');
+            if (ff) ff.style.display = 'block';
+            if (cs) cs.style.display = 'none';
+            if (bc) bc.style.display = 'block';
+            checkoutOverlay.classList.add('active');
+            closeCart();
+            document.body.style.overflow = 'hidden';
+        }
+        function closeCheckout(){
+            checkoutOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        var coClose = document.getElementById('checkoutClose');
+        if (coClose) coClose.addEventListener('click', closeCheckout);
+        checkoutOverlay.addEventListener('click', function(e){ if (e.target === checkoutOverlay) closeCheckout(); });
+        var btnBack = document.getElementById('btnBackToCart');
+        if (btnBack) btnBack.addEventListener('click', function(){
+            closeCheckout();
+            setTimeout(openCart, 200);
+        });
+
+        document.querySelectorAll('.payment-tab').forEach(function(tab){
+            tab.addEventListener('click', function(){
+                document.querySelectorAll('.payment-tab').forEach(function(t){ t.classList.remove('active'); });
+                tab.classList.add('active');
+                var pay = tab.getAttribute('data-pay');
+                document.querySelectorAll('.payment-body').forEach(function(b){ b.classList.remove('active'); });
+                var target = document.getElementById(pay === 'card' ? 'payCard' : pay === 'pix' ? 'payPix' : 'payBoleto');
+                if (target) target.classList.add('active');
+            });
+        });
+
+        var pixKeyEl = document.getElementById('pixKey');
+        if (pixKeyEl) {
+            pixKeyEl.addEventListener('click', function(){
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(pixKeyEl.textContent).then(function(){
+                        showToast('&#128247; Chave PIX copiada!');
+                    });
+                }
+            });
+        }
+
+        var btnConfirm = document.getElementById('btnConfirmOrder');
+        if (btnConfirm) {
+            btnConfirm.addEventListener('click', function(){
+                var name = document.getElementById('coName').value.trim();
+                var email = document.getElementById('coEmail').value.trim();
+                var phone = document.getElementById('coPhone').value.trim();
+                var address = document.getElementById('coAddress').value.trim();
+                var number = document.getElementById('coNumber').value.trim();
+                var city = document.getElementById('coCity').value.trim();
+                var state = document.getElementById('coState').value;
+
+                if (!name || !email || !phone || !address || !number || !city || !state) {
+                    showToast('&#9888; Preencha todos os campos obrigatórios.');
+                    return;
+                }
+
+                var activePayTab = document.querySelector('.payment-tab.active');
+                var payMethod = activePayTab ? activePayTab.getAttribute('data-pay') : 'card';
+                var payLabel = payMethod === 'card' ? 'Cartão de Crédito' : payMethod === 'pix' ? 'PIX' : 'Boleto';
+
+                var orderId = 'BF-' + Date.now().toString(36).toUpperCase();
+                var now = new Date();
+                var dateStr = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+
+                var nfNum = document.getElementById('nfOrderNum');
+                var nfDate = document.getElementById('nfDate');
+                if (nfNum) nfNum.textContent = orderId;
+                if (nfDate) nfDate.textContent = dateStr;
+
+                var cpf = document.getElementById('coCPF').value.trim() || '---';
+                var addrFull = address + ', ' + number;
+                var coComp = document.getElementById('coComplement');
+                if (coComp && coComp.value.trim()) addrFull += ' — ' + coComp.value.trim();
+                addrFull += ' — ' + city + '/' + state;
+
+                var custHtml = '<div><span class="lbl">Nome</span><span class="val">'+name+'</span></div>';
+                custHtml += '<div><span class="lbl">CPF</span><span class="val">'+cpf+'</span></div>';
+                custHtml += '<div><span class="lbl">E-mail</span><span class="val">'+email+'</span></div>';
+                custHtml += '<div><span class="lbl">Telefone</span><span class="val">'+phone+'</span></div>';
+                custHtml += '<div style="grid-column:1/-1;"><span class="lbl">Endereço</span><span class="val">'+addrFull+'</span></div>';
+                var nfCust = document.getElementById('nfCustomerInfo');
+                if (nfCust) nfCust.innerHTML = custHtml;
+
+                var itemsHtml = '';
+                var subtotal = 0;
+                cart.forEach(function(item){
+                    var pu = cartPrice(item.price);
+                    var tot = pu * item.qty;
+                    subtotal += tot;
+                    itemsHtml += '<tr><td>'+item.title+'</td><td class="num">'+item.qty+'</td><td class="num">'+item.price+'</td><td class="num">'+fmtReal(tot)+'</td></tr>';
+                });
+                var nfItems = document.getElementById('nfItemsBody');
+                if (nfItems) nfItems.innerHTML = itemsHtml;
+
+                var shipping = subtotal > 500 ? 0 : 29.90;
+                var total = subtotal + shipping;
+                var totalsHtml = '<div class="nf-row"><span>Subtotal</span><span>'+fmtReal(subtotal)+'</span></div>';
+                totalsHtml += '<div class="nf-row"><span>Frete</span><span>'+(shipping === 0 ? 'Grátis' : fmtReal(shipping))+'</span></div>';
+                totalsHtml += '<div class="nf-row total"><span>TOTAL</span><span>'+fmtReal(total)+'</span></div>';
+                var nfTot = document.getElementById('nfTotals');
+                if (nfTot) nfTot.innerHTML = totalsHtml;
+
+                var nfPay = document.getElementById('nfPayment');
+                if (nfPay) nfPay.innerHTML = '<strong>Forma de pagamento:</strong> ' + payLabel;
+
+                document.getElementById('checkoutFormFields').style.display = 'none';
+                document.getElementById('checkoutSuccess').style.display = 'block';
+                document.getElementById('btnConfirmOrder').style.display = 'none';
+
+                showToast('&#9989; Pedido ' + orderId + ' confirmado! (' + payLabel + ')');
+                cart = [];
+                renderCart();
+                saveCart(cart);
+            });
+        }
+
+        var btnPrint = document.getElementById('btnPrintNF');
+        if (btnPrint) btnPrint.addEventListener('click', function(){ window.print(); });
+
+        var btnChk = document.getElementById('btnCheckout');
+        if (btnChk) btnChk.addEventListener('click', function(){
+            if (cart.length === 0) { showToast('&#9888; Carrinho vazio.'); return; }
+            openCheckout();
+        });
+    }
+
+    /* ── AUTH ─────────────────────────── */
+    var USERS_KEY = 'bf_users';
+    var SESSION_KEY = 'bf_session';
+    function loadUsers(){ try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; } catch(e){ return []; } }
+    function saveUsers(arr){ localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
+    function getSession(){ try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e){ return null; } }
+
+    var users = loadUsers();
+    if (users.length === 0) {
+        users.push({name:'Admin', email:'admin', pass:'admin'});
+        saveUsers(users);
+    }
+
+    var currentUser = getSession();
+    var authOverlay = document.getElementById('authOverlay');
+    var boxLogin = document.getElementById('authBoxLogin');
+    var boxRegister = document.getElementById('authBoxRegister');
+    var btnLoginHeader = document.getElementById('btnLoginHeader');
+
+    if (authOverlay && boxLogin && boxRegister) {
+        function updateAuthUI(){
+            if (currentUser && btnLoginHeader) {
+                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnLogout">&#128682; Sair</button></div></div>';
+                var unameBtn = document.getElementById('userNameBtn');
+                if (unameBtn) unameBtn.addEventListener('click', function(e){ e.stopPropagation(); var m = document.getElementById('userMenu'); if (m) m.classList.toggle('open'); });
+                var logoutBtn = document.getElementById('btnLogout');
+                if (logoutBtn) logoutBtn.addEventListener('click', function(){
+                    localStorage.removeItem(SESSION_KEY);
+                    currentUser = null;
+                    location.reload();
+                });
+                document.addEventListener('click', function(){
+                    var m = document.getElementById('userMenu');
+                    if (m) m.classList.remove('open');
+                });
+            }
+        }
+        updateAuthUI();
+
+        if (btnLoginHeader && btnLoginHeader.parentNode) {
+            btnLoginHeader.addEventListener('click', function(){
+                authOverlay.classList.add('active');
+                boxLogin.style.display = 'block';
+                boxRegister.style.display = 'none';
+                var le = document.getElementById('loginError'); if (le) le.textContent = '';
+                var re = document.getElementById('regError'); if (re) re.textContent = '';
+            });
+        }
+        authOverlay.addEventListener('click', function(e){ if (e.target === authOverlay) authOverlay.classList.remove('active'); });
+
+        var swReg = document.getElementById('switchToRegister');
+        if (swReg) swReg.addEventListener('click', function(){
+            boxLogin.style.display = 'none';
+            boxRegister.style.display = 'block';
+            var le = document.getElementById('loginError'); if (le) le.textContent = '';
+            var re = document.getElementById('regError'); if (re) re.textContent = '';
+        });
+        var swLog = document.getElementById('switchToLogin');
+        if (swLog) swLog.addEventListener('click', function(){
+            boxRegister.style.display = 'none';
+            boxLogin.style.display = 'block';
+            var le = document.getElementById('loginError'); if (le) le.textContent = '';
+            var re = document.getElementById('regError'); if (re) re.textContent = '';
+        });
+
+        var btnL = document.getElementById('btnLogin');
+        if (btnL) btnL.addEventListener('click', function(){
+            var email = document.getElementById('loginEmail').value.trim();
+            var pass = document.getElementById('loginPass').value;
+            var u = users.find(function(u){ return u.email === email && u.pass === pass; });
+            if (u) {
+                currentUser = u;
+                localStorage.setItem(SESSION_KEY, JSON.stringify(u));
+                authOverlay.classList.remove('active');
+                showToast('&#128100; Bem-vindo, ' + u.name + '!');
+                setTimeout(function(){ location.reload(); }, 600);
+            } else {
+                var le = document.getElementById('loginError'); if (le) le.textContent = 'E-mail ou senha inválidos.';
+            }
+        });
+
+        var btnR = document.getElementById('btnRegister');
+        if (btnR) btnR.addEventListener('click', function(){
+            var name = document.getElementById('regName').value.trim();
+            var email = document.getElementById('regEmail').value.trim();
+            var pass = document.getElementById('regPass').value;
+            if (!name || !email || !pass) { var re = document.getElementById('regError'); if (re) re.textContent = 'Preencha todos os campos.'; return; }
+            if (pass.length < 4) { var re = document.getElementById('regError'); if (re) re.textContent = 'Senha deve ter ao menos 4 caracteres.'; return; }
+            if (users.find(function(u){ return u.email === email; })) { var re = document.getElementById('regError'); if (re) re.textContent = 'Este e-mail já está cadastrado.'; return; }
+            var newUser = {name: name, email: email, pass: pass};
+            users.push(newUser);
+            saveUsers(users);
+            currentUser = newUser;
+            localStorage.setItem(SESSION_KEY, JSON.stringify(newUser));
+            authOverlay.classList.remove('active');
+            showToast('&#127881; Conta criada com sucesso!');
+            setTimeout(function(){ location.reload(); }, 600);
+        });
+    }
+
+    /* ── TOAST ────────────────────────── */
+    function showToast(msg){
+        var container = document.getElementById('toastContainer');
+        if (!container) return;
+        var t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        container.appendChild(t);
+        setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 2500);
+    }
+
+    /* ── CONTATO INTERATIVO ───────────── */
+    var phoneEl = document.getElementById('contactPhone');
+    if (phoneEl) {
+        phoneEl.addEventListener('click', function(){
+            var num = phoneEl.getAttribute('data-copy');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(num).then(function(){
+                    phoneEl.classList.add('copied');
+                    setTimeout(function(){ phoneEl.classList.remove('copied'); }, 1800);
+                    showToast('&#128222; Número copiado: (16) 98138-6747');
+                });
+            }
+        });
+    }
+    var emailEl = document.getElementById('contactEmail');
+    if (emailEl) {
+        emailEl.addEventListener('click', function(){
+            var em = emailEl.getAttribute('data-email');
+            window.location.href = 'mailto:' + em;
+        });
+    }
+
+    /* ── PRODUTOS: add-to-cart + modal + filtro ── */
+    var productGrid = document.querySelector('.product-grid');
+    if (productGrid) {
+        productGrid.addEventListener('click', function(e){
+            var btn = e.target.closest('.add-to-cart');
+            if (btn) {
+                e.stopPropagation();
+                var card = btn.closest('.product-card');
+                var title = card.querySelector('h3').textContent.trim();
+                var price = card.querySelector('.price').textContent.trim();
+                addToCart(title, price);
+                return;
+            }
+            var card = e.target.closest('.product-card');
+            if (!card) return;
+            if (e.target.closest('.btn-card')) return;
+            openModal(card);
+        });
+
+        var btns = document.querySelectorAll('.filter-btn');
+        var cards = document.querySelectorAll('.product-card');
+        btns.forEach(function(btn){
+            btn.addEventListener('click', function(){
+                btns.forEach(function(b){ b.classList.remove('active'); });
+                btn.classList.add('active');
+                var filter = btn.getAttribute('data-filter');
+                cards.forEach(function(card){
+                    if (filter === 'todas' || card.getAttribute('data-category') === filter) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    }
+
+    /* ── MODAL DE PRODUTO ────────────── */
+    var overlay = document.getElementById('productModal');
+    if (overlay) {
+        var modalClose = document.getElementById('modalClose');
+        var mainImg = document.getElementById('modalMainImg');
+        var thumbs = document.getElementById('modalThumbs');
+        var modalCat = document.getElementById('modalCat');
+        var modalTitle = document.getElementById('modalTitle');
+        var modalDesc = document.getElementById('modalDesc');
+        var modalPrice = document.getElementById('modalPrice');
+        var modalInstall = document.getElementById('modalInstallment');
+        var modalBtn = document.getElementById('modalBtn');
+        var modalStock = document.getElementById('modalStock');
+        var modalAddCart = document.getElementById('modalAddCart');
+        var currentModalProduct = null;
+
+        document.querySelectorAll('.modal-tab').forEach(function(tab){
+            tab.addEventListener('click', function(){
+                document.querySelectorAll('.modal-tab').forEach(function(t){ t.classList.remove('active'); });
+                tab.classList.add('active');
+                var target = tab.getAttribute('data-tab');
+                document.querySelectorAll('.modal-tab-panel').forEach(function(p){ p.classList.remove('active'); });
+                document.getElementById(target === 'galeria' ? 'tabGaleria' : 'tabDescricao').classList.add('active');
+            });
+        });
+
+        function openModal(card) {
+            var title = card.querySelector('h3').textContent.trim();
+            var cat = card.querySelector('.cat').textContent.trim();
+            var desc = card.querySelector('.desc').textContent.trim();
+            var price = card.querySelector('.price').textContent.trim();
+            var inst = card.querySelector('.installment').textContent.trim();
+            var data = productData[title] || null;
+            currentModalProduct = title;
+
+            if (modalCat) modalCat.textContent = cat;
+            if (modalTitle) modalTitle.textContent = title;
+            if (modalPrice) modalPrice.textContent = price;
+            if (modalInstall) modalInstall.textContent = inst;
+
+            if (data) {
+                if (modalDesc) modalDesc.textContent = data.longDesc;
+                if (mainImg) mainImg.innerHTML = data.images[0];
+                if (thumbs) {
+                    thumbs.innerHTML = '';
+                    data.images.forEach(function(img, idx){
+                        var t = document.createElement('div');
+                        t.className = 'modal-thumb' + (idx === 0 ? ' active' : '');
+                        t.innerHTML = img;
+                        t.addEventListener('click', function(){
+                            if (mainImg) mainImg.innerHTML = img;
+                            var all = thumbs.querySelectorAll('.modal-thumb');
+                            all.forEach(function(a){ a.classList.remove('active'); });
+                            t.classList.add('active');
+                        });
+                        thumbs.appendChild(t);
+                    });
+                }
+                if (modalStock) {
+                    var s = data.stock;
+                    var cls, txt;
+                    if (s > 20) { cls = 'high'; txt = s + ' unidades em estoque'; }
+                    else if (s > 5) { cls = 'medium'; txt = 'Apenas ' + s + ' unidades'; }
+                    else { cls = 'low'; txt = 'Últimas ' + s + ' unidades!'; }
+                    modalStock.innerHTML = '<span class="stock-dot ' + cls + '"></span><span class="stock-text ' + cls + '">' + txt + '</span>';
+                }
+            } else {
+                if (modalDesc) modalDesc.textContent = desc;
+                if (mainImg) mainImg.innerHTML = '&#128424;';
+                if (thumbs) thumbs.innerHTML = '';
+                if (modalStock) modalStock.innerHTML = '';
+            }
+
+            document.querySelectorAll('.modal-tab').forEach(function(t){ t.classList.remove('active'); });
+            var galTab = document.querySelector('.modal-tab[data-tab="galeria"]');
+            if (galTab) galTab.classList.add('active');
+            document.querySelectorAll('.modal-tab-panel').forEach(function(p){ p.classList.remove('active'); });
+            var galPanel = document.getElementById('tabGaleria');
+            if (galPanel) galPanel.classList.add('active');
+
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        if (modalAddCart) modalAddCart.addEventListener('click', function(){
+            if (currentModalProduct) {
+                var cardEls = document.querySelectorAll('.product-card');
+                var price = '';
+                cardEls.forEach(function(c){
+                    if (c.querySelector('h3').textContent.trim() === currentModalProduct) {
+                        price = c.querySelector('.price').textContent.trim();
+                    }
+                });
+                if (price) addToCart(currentModalProduct, price);
+            }
+        });
+
+        function closeModal() {
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (modalClose) modalClose.addEventListener('click', closeModal);
+        if (modalBtn) modalBtn.addEventListener('click', function(){
+            setTimeout(closeModal, 150);
+        });
+        overlay.addEventListener('click', function(e){
+            if (e.target === overlay) closeModal();
+        });
+    }
+
+    /* ── KEYDOWN ESCAPE ──────────────── */
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape') {
+            if (overlay && overlay.classList.contains('active')) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            if (cartSidebar && cartSidebar.classList.contains('active')) closeCart();
+            if (authOverlay && authOverlay.classList.contains('active')) authOverlay.classList.remove('active');
+            if (checkoutOverlay && checkoutOverlay.classList.contains('active')) {
+                checkoutOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+
+    /* ── CHAT WIDGET ────────────────── */
+    var panel = document.getElementById('chatPanel');
+    if (panel) {
+        var toggle = document.getElementById('chatToggle');
+        var close = document.getElementById('closeChat');
+        var body = document.getElementById('chatBody');
+        var input = document.getElementById('chatInput');
+        var send = document.getElementById('chatSend');
+
+        var respostas = {
+            'oi':'Olá! Bem-vindo à B&F. Em que posso ajudar?',
+            'ola':'Olá! Bem-vindo à B&F. Em que posso ajudar?',
+            'bom dia':'Bom dia! Em que podemos ajudar hoje?',
+            'boa tarde':'Boa tarde! Como posso auxiliá-lo?',
+            'boa noite':'Boa noite! Estamos aqui para ajudar.',
+            'preço':'Temos impressoras a partir de R$ 479,00 e peças a partir de R$ 289,00. Qual modelo lhe interessa?',
+            'preco':'Temos impressoras a partir de R$ 479,00 e peças a partir de R$ 289,00. Qual modelo lhe interessa?',
+            'orçamento':'Claro! Pode nos enviar um e-mail para atendimento@biancoeferreira.com.br ou ligar para (16) 98138-6747. Qual produto deseja?',
+            'orcamento':'Claro! Pode nos enviar um e-mail para atendimento@biancoeferreira.com.br ou ligar para (16) 98138-6747. Qual produto deseja?',
+            'entrega':'Realizamos entregas para todo o Brasil. O prazo varia conforme a região. Informe seu CEP para consulta.',
+            'garantia':'Todos os nossos produtos possuem garantia mínima de 90 dias. Peças originais contam com garantia do fabricante.',
+            'peças':'Trabalhamos com peças originais e compatíveis para HP, Epson, Brother, Zebra, Elgin e outras marcas. Qual você precisa?',
+            'pecas':'Trabalhamos com peças originais e compatíveis para HP, Epson, Brother, Zebra, Elgin e outras marcas. Qual você precisa?',
+            'obrigado':'Por nada! Estamos à disposição. Tenha um ótimo dia!',
+            'valeu':'Por nada! Estamos à disposição. Tenha um ótimo dia!',
+            'tchau':'Até logo! Qualquer dúvida é só chamar. Tenha um ótimo dia!'
+        };
+
+        function addMsg(texto, tipo){
+            var div = document.createElement('div');
+            div.className = 'chat-msg ' + tipo;
+            div.textContent = texto;
+            body.appendChild(div);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function botReply(msg){
+            var t = msg.toLowerCase().trim();
+            var reply = null;
+            for (var k in respostas) {
+                if (t.indexOf(k) !== -1) { reply = respostas[k]; break; }
+            }
+            if (!reply) {
+                reply = 'Obrigado pelo contato! Um de nossos atendentes retornará em breve. Enquanto isso, pode nos ligar em (16) 98138-6747.';
+            }
+            setTimeout(function(){ addMsg(reply, 'bot'); }, 600);
+        }
+
+        if (toggle) toggle.addEventListener('click', function(){
+            panel.classList.toggle('open');
+        });
+        if (close) close.addEventListener('click', function(){
+            panel.classList.remove('open');
+        });
+        if (send) send.addEventListener('click', function enviar(){
+            var msg = input.value.trim();
+            if (!msg) return;
+            addMsg(msg, 'user');
+            input.value = '';
+            botReply(msg);
+        });
+        if (input) input.addEventListener('keydown', function(e){
+            if (e.key === 'Enter' && send) send.click();
+        });
+    }
+
+    renderCart();
+    updateBadge();
+})();
+
+</script>
+</body>
+</html>
