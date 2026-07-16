@@ -96,12 +96,13 @@
         .anuncio-card .info .name{font-size:.8rem;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .anuncio-card .info .actions{display:flex;gap:8px;margin-top:6px;}
 
-        .preview-bar{position:fixed;bottom:0;right:0;width:340px;height:0;background:var(--bg-card);border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;z-index:50;overflow:hidden;transition:height .3s;}
-        .preview-bar.open{height:500px;}
-        .preview-bar-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--accent);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;}
-        .preview-bar iframe{width:100%;height:calc(100% - 36px);border:none;}
-        .preview-toggle{position:fixed;bottom:12px;right:12px;z-index:51;background:var(--accent);color:#fff;border:none;border-radius:25px;padding:8px 18px;font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(0,0,0,.4);}
-        .preview-toggle:hover{background:var(--accent-hover);}
+        .preview-bar{position:fixed;top:0;right:-480px;width:440px;height:100vh;background:var(--bg-card);border-left:1px solid var(--border);z-index:49;overflow:hidden;transition:right .35s ease;display:flex;flex-direction:column;}
+        .preview-bar.open{right:0;}
+        .preview-bar-header{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;background:var(--accent);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;flex-shrink:0;}
+        .preview-bar iframe{width:100%;flex:1;border:none;transform:scale(0.55);transform-origin:top left;width:182%;height:182%;}
+        .preview-bar-header .btn-close-prev{background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;padding:0 4px;line-height:1;}
+        .preview-toggle{position:fixed;bottom:16px;right:16px;z-index:51;background:var(--accent);color:#fff;border:none;border-radius:30px;padding:10px 22px;font-weight:700;font-size:.84rem;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.5);letter-spacing:-0.2px;}
+        .preview-toggle:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.6);}
 
         .help-text{font-size:.68rem;color:var(--text-muted);margin-top:4px;}
         .divider{width:100%;height:1px;background:var(--border);margin:14px 0;}
@@ -115,8 +116,8 @@
             .main-content{margin-left:54px;padding:16px;}
             .form-row{flex-direction:column;}
             .form-row .fg{min-width:100%;}
-            .preview-bar{width:100%;}
-            .preview-bar.open{height:350px;}
+            .preview-bar{width:100%;right:-100%;}
+            .preview-bar.open{right:0;}
         }
         @media(max-width:480px){
             .main-content{margin-left:0;padding:12px 12px 90px;}
@@ -283,12 +284,44 @@
         <!-- ========== USUÁRIOS ========== -->
         <div class="tab-panel" id="tab-usuarios">
             <h1 class="page-title">&#128101; Gerenciar Usuários</h1>
-            <p class="page-sub">Contas cadastradas no site</p>
+            <p class="page-sub">Adicione, edite, redefina senhas e configure permissões</p>
             <div class="card">
-                <h3>Usuários</h3>
+                <div class="flex-row" style="justify-content:space-between;margin-bottom:12px;">
+                    <h3 style="margin:0;">Usuários Cadastrados</h3>
+                    <button class="btn btn-primary btn-sm" id="btnShowAddUser">&#10133; Novo Usuário</button>
+                </div>
+                <!-- Add/Edit User Form -->
+                <div id="userFormCard" class="card" style="display:none;background:var(--bg-input);margin-bottom:14px;">
+                    <h3 id="userFormTitle">&#10133; Adicionar Usuário</h3>
+                    <div class="form-row">
+                        <div class="fg" style="flex:1;"><label>Nome*</label><input type="text" id="userFormName"></div>
+                        <div class="fg" style="flex:1;"><label>E-mail*</label><input type="text" id="userFormEmail"></div>
+                        <div class="fg" style="flex:1;"><label>Senha</label><input type="password" id="userFormPass" placeholder="Mínimo 4 caracteres"></div>
+                        <div class="fg"><label>Permissão</label><select id="userFormRole"><option value="user">Usuário</option><option value="admin">Admin</option></select></div>
+                    </div>
+                    <div class="flex-row" style="margin-top:10px;">
+                        <button class="btn btn-primary btn-sm" id="btnSaveUser">&#128190; Salvar</button>
+                        <button class="btn btn-outline btn-sm" id="btnCancelUser">Cancelar</button>
+                        <input type="hidden" id="userFormIdx" value="-1">
+                    </div>
+                </div>
+                <!-- Reset Password Modal inline -->
+                <div id="resetPassCard" class="card" style="display:none;background:var(--bg-input);margin-bottom:14px;">
+                    <h3>&#128274; Redefinir Senha: <span id="resetPassUser"></span></h3>
+                    <div class="form-row">
+                        <div class="fg" style="flex:1;"><label>Nova Senha</label><input type="password" id="resetNewPass" placeholder="Mínimo 4 caracteres"></div>
+                        <div class="fg" style="flex:1;"><label>Confirmar</label><input type="password" id="resetNewPass2" placeholder="Repita a senha"></div>
+                    </div>
+                    <div class="flex-row" style="margin-top:10px;">
+                        <button class="btn btn-primary btn-sm" id="btnConfirmReset">Confirmar</button>
+                        <button class="btn btn-outline btn-sm" id="btnCancelReset">Cancelar</button>
+                        <input type="hidden" id="resetPassIdx" value="-1">
+                    </div>
+                </div>
+                <!-- Users Table -->
                 <table>
-                    <thead><tr><th>Nome</th><th>E-mail</th><th>Ações</th></tr></thead>
-                    <tbody id="usersBody"><tr><td colspan="3" class="empty-state">Nenhum usuário.</td></tr></tbody>
+                    <thead><tr><th>Nome</th><th>E-mail</th><th>Permissão</th><th style="width:130px;">Ações</th></tr></thead>
+                    <tbody id="usersBody"><tr><td colspan="4" class="empty-state">Nenhum usuário.</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -301,7 +334,7 @@
 <div class="preview-bar" id="previewBar">
     <div class="preview-bar-header" id="previewBarHeader">
         <span>&#128065; Pré-visualização do Site</span>
-        <span style="font-size:.7rem;">(arraste para redimensionar)</span>
+        <button class="btn-close-prev" id="previewCloseBtn">&times;</button>
     </div>
     <iframe id="previewFrame" src="index.html"></iframe>
 </div>
@@ -342,10 +375,11 @@ var loginScreen=document.getElementById('loginScreen'),adminLayout=document.getE
 function getAdminSession(){try{return JSON.parse(localStorage.getItem(ADMIN_KEY))}catch(e){return null}}
 function login(user,pass){
     var users=load(USERS_KEY,[]);
-    if(!users.length){users.push({name:'Admin',email:'admin',pass:'admin'});save(USERS_KEY,users)}
+    if(!users.length){users.push({name:'Admin',email:'admin',pass:'admin',role:'admin'});save(USERS_KEY,users)}
     var found=users.find(function(u){return u.email===user&&u.pass===pass});
-    if(found&&found.email==='admin'){localStorage.setItem(ADMIN_KEY,JSON.stringify(found));showDashboard();return}
-    document.getElementById('loginError').textContent=found?'Apenas admin pode acessar.':'Usuário ou senha incorreto.';
+    if(found&&(found.role==='admin'||found.email==='admin')){localStorage.setItem(ADMIN_KEY,JSON.stringify(found));showDashboard();return}
+    if(found){document.getElementById('loginError').textContent='Apenas administradores podem acessar.';}
+    else{document.getElementById('loginError').textContent='Usuário ou senha incorreto.';}
 }
 function showDashboard(){loginScreen.style.display='none';adminLayout.classList.add('active');document.getElementById('previewToggle').style.display='block';renderAll()}
 function logout(){localStorage.removeItem(ADMIN_KEY);loginScreen.style.display='flex';adminLayout.classList.remove('active');document.getElementById('previewToggle').style.display='none';document.getElementById('previewBar').classList.remove('open')}
@@ -395,7 +429,7 @@ function renderStock(){
     var tbody=document.getElementById('stockBody'),html='';
     Object.keys(merged).forEach(function(name){
         var p=merged[name],statusBadge=p.stock>20?'badge-green':p.stock>5?'badge-yellow':'badge-red';
-        var statusText=p.stock>20?'OK':p.stock>5?'Baixo':'Crítico';
+        var statusText=p.stock>20?'OK':p.stock>5?'Últimas!!':'Crítico';
         var imgHtml=p.img?'<img src="'+p.img+'" class="tbl-img-preview">':'<span style="font-size:.64rem;color:var(--text-muted);">sem img</span>';
         html+='<tr data-name="'+name.replace(/"/g,'&quot;')+'">'+
             '<td><input class="tbl-input" value="'+name.replace(/"/g,'&quot;')+'" data-field="name" style="min-width:140px;"></td>'+
@@ -587,23 +621,121 @@ document.getElementById('btnSaveConfig').addEventListener('click',function(){
 /* === USERS === */
 function renderUsers(){
     var users=load(USERS_KEY,[]),html='';
-    users.forEach(function(u,i){html+='<tr><td>'+u.name+'</td><td>'+u.email+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')">&#128465;</button></td></tr>'});
-    document.getElementById('usersBody').innerHTML=html||'<tr><td colspan="3" class="empty-state">Nenhum.</td></tr>';
+    users.forEach(function(u,i){
+        var roleBadge=u.role==='admin'?'<span class="badge badge-green">Admin</span>':'<span class="badge" style="background:rgba(59,130,246,.15);color:var(--accent);">Usuário</span>';
+        html+='<tr><td>'+u.name+'</td><td>'+u.email+'</td><td>'+roleBadge+'</td>'+
+            '<td><div class="flex-row" style="gap:4px;">'+
+                '<button class="btn btn-outline btn-sm" onclick="editUser('+i+')" title="Editar">&#9998;</button>'+
+                '<button class="btn btn-outline btn-sm" onclick="showResetPass('+i+')" title="Resetar senha">&#128274;</button>'+
+                '<button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')" title="Remover">&#128465;</button>'+
+            '</div></td></tr>';
+    });
+    document.getElementById('usersBody').innerHTML=html||'<tr><td colspan="4" class="empty-state">Nenhum.</td></tr>';
 }
+
+window.editUser=function(i){
+    var users=load(USERS_KEY,[]);
+    if(!users[i])return;
+    document.getElementById('userFormTitle').textContent='&#9998; Editar Usuário';
+    document.getElementById('userFormName').value=users[i].name||'';
+    document.getElementById('userFormEmail').value=users[i].email||'';
+    document.getElementById('userFormPass').value='';
+    document.getElementById('userFormPass').placeholder='Deixe vazio para manter';
+    document.getElementById('userFormRole').value=users[i].role||'user';
+    document.getElementById('userFormIdx').value=i;
+    document.getElementById('userFormCard').style.display='block';
+};
+
+window.showResetPass=function(i){
+    var users=load(USERS_KEY,[]);
+    if(!users[i])return;
+    document.getElementById('resetPassUser').textContent=users[i].name+' ('+users[i].email+')';
+    document.getElementById('resetPassIdx').value=i;
+    document.getElementById('resetNewPass').value='';
+    document.getElementById('resetNewPass2').value='';
+    document.getElementById('userFormCard').style.display='none';
+    document.getElementById('resetPassCard').style.display='block';
+};
+
+document.getElementById('btnShowAddUser').addEventListener('click',function(){
+    document.getElementById('userFormTitle').textContent='&#10133; Adicionar Usuário';
+    document.getElementById('userFormName').value='';
+    document.getElementById('userFormEmail').value='';
+    document.getElementById('userFormPass').value='';
+    document.getElementById('userFormPass').placeholder='Mínimo 4 caracteres';
+    document.getElementById('userFormRole').value='user';
+    document.getElementById('userFormIdx').value='-1';
+    document.getElementById('userFormCard').style.display='block';
+    document.getElementById('resetPassCard').style.display='none';
+});
+
+document.getElementById('btnCancelUser').addEventListener('click',function(){
+    document.getElementById('userFormCard').style.display='none';
+});
+document.getElementById('btnCancelReset').addEventListener('click',function(){
+    document.getElementById('resetPassCard').style.display='none';
+});
+
+document.getElementById('btnSaveUser').addEventListener('click',function(){
+    var name=document.getElementById('userFormName').value.trim();
+    var email=document.getElementById('userFormEmail').value.trim();
+    var pass=document.getElementById('userFormPass').value;
+    var role=document.getElementById('userFormRole').value;
+    var idx=parseInt(document.getElementById('userFormIdx').value);
+    if(!name||!email){showToast('&#9888; Nome e e-mail são obrigatórios.');return}
+    var users=load(USERS_KEY,[]);
+    if(idx>=0){
+        if(users[idx].email==='admin'&&email!=='admin'){showToast('&#9888; Não pode mudar o e-mail do admin.');return}
+        users[idx].name=name;
+        if(email!==users[idx].email){
+            if(users.find(function(u,i){return i!==idx&&u.email===email})){showToast('&#9888; E-mail já cadastrado.');return}
+            users[idx].email=email;
+        }
+        if(pass&&pass.length>=4)users[idx].pass=pass;
+        if(users[idx].email==='admin')users[idx].role='admin';
+        else users[idx].role=role;
+        save(USERS_KEY,users);
+        showToast('&#9989; Usuário "'+name+'" atualizado!');
+    }else{
+        if(users.find(function(u){return u.email===email})){showToast('&#9888; E-mail já cadastrado.');return}
+        if(!pass||pass.length<4){showToast('&#9888; Senha mínima: 4 caracteres.');return}
+        users.push({name:name,email:email,pass:pass,role:role});
+        save(USERS_KEY,users);
+        showToast('&#9989; Usuário "'+name+'" adicionado!');
+    }
+    document.getElementById('userFormCard').style.display='none';
+    renderUsers();
+});
+
+document.getElementById('btnConfirmReset').addEventListener('click',function(){
+    var idx=parseInt(document.getElementById('resetPassIdx').value);
+    var p1=document.getElementById('resetNewPass').value;
+    var p2=document.getElementById('resetNewPass2').value;
+    if(!p1||p1.length<4){showToast('&#9888; Senha mínima: 4 caracteres.');return}
+    if(p1!==p2){showToast('&#9888; Senhas não conferem.');return}
+    var users=load(USERS_KEY,[]);
+    if(!users[idx])return;
+    users[idx].pass=p1;
+    save(USERS_KEY,users);
+    showToast('&#9989; Senha de "'+users[idx].name+'" redefinida!');
+    document.getElementById('resetPassCard').style.display='none';
+});
+
 window.deleteUser=function(i){
     var users=load(USERS_KEY,[]);
     if(users[i]&&users[i].email==='admin'){showToast('&#9888; Não pode remover admin.');return}
-    if(!confirm('Remover?'))return;
+    if(!confirm('Remover usuário "'+users[i].name+'"?'))return;
     users.splice(i,1);save(USERS_KEY,users);renderUsers();showToast('&#9989; Removido.');
 };
 
 /* === PREVIEW === */
-var previewBar=document.getElementById('previewBar'),previewToggle=document.getElementById('previewToggle');
+var previewBar=document.getElementById('previewBar'),previewToggle=document.getElementById('previewToggle'),previewCloseBtn=document.getElementById('previewCloseBtn');
 previewToggle.addEventListener('click',function(){
     previewBar.classList.toggle('open');
     if(previewBar.classList.contains('open')){document.getElementById('previewFrame').src='index.html?t='+Date.now()}
 });
-document.getElementById('previewBarHeader').addEventListener('click',function(){previewBar.classList.toggle('open')});
+if(previewCloseBtn) previewCloseBtn.addEventListener('click',function(e){e.stopPropagation();previewBar.classList.remove('open')});
+document.getElementById('previewBarHeader').addEventListener('click',function(e){if(e.target===this)previewBar.classList.toggle('open')});
 
 })();
 </script>

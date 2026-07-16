@@ -2148,7 +2148,7 @@
             var s = data.stock;
             var cls, txt;
             if (s > 20) { cls = 'high'; txt = 'Em estoque (' + s + ' un.)'; }
-            else if (s > 5) { cls = 'medium'; txt = 'Estoque baixo (' + s + ' un.)'; }
+            else if (s > 5) { cls = 'medium'; txt = 'Últimas unidades!! (' + s + ' un.)'; }
             else { cls = 'low'; txt = 'Últimas unidades (' + s + ' un.)'; }
             el.innerHTML = '<span class="stock-dot ' + cls + '"></span><span class="stock-text ' + cls + '">' + txt + '</span>';
         });
@@ -2437,7 +2437,7 @@
 
     var users = loadUsers();
     if (users.length === 0) {
-        users.push({name:'Admin', email:'admin', pass:'admin'});
+        users.push({name:'Admin', email:'admin', pass:'admin', role:'admin'});
         saveUsers(users);
     }
 
@@ -2518,7 +2518,7 @@
             if (!name || !email || !pass) { var re = document.getElementById('regError'); if (re) re.textContent = 'Preencha todos os campos.'; return; }
             if (pass.length < 4) { var re = document.getElementById('regError'); if (re) re.textContent = 'Senha deve ter ao menos 4 caracteres.'; return; }
             if (users.find(function(u){ return u.email === email; })) { var re = document.getElementById('regError'); if (re) re.textContent = 'Este e-mail já está cadastrado.'; return; }
-            var newUser = {name: name, email: email, pass: pass};
+            var newUser = {name: name, email: email, pass: pass, role: 'user'};
             users.push(newUser);
             saveUsers(users);
             currentUser = newUser;
