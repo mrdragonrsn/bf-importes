@@ -197,7 +197,7 @@ function renderCategories(){
     var html='';
     cats.forEach(function(c,i){
         html+='<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:8px;">'+
-            '<span style="font-size:.8rem;">'+c+'</span>'+
+            '<input class="tbl-input" value="'+c+'" data-idx="'+i+'" data-cat-orig="'+c+'" style="font-size:.8rem;width:140px;padding:3px 6px;" onchange="editCat(this)">'+
             '<button class="btn-icon danger" onclick="removeCat('+i+')" title="Remover" style="font-size:.8rem;">&#128465;</button>'+
         '</div>';
     });
@@ -218,6 +218,19 @@ document.getElementById('btnAddCat').addEventListener('click',function(){
     showToast('&#9989; Categoria "'+name+'" adicionada!');
 });
 document.getElementById('catInput').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('btnAddCat').click()});
+window.editCat=function(el){
+    var idx=parseInt(el.getAttribute('data-idx'));
+    var orig=el.getAttribute('data-cat-orig');
+    var val=el.value.trim().toLowerCase().replace(/\s+/g,'-');
+    if(!val||val===orig)return;
+    var cats=getCategories();
+    if(cats.indexOf(val)>=0&&val!==orig){showToast('&#9888; Categoria já existe.');el.value=orig;return}
+    cats[idx]=val;
+    save(CATEGORIES_KEY,cats);
+    el.setAttribute('data-cat-orig',val);
+    renderCategories();
+    showToast('&#9989; Categoria renomeada: "'+orig+'" → "'+val+'"');
+};
 window.removeCat=function(i){
     var cats=getCategories();
     if(cats.length<=1){showToast('&#9888; Precisa de ao menos 1 categoria.');return}
