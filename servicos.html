@@ -145,10 +145,11 @@
                     <div class="modal-price" id="modalPrice"></div>
                     <div class="modal-installment" id="modalInstallment"></div>
                 </div>
-                <div class="modal-footer-actions">
-                    <button class="btn-modal-cart" id="modalAddCart">&#128722; Adicionar</button>
-                    <a href="#" class="btn-modal-quote" id="modalBtn">&#128172; Solicitar Orçamento</a>
-                </div>
+                    <div class="modal-footer-actions">
+                        <button class="btn-modal-cart" id="modalAddCart">&#128722; Adicionar</button>
+                        <button class="btn-modal-buy" id="modalBuyNow">&#128179; Comprar</button>
+                        <a href="#" class="btn-modal-quote" id="modalBtn">&#128172; Orçamento</a>
+                    </div>
             </div>
         </div>
     </div>
@@ -162,6 +163,12 @@
             </div>
             <div class="checkout-summary" id="checkoutSummary"></div>
             <div class="checkout-form" id="checkoutForm">
+                <div id="checkoutLoginGate" class="login-gate" style="display:none;">
+                    <h3>&#128274; Faça login para finalizar</h3>
+                    <p>Você precisa estar logado para realizar o pagamento.</p>
+                    <button class="btn-auth-gate" onclick="var o=document.getElementById('checkoutOverlay');if(o)o.classList.remove('active');document.body.style.overflow='';var a=document.getElementById('authOverlay');if(a)a.classList.add('active');" type="button">&#128100; Fazer Login</button>
+                    <button class="btn-auth-gate outline" onclick="var o=document.getElementById('checkoutOverlay');if(o)o.classList.remove('active');document.body.style.overflow='';var a=document.getElementById('authOverlay');if(a)a.classList.add('active');var r=document.getElementById('switchToRegister');if(r)r.click();" type="button">&#128100; Criar Conta</button>
+                </div>
                 <div id="checkoutFormFields">
                     <h4>&#128666; Dados de Entrega</h4>
                     <div class="checkout-field"><label>Nome completo</label><input type="text" id="coName" placeholder="Seu nome completo"></div>

@@ -93,7 +93,6 @@ function openLightbox(src){
                             '<div class="stock-info" data-product="'+name+'"></div>' +
                             '<div class="price">'+priceStr+'</div>' +
                             '<div class="installment">ou '+(p.installments||10)+'x de R$ '+(inst.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})).replace('.',',')+'</div>' +
-                            '<button class="btn-card add-to-cart">&#128722; Adicionar</button>' +
                         '</div>';
                     productGrid.appendChild(card);
                 }
@@ -262,12 +261,14 @@ function openLightbox(src){
 
         function openCheckout(){
             renderCheckoutSummary();
+            var gate = document.getElementById('checkoutLoginGate');
             var ff = document.getElementById('checkoutFormFields');
             var cs = document.getElementById('checkoutSuccess');
             var bc = document.getElementById('btnConfirmOrder');
-            if (ff) ff.style.display = 'block';
+            if(gate) gate.style.display = currentUser ? 'none' : 'block';
+            if (ff) ff.style.display = currentUser ? 'block' : 'none';
             if (cs) cs.style.display = 'none';
-            if (bc) bc.style.display = 'block';
+            if (bc) bc.style.display = currentUser ? 'block' : 'none';
             checkoutOverlay.classList.add('active');
             closeCart();
             document.body.style.overflow = 'hidden';
@@ -781,6 +782,22 @@ function openLightbox(src){
                     }
                 });
                 if (price) addToCart(currentModalProduct, price);
+            }
+        });
+
+        var modalBuyNow = document.getElementById('modalBuyNow');
+        if (modalBuyNow) modalBuyNow.addEventListener('click', function(){
+            if (currentModalProduct) {
+                var cardEls = document.querySelectorAll('.product-card');
+                var price = '';
+                cardEls.forEach(function(c){
+                    if (c.querySelector('h3').textContent.trim() === currentModalProduct) {
+                        price = c.querySelector('.price').textContent.trim();
+                    }
+                });
+                if (price) addToCart(currentModalProduct, price);
+                closeModal();
+                setTimeout(openCheckout, 300);
             }
         });
 

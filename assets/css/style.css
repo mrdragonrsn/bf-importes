@@ -735,6 +735,51 @@
             background: var(--azul-padrao);
             color: var(--branco);
         }
+        .btn-modal-buy {
+            background: #16a34a;
+            color: var(--branco);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.84rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.25s;
+            font-family: inherit;
+            text-align: center;
+        }
+        .btn-modal-buy:hover { background: #15803d; transform: translateY(-1px); }
+
+        /* ── LOGIN GATE ─────────────────── */
+        .login-gate {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .login-gate h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .login-gate p { font-size: 0.84rem; color: #64748b; margin-bottom: 20px; }
+        .login-gate .btn-auth-gate {
+            display: block;
+            width: 100%;
+            background: var(--azul-padrao);
+            color: var(--branco);
+            padding: 12px 0;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.92rem;
+            font-family: inherit;
+            margin-bottom: 10px;
+            transition: background 0.25s;
+        }
+        .login-gate .btn-auth-gate:hover { background: var(--azul-medio); }
+        .login-gate .btn-auth-gate.outline {
+            background: var(--branco);
+            color: var(--azul-padrao);
+            border: 2px solid var(--azul-padrao);
+        }
+        .login-gate .btn-auth-gate.outline:hover { background: var(--cinza-claro); }
 
         @media (max-width: 500px) {
             .modal-main-img { height: 180px; font-size: 3.6rem; }

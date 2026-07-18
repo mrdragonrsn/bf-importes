@@ -1,5 +1,5 @@
 (function(){
-var USERS_KEY='bf_users', STOCK_KEY='bf_stock', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', ADMIN_KEY='bf_admin_session';
+var USERS_KEY='bf_users', STOCK_KEY='bf_stock', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', ADMIN_KEY='bf_admin_session', CATEGORIES_KEY='bf_categories';
 
 function load(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback}catch(e){return fallback||{}}}
 function save(key,obj){localStorage.setItem(key,JSON.stringify(obj))}
@@ -24,6 +24,7 @@ function defaultStock(){return {
 
 function defaultBanner(){return{title:'Impressoras, multifuncionais e peças',title2:'com garantia e procedência',subtitle:'Desde equipamentos e suprimentos até peças originais e genéricas.',bgUrl:'',bgColor:'linear-gradient(170deg, #0d2f5e 0%, #0a1f3f 100%)',btnText:'Ver Produtos'}}
 function defaultConfig(){return{company:'BIANCO & FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA',brand:'B&F Importes',cnpj:'03.108.169/0001-58',phone:'(16) 98138-6747',email:'atendimento@biancoeferreira.com.br',hours:'Seg–Sex 8h às 18h | Sáb 8h às 13h',address:'R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090',cep:'14870-090',cityState:'Jaboticabal — SP'}}
+function defaultCategories(){return['impressoras','multifuncionais','pecas','suprimentos']}
 
 /* === AUTH === */
 var loginScreen=document.getElementById('loginScreen'),adminLayout=document.getElementById('adminLayout'),btnLogin=document.getElementById('btnAdminLogin');
@@ -71,7 +72,7 @@ document.getElementById('prodImgFile').addEventListener('change',function(e){
 });
 
 /* === RENDER ALL === */
-function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers()}
+function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories()}
 
 /* === STOCK TABLE + ADD === */
 function renderStock(){
@@ -90,7 +91,7 @@ function renderStock(){
         html+='<tr data-name="'+name.replace(/"/g,'&quot;')+'">'+
             '<td><input class="tbl-input" value="'+name.replace(/"/g,'&quot;')+'" data-field="name" style="min-width:140px;"></td>'+
             '<td><select class="tbl-input" data-field="cat" style="min-width:110px;">'+
-                ['impressoras','multifuncionais','pecas','suprimentos'].map(function(c){return '<option value="'+c+'"'+(p.cat===c?' selected':'')+'>'+c+'</option>'}).join('')+
+                catOptions().map(function(c){return '<option value="'+c+'"'+(p.cat===c?' selected':'')+'>'+c+'</option>'}).join('')+
             '</select></td>'+
             '<td><input class="tbl-input" value="'+(p.price||'')+'" data-field="price" style="width:90px;"></td>'+
             '<td><input class="tbl-input" type="number" value="'+p.stock+'" data-field="stock" min="0" style="width:65px;"></td>'+
@@ -175,6 +176,58 @@ document.getElementById('btnAddProduct').addEventListener('click',function(){
     msg.textContent='Adicionado com sucesso!';msg.style.color='var(--success)';
     setTimeout(function(){msg.textContent=''},3000);
 });
+
+/* === CATEGORIES === */
+function getCategories(){
+    var cats=load(CATEGORIES_KEY,[]);
+    if(!cats.length){cats=defaultCategories();save(CATEGORIES_KEY,cats)}
+    return cats;
+}
+function catOptions(){return getCategories()}
+function updateCatSelects(){
+    var cats=getCategories();
+    document.querySelectorAll('#prodCat, select[data-field="cat"]').forEach(function(sel){
+        var cur=sel.value;
+        sel.innerHTML=cats.map(function(c){return '<option value="'+c+'">'+c+'</option>'}).join('');
+        if(cats.indexOf(cur)>=0)sel.value=cur;
+    });
+}
+function renderCategories(){
+    var cats=getCategories();
+    var html='';
+    cats.forEach(function(c,i){
+        html+='<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:8px;">'+
+            '<span style="font-size:.8rem;">'+c+'</span>'+
+            '<button class="btn-icon danger" onclick="removeCat('+i+')" title="Remover" style="font-size:.8rem;">&#128465;</button>'+
+        '</div>';
+    });
+    document.getElementById('catList').innerHTML=html||'<span style="font-size:.78rem;color:var(--text-muted);">Nenhuma categoria.</span>';
+    updateCatSelects();
+}
+document.getElementById('btnAddCat').addEventListener('click',function(){
+    var input=document.getElementById('catInput');
+    var name=input.value.trim().toLowerCase().replace(/\s+/g,'-');
+    if(!name)return;
+    var cats=getCategories();
+    if(cats.indexOf(name)>=0){showToast('&#9888; Categoria já existe.');return}
+    cats.push(name);
+    save(CATEGORIES_KEY,cats);
+    input.value='';
+    renderCategories();
+    renderStock();
+    showToast('&#9989; Categoria "'+name+'" adicionada!');
+});
+document.getElementById('catInput').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('btnAddCat').click()});
+window.removeCat=function(i){
+    var cats=getCategories();
+    if(cats.length<=1){showToast('&#9888; Precisa de ao menos 1 categoria.');return}
+    if(!confirm('Remover categoria "'+cats[i]+'"? Produtos com esta categoria serão afetados.'))return;
+    cats.splice(i,1);
+    save(CATEGORIES_KEY,cats);
+    renderCategories();
+    renderStock();
+    showToast('&#128465; Categoria removida.');
+};
 
 /* === ANÚNCIOS === */
 var anunciosTemp=[];

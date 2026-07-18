@@ -48,10 +48,7 @@
                 <h3>&#10133; Adicionar Produto</h3>
                 <div class="form-row">
                     <div class="fg" style="flex:2;"><label>Nome*</label><input type="text" id="prodName" placeholder="Ex: HP LaserJet Pro M404dn"></div>
-                    <div class="fg"><label>Categoria*</label><select id="prodCat">
-                        <option value="impressoras">Impressoras</option><option value="multifuncionais">Multifuncionais</option>
-                        <option value="pecas">Peças</option><option value="suprimentos">Suprimentos</option>
-                    </select></div>
+                    <div class="fg"><label>Categoria*</label><select id="prodCat"></select></div>
                     <div class="fg"><label>Preço*</label><input type="text" id="prodPrice" placeholder="2199,00"></div>
                     <div class="fg"><label>Parcelas</label><select id="prodInstallments"><option value="10">10x</option><option value="6">6x</option><option value="3">3x</option><option value="1">à vista</option></select></div>
                     <div class="fg" style="max-width:80px;"><label>Estoque*</label><input type="number" id="prodStock" value="10" min="0"></div>
@@ -65,9 +62,19 @@
                             <button class="btn btn-outline btn-sm" onclick="document.getElementById('prodImgFile').click()">&#128247; Escolher</button>
                             <span id="prodImgName" style="font-size:.72rem;color:var(--text-muted);">Nenhuma</span>
                             <img id="prodImgPreview" style="width:36px;height:36px;object-fit:cover;border-radius:4px;display:none;">
-                        </div>
-                    </div>
                 </div>
+            </div>
+
+            <!-- Categories management -->
+            <div class="card">
+                <h3>&#128220; Gerenciar Categorias</h3>
+                <div class="form-row">
+                    <div class="fg" style="flex:1;"><label>Nova Categoria</label><input type="text" id="catInput" placeholder="Ex: Acessórios"></div>
+                    <div class="fg" style="width:auto;align-self:flex-end;"><button class="btn btn-primary btn-sm" id="btnAddCat">&#10133; Adicionar</button></div>
+                </div>
+                <div id="catList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+            </div>
+        </div>
                 <div class="form-row">
                     <div class="fg" style="flex:3;"><label>Descrição Longa</label><textarea id="prodLongDesc" placeholder="Descrição detalhada..."></textarea></div>
                 </div>
