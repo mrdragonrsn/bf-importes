@@ -4,6 +4,20 @@ function openLightbox(src){
     if(lb && img){ img.src = src; lb.classList.add('active'); }
 }
 
+/* ── LOADING FEEDBACK ─────────────── */
+(function(){
+    var loader = document.getElementById('pageLoader');
+    if(!loader) return;
+    var ready = function(){
+        setTimeout(function(){
+            loader.style.opacity = '0';
+            setTimeout(function(){ loader.style.display = 'none'; }, 500);
+        }, 400);
+    };
+    if(document.readyState === 'complete') ready();
+    else window.addEventListener('load', ready);
+})();
+
 (function(){
     /* ── DADOS DOS PRODUTOS ─────────── */
     var productData = {
@@ -776,8 +790,12 @@ function openLightbox(src){
         }
 
         if (modalClose) modalClose.addEventListener('click', closeModal);
-        if (modalBtn) modalBtn.addEventListener('click', function(){
-            setTimeout(closeModal, 150);
+        if (modalBtn) modalBtn.addEventListener('click', function(e){
+            e.preventDefault();
+            var name = currentModalProduct || 'um produto';
+            var msg = 'Ol\u00E1! Gostaria de solicitar or\u00E7amento para: ' + name;
+            window.open('https://wa.me/5516981386747?text=' + encodeURIComponent(msg), '_blank');
+            setTimeout(closeModal, 300);
         });
         overlay.addEventListener('click', function(e){
             if (e.target === overlay) closeModal();

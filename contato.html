@@ -120,7 +120,7 @@
                 </div>
                 <div class="modal-footer-actions">
                     <button class="btn-modal-cart" id="modalAddCart">&#128722; Adicionar</button>
-                    <a href="https://wa.me/5516981386747?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" class="btn-modal-quote" id="modalBtn">&#128172; Solicitar Orçamento</a>
+                    <a href="#" class="btn-modal-quote" id="modalBtn">&#128172; Solicitar Orçamento</a>
                 </div>
             </div>
         </div>
@@ -294,7 +294,15 @@
         <img id="lightboxImg" src="" alt="">
     </div>
 
-    <script src="assets/js/main.js"></script>
+    <div id="pageLoader" style="position:fixed;inset:0;background:#0a1f3f;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s;">
+    <div style="text-align:center;color:#fff;">
+        <div style="font-size:3rem;animation:pulseLoad 0.6s ease-in-out infinite alternate;">🖨️</div>
+        <div style="margin-top:10px;font-size:0.85rem;color:#94a3b8;">Carregando...</div>
+    </div>
+</div>
+<style>@keyframes pulseLoad{from{transform:scale(1);opacity:0.5;}to{transform:scale(1.15);opacity:1;}}</style>
+
+<script src="assets/js/main.js"></script>
 
 </body>
 </html>
