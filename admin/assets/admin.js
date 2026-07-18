@@ -388,7 +388,7 @@ window.deleteUser=function(i){
 var previewBar=document.getElementById('previewBar'),previewToggle=document.getElementById('previewToggle'),previewCloseBtn=document.getElementById('previewCloseBtn');
 previewToggle.addEventListener('click',function(){
     previewBar.classList.toggle('open');
-    if(previewBar.classList.contains('open')){document.getElementById('previewFrame').src='index.html?t='+Date.now()}
+    if(previewBar.classList.contains('open')){document.getElementById('previewFrame').src='../index.html?t='+Date.now()}
 });
 if(previewCloseBtn) previewCloseBtn.addEventListener('click',function(e){e.stopPropagation();previewBar.classList.remove('open')});
 document.getElementById('previewBarHeader').addEventListener('click',function(e){if(e.target===this)previewBar.classList.toggle('open')});
