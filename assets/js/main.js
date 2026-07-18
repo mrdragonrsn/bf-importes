@@ -1,3 +1,9 @@
+function openLightbox(src){
+    var lb = document.getElementById('lightbox');
+    var img = document.getElementById('lightboxImg');
+    if(lb && img){ img.src = src; lb.classList.add('active'); }
+}
+
 (function(){
     /* ── DADOS DOS PRODUTOS ─────────── */
     var productData = {
