@@ -38,8 +38,8 @@ function login(user,pass){
     if(found){document.getElementById('loginError').textContent='Apenas administradores podem acessar.';}
     else{document.getElementById('loginError').textContent='Usuário ou senha incorreto.';}
 }
-function showDashboard(){loginScreen.style.display='none';adminLayout.classList.add('active');document.getElementById('previewToggle').style.display='block';renderAll()}
-function logout(){localStorage.removeItem(ADMIN_KEY);loginScreen.style.display='flex';adminLayout.classList.remove('active');document.getElementById('previewToggle').style.display='none';document.getElementById('previewBar').classList.remove('open')}
+function showDashboard(){loginScreen.style.display='none';adminLayout.classList.add('active');renderAll();refreshPreview()}
+function logout(){localStorage.removeItem(ADMIN_KEY);loginScreen.style.display='flex';adminLayout.classList.remove('active')}
 
 if(getAdminSession())showDashboard();
 btnLogin.addEventListener('click',function(){login(document.getElementById('adminUser').value.trim()||'admin',document.getElementById('adminPass').value||'admin')});
@@ -451,12 +451,27 @@ window.deleteUser=function(i){
 };
 
 /* === PREVIEW === */
-var previewBar=document.getElementById('previewBar'),previewToggle=document.getElementById('previewToggle'),previewCloseBtn=document.getElementById('previewCloseBtn');
-previewToggle.addEventListener('click',function(){
-    previewBar.classList.toggle('open');
-    if(previewBar.classList.contains('open')){document.getElementById('previewFrame').src='../index.html?t='+Date.now()}
+function refreshPreview(){
+    var f = document.getElementById('previewFrame');
+    if(f) f.src = '../index.html?t=' + Date.now();
+}
+document.getElementById('btnRefreshPreview').addEventListener('click', refreshPreview);
+var _saveIds = ['btnSaveBanner','btnSaveAnuncios','btnSaveConfig','btnAddProduct','btnSaveUser','btnConfirmReset','btnAddCat'];
+_saveIds.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('click', function(){ setTimeout(refreshPreview, 300); });
 });
-if(previewCloseBtn) previewCloseBtn.addEventListener('click',function(e){e.stopPropagation();previewBar.classList.remove('open')});
-document.getElementById('previewBarHeader').addEventListener('click',function(e){if(e.target===this)previewBar.classList.toggle('open')});
+/* updateStock with refresh */
+window.updateStock = function(el){
+    var name = el.getAttribute('data-product');
+    var val = parseInt(el.value) || 0;
+    var stock = load(STOCK_KEY, {});
+    if (!stock[name]) stock[name] = {};
+    stock[name].stock = val;
+    save(STOCK_KEY, stock);
+    showToast('&#9989; Estoque de "' + name + '" atualizado para ' + val + ' un.');
+    setTimeout(renderStock, 300);
+    setTimeout(refreshPreview, 500);
+};
 
 })();

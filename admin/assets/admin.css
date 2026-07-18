@@ -35,7 +35,7 @@
         .btn-logout{width:100%;padding:7px 0;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-family:inherit;font-size:.78rem;}
         .btn-logout:hover{color:var(--danger);border-color:var(--danger);}
 
-        .main-content{flex:1;margin-left:200px;padding:24px 28px 24px 28px;}
+        .main-content{flex:1;margin-left:200px;padding:20px 22px;overflow-y:auto;height:100vh;}
         .tab-panel{display:none;}
         .tab-panel.active{display:block;}
         .page-title{font-size:1.3rem;font-weight:700;margin-bottom:6px;}
@@ -89,28 +89,39 @@
         .anuncio-card .info .name{font-size:.8rem;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .anuncio-card .info .actions{display:flex;gap:8px;margin-top:6px;}
 
-        .preview-bar{position:fixed;top:0;right:-480px;width:440px;height:100vh;background:var(--bg-card);border-left:1px solid var(--border);z-index:49;overflow:hidden;transition:right .35s ease;display:flex;flex-direction:column;}
-        .preview-bar.open{right:0;}
-        .preview-bar-header{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;background:var(--accent);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;flex-shrink:0;}
-        .preview-bar iframe{width:100%;flex:1;border:none;transform:scale(0.55);transform-origin:top left;width:182%;height:182%;}
-        .preview-bar-header .btn-close-prev{background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;padding:0 4px;line-height:1;}
-        .preview-toggle{position:fixed;bottom:16px;right:16px;z-index:51;background:var(--accent);color:#fff;border:none;border-radius:30px;padding:10px 22px;font-weight:700;font-size:.84rem;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.5);letter-spacing:-0.2px;}
-        .preview-toggle:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.6);}
+        .preview-panel{
+            width:400px;flex-shrink:0;background:var(--bg-card);
+            border-left:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;
+        }
+        .preview-header{
+            display:flex;justify-content:space-between;align-items:center;
+            padding:10px 16px;background:var(--bg-input);border-bottom:1px solid var(--border);
+            font-size:.78rem;font-weight:700;color:var(--text-muted);flex-shrink:0;
+        }
+        .btn-refresh-prev{background:none;border:none;color:var(--text-muted);font-size:1.1rem;cursor:pointer;padding:2px 6px;border-radius:4px;}
+        .btn-refresh-prev:hover{color:var(--accent);background:rgba(255,255,255,.05);}
+        .preview-frame-wrap{flex:1;overflow:hidden;position:relative;background:#fff;}
+        .preview-frame-wrap iframe{width:100%;height:100%;border:none;}
 
         .help-text{font-size:.68rem;color:var(--text-muted);margin-top:4px;}
         .divider{width:100%;height:1px;background:var(--border);margin:14px 0;}
 
+        @media(max-width:1100px){
+            .preview-panel{width:320px;}
+        }
+        @media(max-width:900px){
+            .preview-panel{display:none;}
+        }
         @media(max-width:768px){
             .sidebar{width:54px;}
             .sidebar-logo{padding:0 6px 10px;text-align:center;}
             .sidebar-logo h2{font-size:.8rem;}.sidebar-logo small{display:none;}
             .sidebar-nav a{padding:10px 6px;justify-content:center;font-size:0;}
             .sidebar-nav a span{font-size:1.1rem;}
-            .main-content{margin-left:54px;padding:16px;}
+            .preview-panel{display:none;}
+            .main-content{margin-left:54px;padding:14px;}
             .form-row{flex-direction:column;}
             .form-row .fg{min-width:100%;}
-            .preview-bar{width:100%;right:-100%;}
-            .preview-bar.open{right:0;}
         }
         @media(max-width:480px){
             .main-content{margin-left:0;padding:12px 12px 90px;}

@@ -210,16 +210,18 @@
         </div>
 
     </main>
-</div>
 
-<!-- PREVIEW PAINEL -->
-<button class="preview-toggle" id="previewToggle" style="display:none;" title="Pré-visualizar site">&#128065; Preview</button>
-<div class="preview-bar" id="previewBar">
-    <div class="preview-bar-header" id="previewBarHeader">
-        <span>&#128065; Pré-visualização do Site</span>
-        <button class="btn-close-prev" id="previewCloseBtn">&times;</button>
-    </div>
-    <iframe id="previewFrame" src="../index.html"></iframe>
+    <!-- ── PREVIEW ───────────────────────── -->
+    <aside class="preview-panel" id="previewPanel">
+        <div class="preview-header">
+            <span>&#128065; Pré-visualização</span>
+            <button class="btn-refresh-prev" id="btnRefreshPreview" title="Atualizar">&#8635;</button>
+        </div>
+        <div class="preview-frame-wrap">
+            <iframe id="previewFrame" src="../index.html"></iframe>
+        </div>
+    </aside>
+
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
