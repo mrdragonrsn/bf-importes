@@ -378,6 +378,29 @@ function openLightbox(src){
                 document.getElementById('checkoutSuccess').style.display = 'block';
                 document.getElementById('btnConfirmOrder').style.display = 'none';
 
+                /* ── SALVAR PEDIDO NO localStorage ── */
+                try {
+                    var orders = JSON.parse(localStorage.getItem('bf_orders')||'[]');
+                    orders.push({
+                        id: orderId,
+                        cliente: name,
+                        email: email,
+                        phone: phone,
+                        cpf: cpf,
+                        endereco: addrFull,
+                        data: dateStr,
+                        timestamp: Date.now(),
+                        total: total,
+                        pagamento: payMethod,
+                        status: 'pendente',
+                        dataEntrega: '',
+                        itens: cart.map(function(item){
+                            return {titulo: item.title, qtd: item.qty, preco: item.price};
+                        })
+                    });
+                    localStorage.setItem('bf_orders', JSON.stringify(orders));
+                } catch(e){}
+
                 showToast('&#9989; Pedido ' + orderId + ' confirmado! (' + payLabel + ')');
                 cart = [];
                 renderCart();

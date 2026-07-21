@@ -1,5 +1,5 @@
 (function(){
-var USERS_KEY='bf_users', STOCK_KEY='bf_stock', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', ADMIN_KEY='bf_admin_session', CATEGORIES_KEY='bf_categories';
+var USERS_KEY='bf_users', STOCK_KEY='bf_stock', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', ADMIN_KEY='bf_admin_session', CATEGORIES_KEY='bf_categories', PEDIDOS_KEY='bf_orders';
 
 function load(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback}catch(e){return fallback||{}}}
 function save(key,obj){localStorage.setItem(key,JSON.stringify(obj))}
@@ -72,7 +72,7 @@ document.getElementById('prodImgFile').addEventListener('change',function(e){
 });
 
 /* === RENDER ALL === */
-function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories()}
+function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories();renderPedidos()}
 
 /* === STOCK TABLE + ADD === */
 function renderStock(){
@@ -243,11 +243,10 @@ window.removeCat=function(i){
 };
 
 /* === ANÚNCIOS === */
-var anunciosTemp=[];
+var anunciosTemp=null;
 function renderAnuncios(){
     var list=document.getElementById('anunciosList'),html='';
-    anunciosTemp=load(ANUNCIOS_KEY,[]);
-    if(!anunciosTemp.length){anunciosTemp=[{name:'Anúncio 1',data:''},{name:'Anúncio 2',data:''},{name:'Anúncio 3',data:''},{name:'Anúncio 4',data:''}]}
+    if(!anunciosTemp||!anunciosTemp.length){anunciosTemp=load(ANUNCIOS_KEY,[]);if(!anunciosTemp.length){anunciosTemp=[{name:'Anúncio 1',data:''},{name:'Anúncio 2',data:''},{name:'Anúncio 3',data:''},{name:'Anúncio 4',data:''}]}}
     anunciosTemp.forEach(function(a,idx){
         var imgTag=a.data?'<img src="'+a.data+'">':'<div style="width:100px;height:80px;background:var(--bg-input);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.7rem;">Sem imagem</div>';
         html+='<div class="anuncio-card" data-idx="'+idx+'">'+
@@ -449,6 +448,69 @@ window.deleteUser=function(i){
     if(!confirm('Remover usuário "'+users[i].name+'"?'))return;
     users.splice(i,1);save(USERS_KEY,users);renderUsers();showToast('&#9989; Removido.');
 };
+
+/* === PEDIDOS === */
+var pedidosFilterAtual = 'todos';
+
+function renderPedidos(){
+    var pedidos = load(PEDIDOS_KEY, []);
+    var tbody = document.getElementById('pedidosBody');
+    var html = '';
+
+    pedidos.sort(function(a, b){ return b.timestamp - a.timestamp; });
+
+    pedidos.forEach(function(p, i){
+        if(pedidosFilterAtual !== 'todos' && p.status !== pedidosFilterAtual) return;
+
+        var statusClass = p.status === 'entregue' ? 'badge-green' : p.status === 'cancelado' ? 'badge-red' : 'badge-yellow';
+        var statusText = p.status.charAt(0).toUpperCase() + p.status.slice(1);
+        var entrega = p.dataEntrega || '—';
+
+        var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
+
+        html += '<tr>' +
+            '<td><strong>' + p.id + '</strong></td>' +
+            '<td>' + (p.cliente || p.name || '—') + '</td>' +
+            '<td>' + p.data + '</td>' +
+            '<td>R$ ' + parseFloat(p.total).toFixed(2).replace('.', ',') + '</td>' +
+            '<td>' + pagLabel + '</td>' +
+            '<td><span class="badge ' + statusClass + '">' + statusText + '</span></td>' +
+            '<td>' + entrega + '</td>' +
+            '<td>' +
+                '<select class="tbl-input" onchange="alterarStatusPedido(' + i + ', this.value)" style="width:100px;">' +
+                    '<option value="pendente"' + (p.status === 'pendente' ? ' selected' : '') + '>Pendente</option>' +
+                    '<option value="entregue"' + (p.status === 'entregue' ? ' selected' : '') + '>Entregue</option>' +
+                    '<option value="cancelado"' + (p.status === 'cancelado' ? ' selected' : '') + '>Cancelado</option>' +
+                '</select>' +
+            '</td>' +
+        '</tr>';
+    });
+
+    tbody.innerHTML = html || '<tr><td colspan="8" class="empty-state">Nenhum pedido encontrado.</td></tr>';
+}
+
+window.alterarStatusPedido = function(idx, novoStatus){
+    var pedidos = load(PEDIDOS_KEY, []);
+    if(!pedidos[idx]) return;
+    pedidos[idx].status = novoStatus;
+    if(novoStatus === 'entregue'){
+        pedidos[idx].dataEntrega = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    } else {
+        pedidos[idx].dataEntrega = '';
+    }
+    save(PEDIDOS_KEY, pedidos);
+    renderPedidos();
+    showToast('&#9989; Pedido ' + pedidos[idx].id + ' atualizado para "' + novoStatus + '"');
+};
+
+document.querySelectorAll('.filter-pedido').forEach(function(btn){
+    btn.addEventListener('click', function(){
+        document.querySelectorAll('.filter-pedido').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        pedidosFilterAtual = btn.getAttribute('data-filter');
+        renderPedidos();
+    });
+});
 
 /* === PREVIEW === */
 function refreshPreview(){

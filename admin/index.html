@@ -30,6 +30,7 @@
             <a data-tab="anuncios"><span>&#128444;</span> Anúncios</a>
             <a data-tab="config"><span>&#9881;</span> Configurações</a>
             <a data-tab="usuarios"><span>&#128101;</span> Usuários</a>
+            <a data-tab="pedidos"><span>&#128230;</span> Pedidos</a>
         </nav>
         <div class="sidebar-footer">
             <button class="btn-logout" id="btnAdminLogout">&#128682; Sair</button>
@@ -160,6 +161,27 @@
                 <div class="flex-row" style="margin-top:10px;">
                     <button class="btn btn-primary" id="btnSaveConfig">&#128190; Salvar</button>
                     <span id="configMsg" style="font-size:.74rem;color:var(--text-muted);"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== PEDIDOS ========== -->
+        <div class="tab-panel" id="tab-pedidos">
+            <h1 class="page-title">&#128230; Pedidos</h1>
+            <p class="page-sub">Visualize e gerencie os pedidos realizados no site</p>
+            <div class="card">
+                <h3>&#128203; Lista de Pedidos</h3>
+                <div class="pedidos-filters">
+                    <button class="filter-pedido active" data-filter="todos">Todos</button>
+                    <button class="filter-pedido" data-filter="pendente">Pendentes</button>
+                    <button class="filter-pedido" data-filter="entregue">Entregues</button>
+                    <button class="filter-pedido" data-filter="cancelado">Cancelados</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead><tr><th>Pedido</th><th>Cliente</th><th>Data</th><th>Total</th><th>Pagamento</th><th>Status</th><th>Entrega</th><th style="width:140px;">Ações</th></tr></thead>
+                        <tbody id="pedidosBody"><tr><td colspan="8" class="empty-state">Nenhum pedido encontrado.</td></tr></tbody>
+                    </table>
                 </div>
             </div>
         </div>
