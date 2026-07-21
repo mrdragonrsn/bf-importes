@@ -311,10 +311,26 @@ function openLightbox(src){
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(pixKeyEl.textContent).then(function(){
                         showToast('&#128247; Chave PIX copiada!');
-                    });
+        });
+    }
+
+    /* ── SYNC CATEGORIAS DO ADMIN ────── */
+    (function(){
+        var filterBar = document.getElementById('filterBar');
+        if(!filterBar) return;
+        try {
+            var cats = JSON.parse(localStorage.getItem('bf_categories')||'[]');
+            cats.forEach(function(cat){
+                if(!filterBar.querySelector('.filter-btn[data-filter="'+cat+'"]')) {
+                    var btn = document.createElement('button');
+                    btn.className = 'filter-btn';
+                    btn.setAttribute('data-filter', cat);
+                    btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g,' ');
+                    filterBar.appendChild(btn);
                 }
             });
-        }
+        } catch(e) {}
+    })();
 
         var btnConfirm = document.getElementById('btnConfirmOrder');
         if (btnConfirm) {
