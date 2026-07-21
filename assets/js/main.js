@@ -11,11 +11,11 @@ function openLightbox(src){
     var ready = function(){
         setTimeout(function(){
             loader.style.opacity = '0';
-            setTimeout(function(){ loader.style.display = 'none'; }, 500);
-        }, 400);
+            setTimeout(function(){ loader.style.display = 'none'; }, 200);
+        }, 100);
     };
-    if(document.readyState === 'complete') ready();
-    else window.addEventListener('load', ready);
+    if(document.readyState === 'complete' || document.readyState === 'interactive') ready();
+    else window.addEventListener('DOMContentLoaded', ready);
 })();
 
 (function(){
