@@ -394,6 +394,63 @@
         </div>
     </div>
 
+    <!-- ── PERFIL ────────────────────────────── -->
+    <div class="perfil-overlay" id="perfilOverlay">
+        <div class="perfil-modal">
+            <div class="perfil-header">
+                <h3>&#9881; Meu Perfil</h3>
+                <button class="perfil-close" id="perfilClose">&times;</button>
+            </div>
+            <div class="perfil-tabs">
+                <button class="perfil-tab active" data-ptab="perfil-dados">&#128100; Dados</button>
+                <button class="perfil-tab" data-ptab="perfil-endereco">&#127968; Endereço</button>
+                <button class="perfil-tab" data-ptab="perfil-cartoes">&#128179; Cartões</button>
+            </div>
+            <div class="perfil-body">
+                <div class="perfil-panel active" id="perfil-dados">
+                    <div class="perfil-foto-area">
+                        <div class="perfil-foto" id="perfilFoto">&#128100;</div>
+                        <label class="btn-perfil-foto"><input type="file" accept="image/*" id="perfilFotoInput" style="display:none;">&#128247; Alterar foto</label>
+                    </div>
+                    <div class="perfil-field"><label>Nome</label><input type="text" id="perfilNome" placeholder="Seu nome"></div>
+                    <div class="perfil-field"><label>E-mail</label><input type="text" id="perfilEmail" placeholder="seu@email.com" readonly></div>
+                    <div class="perfil-field"><label>Telefone</label><input type="text" id="perfilPhone" placeholder="(00) 00000-0000"></div>
+                    <button class="btn-perfil-salvar" id="btnSalvarDados">&#128190; Salvar Dados</button>
+                </div>
+                <div class="perfil-panel" id="perfil-endereco">
+                    <div class="perfil-field"><label>CEP</label><input type="text" id="perfilCEP" placeholder="00000-000"></div>
+                    <div class="perfil-row">
+                        <div class="perfil-field" style="flex:2;"><label>Rua</label><input type="text" id="perfilRua" placeholder="Rua, Avenida..."></div>
+                        <div class="perfil-field" style="flex:0 0 80px;"><label>Nº</label><input type="text" id="perfilNumero" placeholder="123"></div>
+                    </div>
+                    <div class="perfil-field"><label>Bairro</label><input type="text" id="perfilBairro" placeholder="Bairro"></div>
+                    <div class="perfil-row">
+                        <div class="perfil-field"><label>Cidade</label><input type="text" id="perfilCidade" placeholder="Cidade"></div>
+                        <div class="perfil-field" style="flex:0 0 70px;"><label>UF</label><input type="text" id="perfilEstado" placeholder="SP" maxlength="2"></div>
+                    </div>
+                    <div class="perfil-field"><label>Complemento</label><input type="text" id="perfilComplemento" placeholder="Apto, bloco..."></div>
+                    <button class="btn-perfil-salvar" id="btnSalvarEndereco">&#128190; Salvar Endereço</button>
+                </div>
+                <div class="perfil-panel" id="perfil-cartoes">
+                    <div id="cartoesLista"></div>
+                    <button class="btn-add-cartao" id="btnAddCartao">&#10133; Adicionar Cartão</button>
+                    <div id="cartaoForm" style="display:none;">
+                        <div class="perfil-field"><label>Número do cartão</label><input type="text" id="cartaoNumero" placeholder="0000 0000 0000 0000" maxlength="19"></div>
+                        <div class="perfil-field"><label>Nome no cartão</label><input type="text" id="cartaoNome" placeholder="Nome impresso"></div>
+                        <div class="perfil-row">
+                            <div class="perfil-field"><label>Validade</label><input type="text" id="cartaoValidade" placeholder="MM/AA" maxlength="5"></div>
+                            <div class="perfil-field"><label>Bandeira</label><select id="cartaoBandeira"><option value="visa">Visa</option><option value="master">Mastercard</option><option value="elo">Elo</option><option value="amex">American Express</option><option value="hiper">Hipercard</option><option value="outro">Outra</option></select></div>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn-perfil-salvar" id="btnSalvarCartao" style="flex:1;">&#128190; Salvar Cartão</button>
+                            <button class="btn-perfil-cancel" id="btnCancelCartao" style="flex:1;">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="pageLoader" style="position:fixed;inset:0;background:#0a1f3f;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s;">
     <div style="text-align:center;color:#fff;">
         <div style="font-size:3rem;animation:pulseLoad 0.6s ease-in-out infinite alternate;">🖨️</div>

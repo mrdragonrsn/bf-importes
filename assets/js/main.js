@@ -476,7 +476,7 @@ function openLightbox(src){
         applyMask(document.getElementById('cardExpiry'), maskExpiry);
 
         var cvvEl = document.getElementById('cardCVV');
-        if(cvvEl){ cvvEl.setAttribute('maxlength','4'); cvvEl.addEventListener('input',function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); }); }
+        if(cvvEl){ cvvEl.setAttribute('maxlength','3'); cvvEl.addEventListener('input',function(){ this.value=this.value.replace(/\D/g,'').slice(0,3); }); }
 
         var expiryEl = document.getElementById('cardExpiry');
         if(expiryEl){
@@ -541,7 +541,7 @@ function openLightbox(src){
     if (authOverlay && boxLogin && boxRegister) {
         function updateAuthUI(){
             if (currentUser && btnLoginHeader) {
-                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnMeusPedidos">&#128230; Meus Pedidos</button><button id="btnLogout">&#128682; Sair</button></div></div>';
+                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnPerfil">&#9881; Perfil</button><button id="btnMeusPedidos">&#128230; Meus Pedidos</button><button id="btnLogout">&#128682; Sair</button></div></div>';
                 var unameBtn = document.getElementById('userNameBtn');
                 if (unameBtn) unameBtn.addEventListener('click', function(e){ e.stopPropagation(); var m = document.getElementById('userMenu'); if (m) m.classList.toggle('open'); });
                 var logoutBtn = document.getElementById('btnLogout');
@@ -1173,6 +1173,255 @@ function openLightbox(src){
         if(pedidosOverlay) pedidosOverlay.addEventListener('click', function(e){
             if(e.target === pedidosOverlay) closeMeusPedidos();
         });
+    })();
+
+    /* ── PERFIL DO USUÁRIO ────────────── */
+    (function(){
+        var PERFIL_KEY = 'bf_profiles';
+
+        function getPerfilKey(){ return currentUser ? ('bf_profile_' + currentUser.email) : null; }
+        function loadPerfil(){
+            var key = getPerfilKey();
+            if(!key) return null;
+            try { return JSON.parse(localStorage.getItem(key)) || {}; } catch(e){ return {}; }
+        }
+        function savePerfil(data){
+            var key = getPerfilKey();
+            if(!key) return;
+            var current = loadPerfil() || {};
+            Object.keys(data).forEach(function(k){ current[k] = data[k]; });
+            localStorage.setItem(key, JSON.stringify(current));
+        }
+
+        function openPerfil(){
+            var overlay = document.getElementById('perfilOverlay');
+            if(!overlay || !currentUser) return;
+            var perfil = loadPerfil();
+
+            document.getElementById('perfilNome').value = perfil.nome || currentUser.name || '';
+            document.getElementById('perfilEmail').value = currentUser.email || '';
+            document.getElementById('perfilPhone').value = perfil.phone || '';
+
+            if(perfil.foto){
+                document.getElementById('perfilFoto').innerHTML = '<img src="'+perfil.foto+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+            } else {
+                document.getElementById('perfilFoto').innerHTML = '&#128100;';
+            }
+
+            if(perfil.endereco){
+                document.getElementById('perfilCEP').value = perfil.endereco.cep || '';
+                document.getElementById('perfilRua').value = perfil.endereco.rua || '';
+                document.getElementById('perfilNumero').value = perfil.endereco.numero || '';
+                document.getElementById('perfilBairro').value = perfil.endereco.bairro || '';
+                document.getElementById('perfilCidade').value = perfil.endereco.cidade || '';
+                document.getElementById('perfilEstado').value = perfil.endereco.estado || '';
+                document.getElementById('perfilComplemento').value = perfil.endereco.complemento || '';
+            } else {
+                ['perfilCEP','perfilRua','perfilNumero','perfilBairro','perfilCidade','perfilEstado','perfilComplemento'].forEach(function(id){
+                    document.getElementById(id).value = '';
+                });
+            }
+
+            renderCartoes(perfil);
+            document.querySelector('.perfil-tab.active').click();
+
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePerfil(){
+            var overlay = document.getElementById('perfilOverlay');
+            if(overlay){ overlay.classList.remove('active'); document.body.style.overflow = ''; }
+        }
+
+        function renderCartoes(perfil){
+            var lista = document.getElementById('cartoesLista');
+            if(!lista) return;
+            var cartoes = (perfil && perfil.cartoes) || [];
+            if(cartoes.length === 0){
+                lista.innerHTML = '<p style="text-align:center;color:#94a3b8;padding:16px 0;">Nenhum cartão salvo.</p>';
+            } else {
+                var html = '';
+                cartoes.forEach(function(c, i){
+                    var ultimos = c.numero.replace(/\D/g,'').slice(-4);
+                    var bandeiraIcon = {'visa':'🔵','master':'🔴','elo':'🟡','amex':'🔷','hiper':'🟢'}[c.bandeira] || '💳';
+                    html += '<div class="cartao-card">' +
+                        '<div class="cartao-card-icon">'+bandeiraIcon+'</div>' +
+                        '<div class="cartao-card-info">' +
+                            '<strong>'+c.bandeira.toUpperCase()+'</strong> &bull;&bull;&bull;&bull; '+ultimos+
+                            ' | '+c.nome+' | Val: '+c.validade+
+                        '</div>' +
+                        '<button class="btn-cartao-remove" onclick="window.removeCartao('+i+')" title="Remover">&#128465;</button>' +
+                    '</div>';
+                });
+                lista.innerHTML = html;
+            }
+        }
+
+        window.removeCartao = function(idx){
+            if(!confirm('Remover este cartão?')) return;
+            var perfil = loadPerfil() || {};
+            if(perfil.cartoes) perfil.cartoes.splice(idx,1);
+            savePerfil({cartoes: perfil.cartoes || []});
+            renderCartoes(perfil);
+            showToast('&#128465; Cartão removido.');
+        };
+
+        var fotoInput = document.getElementById('perfilFotoInput');
+        if(fotoInput){
+            fotoInput.addEventListener('change', function(){
+                var file = this.files[0];
+                if(!file) return;
+                var reader = new FileReader();
+                reader.onload = function(e){
+                    document.getElementById('perfilFoto').innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                    savePerfil({foto: e.target.result});
+                    showToast('&#128247; Foto atualizada!');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('btnSalvarDados').addEventListener('click', function(){
+            var nome = document.getElementById('perfilNome').value.trim();
+            var phone = document.getElementById('perfilPhone').value.trim();
+            if(!nome){ showToast('&#9888; Informe seu nome.'); return; }
+            savePerfil({nome: nome, phone: phone});
+            currentUser.name = nome;
+            localStorage.setItem('bf_session', JSON.stringify(currentUser));
+            var btn = document.getElementById('userNameBtn');
+            if(btn) btn.innerHTML = '&#128100; ' + nome;
+            showToast('&#9989; Dados salvos!');
+        });
+
+        document.getElementById('btnSalvarEndereco').addEventListener('click', function(){
+            var endereco = {
+                cep: document.getElementById('perfilCEP').value.trim(),
+                rua: document.getElementById('perfilRua').value.trim(),
+                numero: document.getElementById('perfilNumero').value.trim(),
+                bairro: document.getElementById('perfilBairro').value.trim(),
+                cidade: document.getElementById('perfilCidade').value.trim(),
+                estado: document.getElementById('perfilEstado').value.trim(),
+                complemento: document.getElementById('perfilComplemento').value.trim()
+            };
+            if(!endereco.rua || !endereco.numero || !endereco.cidade || !endereco.estado){
+                showToast('&#9888; Preencha rua, número, cidade e estado.');
+                return;
+            }
+            savePerfil({endereco: endereco});
+            showToast('&#9989; Endereço salvo! Este endereço será usado no checkout.');
+        });
+
+        document.getElementById('btnAddCartao').addEventListener('click', function(){
+            document.getElementById('cartaoForm').style.display = 'block';
+            this.style.display = 'none';
+            ['cartaoNumero','cartaoNome','cartaoValidade'].forEach(function(id){ document.getElementById(id).value = ''; });
+        });
+
+        document.getElementById('btnCancelCartao').addEventListener('click', function(){
+            document.getElementById('cartaoForm').style.display = 'none';
+            document.getElementById('btnAddCartao').style.display = 'block';
+        });
+
+        document.getElementById('btnSalvarCartao').addEventListener('click', function(){
+            var numero = document.getElementById('cartaoNumero').value.trim();
+            var nome = document.getElementById('cartaoNome').value.trim();
+            var validade = document.getElementById('cartaoValidade').value.trim();
+            var bandeira = document.getElementById('cartaoBandeira').value;
+            if(!numero || !nome || !validade){ showToast('&#9888; Preencha todos os campos do cartão.'); return; }
+            var perfil = loadPerfil() || {};
+            if(!perfil.cartoes) perfil.cartoes = [];
+            perfil.cartoes.push({numero: numero, nome: nome, validade: validade, bandeira: bandeira});
+            savePerfil({cartoes: perfil.cartoes});
+            renderCartoes(perfil);
+            document.getElementById('cartaoForm').style.display = 'none';
+            document.getElementById('btnAddCartao').style.display = 'block';
+            showToast('&#9989; Cartão salvo!');
+        });
+
+        var btnPerfil = document.getElementById('btnPerfil');
+        if(btnPerfil) btnPerfil.addEventListener('click', function(e){
+            e.stopPropagation();
+            var m = document.getElementById('userMenu');
+            if(m) m.classList.remove('open');
+            openPerfil();
+        });
+
+        var perfilCloseBtn = document.getElementById('perfilClose');
+        if(perfilCloseBtn) perfilCloseBtn.addEventListener('click', closePerfil);
+
+        var perfilOverlay = document.getElementById('perfilOverlay');
+        if(perfilOverlay) perfilOverlay.addEventListener('click', function(e){
+            if(e.target === perfilOverlay) closePerfil();
+        });
+
+        document.querySelectorAll('.perfil-tab').forEach(function(tab){
+            tab.addEventListener('click', function(){
+                document.querySelectorAll('.perfil-tab').forEach(function(t){ t.classList.remove('active'); });
+                tab.classList.add('active');
+                document.querySelectorAll('.perfil-panel').forEach(function(p){ p.classList.remove('active'); });
+                document.getElementById(tab.getAttribute('data-ptab')).classList.add('active');
+            });
+        });
+
+        var perfilCEP = document.getElementById('perfilCEP');
+        if(perfilCEP){
+            perfilCEP.addEventListener('blur', function(){
+                var raw = this.value.replace(/\D/g,'');
+                if(raw.length !== 8) return;
+                fetch('https://viacep.com.br/ws/'+raw+'/json/')
+                    .then(function(r){ return r.json(); })
+                    .then(function(data){
+                        if(data.erro){ showToast('&#9888; CEP não encontrado.'); return; }
+                        document.getElementById('perfilRua').value = data.logradouro || '';
+                        document.getElementById('perfilBairro').value = data.bairro || '';
+                        document.getElementById('perfilCidade').value = data.localidade || '';
+                        document.getElementById('perfilEstado').value = data.uf || '';
+                    });
+            });
+        }
+
+        function maskCardPerfil(v){
+            v = v.replace(/\D/g,'').slice(0,16);
+            return v.replace(/(\d{4})(\d{4})(\d{4})(\d{4})/,'$1 $2 $3 $4').replace(/(\d{4})(\d{4})(\d{4})/,'$1 $2 $3').replace(/(\d{4})(\d{4})/,'$1 $2').replace(/(\d{4})/,'$1');
+        }
+        function maskExpiryPerfil(v){
+            v = v.replace(/\D/g,'').slice(0,4);
+            if(v.length>=3) return v.replace(/(\d{2})(\d{2})/,'$1/$2');
+            return v;
+        }
+        var cartaoNumero = document.getElementById('cartaoNumero');
+        var cartaoValidade = document.getElementById('cartaoValidade');
+        if(cartaoNumero) cartaoNumero.addEventListener('input', function(){ this.value = maskCardPerfil(this.value); });
+        if(cartaoValidade) cartaoValidade.addEventListener('input', function(){ this.value = maskExpiryPerfil(this.value); });
+
+        /* ── Auto-fill checkout from profile ── */
+        var origOpenCheckout = openCheckout;
+        openCheckout = function(){
+            origOpenCheckout();
+            if(!currentUser) return;
+            var perfil = loadPerfil();
+            if(!perfil || !perfil.endereco) return;
+            var end = perfil.endereco;
+            var coName = document.getElementById('coName');
+            var coPhone = document.getElementById('coPhone');
+            var coCEP = document.getElementById('coCEP');
+            var coAddress = document.getElementById('coAddress');
+            var coNumber = document.getElementById('coNumber');
+            var coNeighborhood = document.getElementById('coNeighborhood');
+            var coCity = document.getElementById('coCity');
+            var coState = document.getElementById('coState');
+            var coComplement = document.getElementById('coComplement');
+            if(coName && !coName.value) coName.value = perfil.nome || currentUser.name || '';
+            if(coPhone && !coPhone.value) coPhone.value = perfil.phone || '';
+            if(end.cep && coCEP && !coCEP.value) coCEP.value = end.cep;
+            if(end.rua && coAddress && !coAddress.value) coAddress.value = end.rua;
+            if(end.numero && coNumber && !coNumber.value) coNumber.value = end.numero;
+            if(end.bairro && coNeighborhood && !coNeighborhood.value) coNeighborhood.value = end.bairro;
+            if(end.cidade && coCity && !coCity.value) coCity.value = end.cidade;
+            if(end.estado && coState && !coState.value) coState.value = end.estado;
+            if(end.complemento && coComplement && !coComplement.value) coComplement.value = end.complemento;
+        };
     })();
 
     /* ── FRETE DINÂMICO ─────────────── */
