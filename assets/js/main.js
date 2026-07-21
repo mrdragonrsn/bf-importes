@@ -799,22 +799,23 @@ function openLightbox(src){
             openModal(card);
         });
 
-        var btns = document.querySelectorAll('.filter-btn');
-        var cards = document.querySelectorAll('.product-card');
-        btns.forEach(function(btn){
-            btn.addEventListener('click', function(){
-                btns.forEach(function(b){ b.classList.remove('active'); });
+        var filterBar2 = document.getElementById('filterBar');
+        if(filterBar2) {
+            filterBar2.addEventListener('click', function(e){
+                var btn = e.target.closest('.filter-btn');
+                if(!btn) return;
+                document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
                 btn.classList.add('active');
                 var filter = btn.getAttribute('data-filter');
-                cards.forEach(function(card){
-                    if (filter === 'todas' || card.getAttribute('data-category') === filter) {
+                document.querySelectorAll('.product-card').forEach(function(card){
+                    if(filter === 'todas' || card.getAttribute('data-category') === filter){
                         card.classList.remove('hidden');
                     } else {
                         card.classList.add('hidden');
                     }
                 });
             });
-        });
+        }
     }
 
     /* ── MODAL DE PRODUTO ────────────── */

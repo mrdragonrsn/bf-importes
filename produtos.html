@@ -196,8 +196,9 @@
                         <button class="btn-modal-cart" id="modalAddCart">&#128722; Adicionar</button>
                         <button class="btn-modal-buy" id="modalBuyNow">&#128179; Comprar</button>
                         <a href="#" class="btn-modal-quote" id="modalBtn">&#128172; Orçamento</a>
-                    </div>
             </div>
+            <div id="searchNoResults" style="display:none;text-align:center;padding:30px;color:#94a3b8;font-size:0.92rem;">Nenhum produto encontrado.</div>
+        </div>
         </div>
     </div>
 
@@ -453,6 +454,12 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- ── LIGHTBOX ───────────────────────────── -->
+    <div class="lightbox-overlay" id="lightbox" onclick="this.classList.remove('active')">
+        <button class="lightbox-close">&times;</button>
+        <img id="lightboxImg" src="" alt="">
     </div>
 
     <div id="pageLoader" style="position:fixed;inset:0;background:#0a1f3f;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s;">

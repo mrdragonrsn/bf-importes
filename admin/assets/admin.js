@@ -326,7 +326,7 @@ document.getElementById('btnResetBanner').addEventListener('click',function(){sa
 /* === CONFIG === */
 function loadConfigForm(){
     var c=load(CONFIG_KEY,defaultConfig());
-    ['cfgCompany','cfgBrand','cfgCNPJ','cfgPhone','cfgEmail','cfgHours','cfgAddress','cfgCEP','cfgCityState','cfgPhone','cfgEmail','cfgHours'].forEach(function(id){document.getElementById(id).value=''});
+    ['cfgCompany','cfgBrand','cfgCNPJ','cfgPhone','cfgEmail','cfgHours','cfgAddress','cfgCEP','cfgCityState'].forEach(function(id){document.getElementById(id).value=''});
     document.getElementById('cfgCompany').value=c.company||'';
     document.getElementById('cfgBrand').value=c.brand||'';
     document.getElementById('cfgCNPJ').value=c.cnpj||'';

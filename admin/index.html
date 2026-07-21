@@ -63,6 +63,15 @@
                             <button class="btn btn-outline btn-sm" onclick="document.getElementById('prodImgFile').click()">&#128247; Escolher</button>
                             <span id="prodImgName" style="font-size:.72rem;color:var(--text-muted);">Nenhuma</span>
                             <img id="prodImgPreview" style="width:36px;height:36px;object-fit:cover;border-radius:4px;display:none;">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="fg" style="flex:3;"><label>Descrição Longa</label><textarea id="prodLongDesc" placeholder="Descrição detalhada..."></textarea></div>
+                </div>
+                <div class="flex-row" style="margin-top:8px;">
+                    <button class="btn btn-primary" id="btnAddProduct">&#10133; Adicionar</button>
+                    <span id="prodAddMsg" style="font-size:.74rem;"></span>
                 </div>
             </div>
 
@@ -74,15 +83,6 @@
                     <div class="fg" style="width:auto;align-self:flex-end;"><button class="btn btn-primary btn-sm" id="btnAddCat">&#10133; Adicionar</button></div>
                 </div>
                 <div id="catList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
-            </div>
-        </div>
-                <div class="form-row">
-                    <div class="fg" style="flex:3;"><label>Descrição Longa</label><textarea id="prodLongDesc" placeholder="Descrição detalhada..."></textarea></div>
-                </div>
-                <div class="flex-row" style="margin-top:8px;">
-                    <button class="btn btn-primary" id="btnAddProduct">&#10133; Adicionar</button>
-                    <span id="prodAddMsg" style="font-size:.74rem;"></span>
-                </div>
             </div>
 
             <!-- Stock Table (Fully Editable) -->
