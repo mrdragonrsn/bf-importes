@@ -297,8 +297,10 @@ function openLightbox(src){
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(pixKeyEl.textContent).then(function(){
                         showToast('&#128247; Chave PIX copiada!');
-        });
-    }
+                    });
+                }
+            });
+        }
 
     /* ── SYNC CATEGORIAS DO ADMIN ────── */
     (function(){
