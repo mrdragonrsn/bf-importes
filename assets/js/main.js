@@ -1243,15 +1243,29 @@ function openLightbox(src){
             } else {
                 var html = '';
                 cartoes.forEach(function(c, i){
-                    var ultimos = c.numero.replace(/\D/g,'').slice(-4);
-                    var bandeiraIcon = {'visa':'🔵','master':'🔴','elo':'🟡','amex':'🔷','hiper':'🟢'}[c.bandeira] || '💳';
-                    html += '<div class="cartao-card">' +
-                        '<div class="cartao-card-icon">'+bandeiraIcon+'</div>' +
-                        '<div class="cartao-card-info">' +
-                            '<strong>'+c.bandeira.toUpperCase()+'</strong> &bull;&bull;&bull;&bull; '+ultimos+
-                            ' | '+c.nome+' | Val: '+c.validade+
+                    var num = c.numero.replace(/\D/g,'');
+                    var numFormatado = num.replace(/(\d{4})/g,'$1 ').trim();
+                    var ultimos4 = num.slice(-4);
+                    var cvv = c.cvv || '***';
+                    var bandeiraCls = c.bandeira || 'outro';
+                    html += '<div class="cartao-3d-wrap">' +
+                        '<div class="cartao-3d" onclick="this.classList.toggle(\'flipped\')">' +
+                            '<div class="cartao-3d-face cartao-3d-front '+bandeiraCls+'">' +
+                                '<button class="cartao-3d-remove" onclick="event.stopPropagation();window.removeCartao('+i+')" title="Remover">&times;</button>' +
+                                '<div class="cartao-3d-top"><span class="cartao-3d-band">'+c.bandeira.toUpperCase()+'</span><span class="cartao-3d-chip">💳</span></div>' +
+                                '<div class="cartao-3d-numero">•••• •••• •••• '+ultimos4+'</div>' +
+                                '<div class="cartao-3d-bottom">' +
+                                    '<div><span class="cartao-3d-nome">'+c.nome+'</span></div>' +
+                                    '<div class="cartao-3d-validade"><span>VÁLIDO ATÉ</span>'+c.validade+'</div>' +
+                                '</div>' +
+                                '<div class="cartao-3d-hint">Clique para ver CVV</div>' +
+                            '</div>' +
+                            '<div class="cartao-3d-face cartao-3d-back">' +
+                                '<div class="cartao-3d-tarja"></div>' +
+                                '<div class="cartao-3d-cvv-area"><span class="cartao-3d-cvv-label">CVV</span><span class="cartao-3d-cvv">'+cvv+'</span></div>' +
+                                '<div class="cartao-3d-hint" style="margin-top:16px;">Clique para voltar</div>' +
+                            '</div>' +
                         '</div>' +
-                        '<button class="btn-cartao-remove" onclick="window.removeCartao('+i+')" title="Remover">&#128465;</button>' +
                     '</div>';
                 });
                 lista.innerHTML = html;
@@ -1294,6 +1308,11 @@ function openLightbox(src){
             showToast('&#9989; Dados salvos!');
         });
 
+        var adminLink = document.getElementById('perfilAdminLink');
+        if(adminLink && currentUser && currentUser.role === 'admin'){
+            adminLink.style.display = 'block';
+        }
+
         document.getElementById('btnSalvarEndereco').addEventListener('click', function(){
             var endereco = {
                 cep: document.getElementById('perfilCEP').value.trim(),
@@ -1315,7 +1334,7 @@ function openLightbox(src){
         document.getElementById('btnAddCartao').addEventListener('click', function(){
             document.getElementById('cartaoForm').style.display = 'block';
             this.style.display = 'none';
-            ['cartaoNumero','cartaoNome','cartaoValidade'].forEach(function(id){ document.getElementById(id).value = ''; });
+            ['cartaoNumero','cartaoNome','cartaoValidade','cartaoCVV'].forEach(function(id){ document.getElementById(id).value = ''; });
         });
 
         document.getElementById('btnCancelCartao').addEventListener('click', function(){
@@ -1328,10 +1347,11 @@ function openLightbox(src){
             var nome = document.getElementById('cartaoNome').value.trim();
             var validade = document.getElementById('cartaoValidade').value.trim();
             var bandeira = document.getElementById('cartaoBandeira').value;
+            var cvv = document.getElementById('cartaoCVV').value.trim();
             if(!numero || !nome || !validade){ showToast('&#9888; Preencha todos os campos do cartão.'); return; }
             var perfil = loadPerfil() || {};
             if(!perfil.cartoes) perfil.cartoes = [];
-            perfil.cartoes.push({numero: numero, nome: nome, validade: validade, bandeira: bandeira});
+            perfil.cartoes.push({numero: numero, nome: nome, validade: validade, bandeira: bandeira, cvv: cvv});
             savePerfil({cartoes: perfil.cartoes});
             renderCartoes(perfil);
             document.getElementById('cartaoForm').style.display = 'none';

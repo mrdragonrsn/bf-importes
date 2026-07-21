@@ -350,6 +350,9 @@
                     <div class="perfil-field"><label>E-mail</label><input type="text" id="perfilEmail" placeholder="seu@email.com" readonly></div>
                     <div class="perfil-field"><label>Telefone</label><input type="text" id="perfilPhone" placeholder="(00) 00000-0000"></div>
                     <button class="btn-perfil-salvar" id="btnSalvarDados">&#128190; Salvar Dados</button>
+                    <div id="perfilAdminLink" style="display:none;margin-top:14px;text-align:center;">
+                        <a href="admin/" class="btn-perfil-salvar" style="background:#0f172a;display:inline-block;width:auto;padding:10px 24px;text-decoration:none;">&#128736; Painel Admin</a>
+                    </div>
                 </div>
                 <div class="perfil-panel" id="perfil-endereco">
                     <div class="perfil-field"><label>CEP</label><input type="text" id="perfilCEP" placeholder="00000-000"></div>
@@ -373,6 +376,7 @@
                         <div class="perfil-field"><label>Nome no cartão</label><input type="text" id="cartaoNome" placeholder="Nome impresso"></div>
                         <div class="perfil-row">
                             <div class="perfil-field"><label>Validade</label><input type="text" id="cartaoValidade" placeholder="MM/AA" maxlength="5"></div>
+                            <div class="perfil-field"><label>CVV</label><input type="text" id="cartaoCVV" placeholder="123" maxlength="3"></div>
                             <div class="perfil-field"><label>Bandeira</label><select id="cartaoBandeira"><option value="visa">Visa</option><option value="master">Mastercard</option><option value="elo">Elo</option><option value="amex">American Express</option><option value="hiper">Hipercard</option><option value="outro">Outra</option></select></div>
                         </div>
                         <div style="display:flex;gap:8px;">

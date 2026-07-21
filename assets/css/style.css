@@ -1967,13 +1967,80 @@
             font-family: inherit; margin: 10px 0; transition: all 0.2s;
         }
         .btn-add-cartao:hover { background: #eff6ff; }
-        .cartao-card {
-            display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px;
+        /* ── CARTÃO 3D FLIP ────────────── */
+        .cartao-3d-wrap {
+            perspective: 800px;
+            width: 100%;
+            height: 180px;
+            margin-bottom: 10px;
         }
-        .cartao-card-icon { font-size: 1.3rem; flex-shrink: 0; }
-        .cartao-card-info { flex: 1; font-size: 0.8rem; color: #475569; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .btn-cartao-remove { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1rem; padding: 4px; flex-shrink: 0; }
-        .btn-cartao-remove:hover { color: #ef4444; }
+        .cartao-3d {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s ease;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .cartao-3d.flipped { transform: rotateY(180deg); }
+        .cartao-3d-face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .cartao-3d-front {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #fff;
+        }
+        .cartao-3d-front.visa { background: linear-gradient(135deg, #1a56b8 0%, #0d2f5e 100%); }
+        .cartao-3d-front.master { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+        .cartao-3d-front.elo { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #1e293b; }
+        .cartao-3d-front.amex { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); }
+        .cartao-3d-front.outro, .cartao-3d-front.hiper { background: linear-gradient(135deg, #059669 0%, #065f46 100%); }
+        .cartao-3d-back {
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+            color: #fff;
+            transform: rotateY(180deg);
+        }
+        .cartao-3d-top { display: flex; justify-content: space-between; align-items: center; }
+        .cartao-3d-band { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .cartao-3d-chip { font-size: 1.6rem; }
+        .cartao-3d-numero {
+            font-size: 1.15rem; letter-spacing: 3px; font-weight: 700; font-family: 'Courier New', monospace;
+            text-align: center; margin: 10px 0;
+        }
+        .cartao-3d-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+        .cartao-3d-nome { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .cartao-3d-validade { font-size: 0.72rem; text-align: right; }
+        .cartao-3d-validade span { display: block; font-size: 0.6rem; opacity: 0.6; }
+        .cartao-3d-tarja {
+            width: 100%; height: 40px; background: #111; margin: 10px 0; border-radius: 4px;
+        }
+        .cartao-3d-cvv-area {
+            display: flex; align-items: center; gap: 10px; padding: 0 8px;
+        }
+        .cartao-3d-cvv-label { font-size: 0.66rem; opacity: 0.7; }
+        .cartao-3d-cvv {
+            background: #fff; color: #1e293b; padding: 4px 10px; border-radius: 4px; font-weight: 700;
+            font-family: 'Courier New', monospace; font-size: 0.9rem; letter-spacing: 2px;
+        }
+        .cartao-3d-remove {
+            position: absolute; top: 8px; right: 10px; z-index: 5; background: rgba(255,255,255,0.2); color: #fff;
+            border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
+        }
+        .cartao-3d-front .cartao-3d-remove { color: #fff; }
+        .elo .cartao-3d-remove, .cartao-3d-front.elo .cartao-3d-remove { color: #1e293b; background: rgba(0,0,0,0.1); }
+        .cartao-3d-hint {
+            text-align: center; font-size: 0.66rem; color: rgba(255,255,255,0.5); margin-top: 6px;
+        }
+        .elo .cartao-3d-hint, .cartao-3d-front.elo .cartao-3d-hint { color: rgba(0,0,0,0.4); }
         #cartaoForm { margin-top: 12px; padding: 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
 
         @media (max-width: 520px) {
