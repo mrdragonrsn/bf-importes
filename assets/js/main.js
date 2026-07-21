@@ -7,15 +7,10 @@ function openLightbox(src){
 /* ── LOADING FEEDBACK ─────────────── */
 (function(){
     var loader = document.getElementById('pageLoader');
-    if(!loader) return;
-    var ready = function(){
-        setTimeout(function(){
-            loader.style.opacity = '0';
-            setTimeout(function(){ loader.style.display = 'none'; }, 200);
-        }, 100);
-    };
-    if(document.readyState === 'complete' || document.readyState === 'interactive') ready();
-    else window.addEventListener('DOMContentLoaded', ready);
+    if(loader) {
+        setTimeout(function(){ loader.style.opacity = '0'; }, 50);
+        setTimeout(function(){ loader.style.display = 'none'; }, 300);
+    }
 })();
 
 (function(){
