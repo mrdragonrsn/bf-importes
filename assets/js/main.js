@@ -541,7 +541,8 @@ function openLightbox(src){
     if (authOverlay && boxLogin && boxRegister) {
         function updateAuthUI(){
             if (currentUser && btnLoginHeader) {
-                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnPerfil">&#9881; Perfil</button><button id="btnMeusPedidos">&#128230; Meus Pedidos</button><button id="btnLogout">&#128682; Sair</button></div></div>';
+                var adminBtn = currentUser.role === 'admin' ? '<a href="admin/" class="user-menu-link" style="display:flex;align-items:center;gap:6px;padding:10px 18px;font-size:0.84rem;color:#334155;text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background=\'var(--cinza-claro)\'" onmouseout="this.style.background=\'none\'">&#128736; Painel Admin</a>' : '';
+                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnPerfil">&#9881; Perfil</button><button id="btnMeusPedidos">&#128230; Meus Pedidos</button>'+adminBtn+'<button id="btnLogout">&#128682; Sair</button></div></div>';
                 var unameBtn = document.getElementById('userNameBtn');
                 if (unameBtn) unameBtn.addEventListener('click', function(e){ e.stopPropagation(); var m = document.getElementById('userMenu'); if (m) m.classList.toggle('open'); });
                 var logoutBtn = document.getElementById('btnLogout');
@@ -587,9 +588,9 @@ function openLightbox(src){
 
         var btnL = document.getElementById('btnLogin');
         if (btnL) btnL.addEventListener('click', function(){
-            var email = document.getElementById('loginEmail').value.trim();
+            var login = document.getElementById('loginEmail').value.trim();
             var pass = document.getElementById('loginPass').value;
-            var u = users.find(function(u){ return u.email === email && u.pass === pass; });
+            var u = users.find(function(u){ return (u.email === login || u.name === login) && u.pass === pass; });
             if (u) {
                 currentUser = u;
                 localStorage.setItem(SESSION_KEY, JSON.stringify(u));
@@ -597,7 +598,7 @@ function openLightbox(src){
                 showToast('&#128100; Bem-vindo, ' + u.name + '!');
                 setTimeout(function(){ location.reload(); }, 600);
             } else {
-                var le = document.getElementById('loginError'); if (le) le.textContent = 'E-mail ou senha inválidos.';
+                var le = document.getElementById('loginError'); if (le) le.textContent = 'Usuário ou senha inválidos.';
             }
         });
 

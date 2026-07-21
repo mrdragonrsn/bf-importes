@@ -33,7 +33,7 @@ function getAdminSession(){try{return JSON.parse(localStorage.getItem(ADMIN_KEY)
 function login(user,pass){
     var users=load(USERS_KEY,[]);
     if(!users.length){users.push({name:'Admin',email:'admin',pass:'admin',role:'admin'});save(USERS_KEY,users)}
-    var found=users.find(function(u){return u.email===user&&u.pass===pass});
+    var found=users.find(function(u){return (u.email===user||u.name===user)&&u.pass===pass});
     if(found&&(found.role==='admin'||found.email==='admin')){localStorage.setItem(ADMIN_KEY,JSON.stringify(found));showDashboard();return}
     if(found){document.getElementById('loginError').textContent='Apenas administradores podem acessar.';}
     else{document.getElementById('loginError').textContent='Usuário ou senha incorreto.';}

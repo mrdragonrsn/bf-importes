@@ -189,7 +189,7 @@
                         <div class="checkout-field"><label>Parcelas</label><select id="cardInstallments"></select></div>
                     </div>
                     <div class="payment-body" id="payPix">
-                        <div class="pix-qrcode"><svg width="120" height="120" viewBox="0 0 512 512"><circle cx="256" cy="256" r="245" fill="#32BCAD"/><text x="256" y="340" font-size="310" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">P</text></svg></div>
+                        <div class="pix-qrcode" id="pixQrCode"><img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=bf-pagamento-550e8400-e29b-41d4-a716-446655440000" alt="QR Code PIX" style="width:180px;height:180px;"></div>
                         <div class="pix-key" id="pixKey" title="Clique para copiar">bf-pagamento-550e8400-e29b-41d4-a716-446655440000</div>
                         <p style="font-size:0.76rem;color:#64748b;text-align:center;">Clique na chave PIX acima para copiar</p>
                     </div>
@@ -245,8 +245,8 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-box" id="authBoxLogin">
             <h3>&#128274; Entrar</h3>
-            <div class="auth-field"><label>E-mail</label><input type="text" id="loginEmail" placeholder="admin"></div>
-            <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" placeholder="admin"></div>
+            <div class="auth-field"><label>Usuário</label><input type="text" id="loginEmail" placeholder="usuário ou email"></div>
+            <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" placeholder="••••••"></div>
             <div class="auth-error" id="loginError"></div>
             <button class="btn-auth" id="btnLogin">Entrar</button>
             <div class="auth-switch">Não tem conta? <a id="switchToRegister">Cadastre-se</a></div>
