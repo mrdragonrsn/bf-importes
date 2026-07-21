@@ -55,6 +55,8 @@ document.querySelectorAll('#sideNav a').forEach(function(a){
         var tabName = a.getAttribute('data-tab');
         document.getElementById('tab-'+tabName).classList.add('active');
         if(tabName === 'pedidos') renderPedidos();
+        if(tabName === 'anuncios') renderAnuncios();
+        if(tabName === 'banners') loadBannerForm();
     });
 });
 
