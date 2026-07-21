@@ -488,6 +488,7 @@ function renderPedidos(){
 
     tbody.innerHTML = html || '<tr><td colspan="8" class="empty-state">Nenhum pedido encontrado.</td></tr>';
 }
+window.renderPedidos = renderPedidos;
 
 window.alterarStatusPedido = function(idx, novoStatus){
     var pedidos = load(PEDIDOS_KEY, []);

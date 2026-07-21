@@ -364,9 +364,12 @@ function openLightbox(src){
                 if (nfItems) nfItems.innerHTML = itemsHtml;
 
                 var shipping = subtotal > 500 ? 0 : 29.90;
-                var total = subtotal + shipping;
+                var uf = state;
+                if (window.calcFrete && uf) { shipping = window.calcFrete(uf, subtotal); }
+                var totalCheckoutEl = document.getElementById('checkoutTotalValue');
+                var total = totalCheckoutEl ? (parseFloat(totalCheckoutEl.getAttribute('data-total')) || (subtotal + shipping)) : (subtotal + shipping);
                 var totalsHtml = '<div class="nf-row"><span>Subtotal</span><span>'+fmtReal(subtotal)+'</span></div>';
-                totalsHtml += '<div class="nf-row"><span>Frete</span><span>'+(shipping === 0 ? 'Grátis' : fmtReal(shipping))+'</span></div>';
+                totalsHtml += '<div class="nf-row"><span>Frete</span><span>'+ (shipping === 0 ? 'Grátis' : fmtReal(shipping)) +'</span></div>';
                 totalsHtml += '<div class="nf-row total"><span>TOTAL</span><span>'+fmtReal(total)+'</span></div>';
                 var nfTot = document.getElementById('nfTotals');
                 if (nfTot) nfTot.innerHTML = totalsHtml;
@@ -1143,6 +1146,7 @@ function openLightbox(src){
             if(norte.indexOf(uf) >= 0) return 69.90;
             return 29.90;
         }
+        window.calcFrete = calcFrete;
     })();
 
     /* ── WHATSAPP NOTIFICAÇÃO ─────────── */
