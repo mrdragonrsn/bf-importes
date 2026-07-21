@@ -269,6 +269,13 @@ function openLightbox(src){
             if (ff) ff.style.display = currentUser ? 'block' : 'none';
             if (cs) cs.style.display = 'none';
             if (bc) bc.style.display = currentUser ? 'block' : 'none';
+
+            if(currentUser){
+                var coName = document.getElementById('coName');
+                var coEmail = document.getElementById('coEmail');
+                if(coName && !coName.value) coName.value = currentUser.name || '';
+                if(coEmail && !coEmail.value) coEmail.value = currentUser.email || '';
+            }
             checkoutOverlay.classList.add('active');
             closeCart();
             document.body.style.overflow = 'hidden';
@@ -420,6 +427,97 @@ function openLightbox(src){
             openCheckout();
         });
     }
+
+    /* ── MÁSCARAS DE INPUT ──────────── */
+    (function(){
+        function applyMask(input, fn){
+            if(!input) return;
+            input.addEventListener('input', function(){ this.value = fn(this.value); });
+        }
+        function maskCPF(v){
+            v = v.replace(/\D/g,'').slice(0,11);
+            return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4').replace(/(\d{3})(\d{3})(\d{3})/,'$1.$2.$3').replace(/(\d{3})(\d{3})/,'$1.$2').replace(/(\d{3})/,'$1');
+        }
+        function maskPhone(v){
+            v = v.replace(/\D/g,'').slice(0,11);
+            if(v.length===11) return v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+            if(v.length>=6) return v.replace(/(\d{2})(\d{4})(\d*)/,'($1) $2-$3');
+            if(v.length>=3) return v.replace(/(\d{2})(\d*)/,'($1) $2');
+            return v.replace(/(\d*)/,'($1');
+        }
+        function maskCEP(v){
+            v = v.replace(/\D/g,'').slice(0,8);
+            return v.replace(/(\d{5})(\d{3})/,'$1-$2').replace(/(\d{5})/,'$1');
+        }
+        function maskCard(v){
+            v = v.replace(/\D/g,'').slice(0,16);
+            return v.replace(/(\d{4})(\d{4})(\d{4})(\d{4})/,'$1 $2 $3 $4').replace(/(\d{4})(\d{4})(\d{4})/,'$1 $2 $3').replace(/(\d{4})(\d{4})/,'$1 $2').replace(/(\d{4})/,'$1');
+        }
+        function maskExpiry(v){
+            v = v.replace(/\D/g,'').slice(0,4);
+            if(v.length>=3) return v.replace(/(\d{2})(\d{2})/,'$1/$2');
+            return v;
+        }
+        function validateExpiry(v){
+            v = v.replace(/\D/g,'');
+            if(v.length<4) return true;
+            var m = parseInt(v.slice(0,2)), y = parseInt('20'+v.slice(2,4));
+            if(m<1||m>12) return false;
+            var now = new Date();
+            if(y < now.getFullYear()) return false;
+            if(y === now.getFullYear() && m < (now.getMonth()+1)) return false;
+            return true;
+        }
+
+        applyMask(document.getElementById('coCPF'), maskCPF);
+        applyMask(document.getElementById('coPhone'), maskPhone);
+        applyMask(document.getElementById('coCEP'), maskCEP);
+        applyMask(document.getElementById('cardNumber'), maskCard);
+        applyMask(document.getElementById('cardExpiry'), maskExpiry);
+
+        var cvvEl = document.getElementById('cardCVV');
+        if(cvvEl){ cvvEl.setAttribute('maxlength','4'); cvvEl.addEventListener('input',function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); }); }
+
+        var expiryEl = document.getElementById('cardExpiry');
+        if(expiryEl){
+            expiryEl.addEventListener('blur',function(){
+                if(this.value.replace(/\D/g,'').length===4 && !validateExpiry(this.value)){
+                    showToast('&#9888; Data de validade do cartão inválida ou expirada.');
+                    this.style.borderColor = '#ef4444';
+                } else { this.style.borderColor = ''; }
+            });
+            expiryEl.addEventListener('input',function(){ this.style.borderColor = ''; });
+        }
+    })();
+
+    /* ── CEP AUTOCOMPLETE ───────────── */
+    (function(){
+        var cepInput = document.getElementById('coCEP');
+        if(!cepInput) return;
+        cepInput.addEventListener('blur', function(){
+            var raw = this.value.replace(/\D/g,'');
+            if(raw.length !== 8) return;
+            var cityEl = document.getElementById('coCity');
+            var stateEl = document.getElementById('coState');
+            var addrEl = document.getElementById('coAddress');
+            var bairroEl = document.getElementById('coNeighborhood');
+            if(cityEl) cityEl.placeholder = 'Buscando...';
+            fetch('https://viacep.com.br/ws/'+raw+'/json/')
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    if(data.erro){ showToast('&#9888; CEP não encontrado.'); if(cityEl) cityEl.placeholder = 'Sua cidade'; return; }
+                    if(cityEl){ cityEl.value = data.localidade||''; cityEl.placeholder = 'Sua cidade'; }
+                    if(stateEl && data.uf){ stateEl.value = data.uf; }
+                    if(addrEl) addrEl.value = data.logradouro||'';
+                    if(bairroEl) bairroEl.value = data.bairro||'';
+                    showToast('&#128205; Endereço preenchido: '+(data.localidade||'')+'/'+(data.uf||''));
+                    if(typeof renderCheckoutSummary === 'function') renderCheckoutSummary();
+                }).catch(function(){
+                    if(cityEl) cityEl.placeholder = 'Sua cidade';
+                    showToast('&#9888; Erro ao consultar CEP.');
+                });
+        });
+    })();
 
     /* ── AUTH ─────────────────────────── */
     var USERS_KEY = 'bf_users';
@@ -1077,39 +1175,8 @@ function openLightbox(src){
         });
     })();
 
-    /* ── VIACEP ────────────────────────── */
+    /* ── FRETE DINÂMICO ─────────────── */
     (function(){
-        var cepInput = document.getElementById('coCEP');
-        if(!cepInput) return;
-
-        cepInput.addEventListener('blur', function(){
-            var cep = cepInput.value.replace(/\D/g,'');
-            if(cep.length !== 8) return;
-
-            var cityEl = document.getElementById('coCity');
-            var stateEl = document.getElementById('coState');
-            var addrEl = document.getElementById('coAddress');
-            var bairroEl = document.getElementById('coNeighborhood');
-
-            if(cityEl) cityEl.placeholder = 'Buscando...';
-
-            fetch('https://viacep.com.br/ws/' + cep + '/json/')
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    if(data.erro){ showToast('CEP não encontrado.'); if(cityEl) cityEl.placeholder = 'Sua cidade'; return; }
-                    if(cityEl){ cityEl.value = data.localidade || ''; cityEl.placeholder = 'Sua cidade'; }
-                    if(stateEl && data.uf){ stateEl.value = data.uf; }
-                    if(addrEl){ addrEl.value = data.logradouro || ''; }
-                    if(bairroEl){ bairroEl.value = data.bairro || ''; }
-                    showToast('&#128205; Endereço preenchido: ' + (data.localidade||'') + '/' + (data.uf||''));
-                    renderCheckoutSummary();
-                })
-                .catch(function(){
-                    if(cityEl) cityEl.placeholder = 'Sua cidade';
-                    showToast('&#9888; Erro ao consultar CEP.');
-                });
-        });
-
         renderCheckoutSummary = (function(original){
             return function(){
                 original();

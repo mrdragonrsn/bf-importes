@@ -52,7 +52,9 @@ document.querySelectorAll('#sideNav a').forEach(function(a){
         document.querySelectorAll('#sideNav a').forEach(function(l){l.classList.remove('active')});
         a.classList.add('active');
         document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
-        document.getElementById('tab-'+a.getAttribute('data-tab')).classList.add('active');
+        var tabName = a.getAttribute('data-tab');
+        document.getElementById('tab-'+tabName).classList.add('active');
+        if(tabName === 'pedidos') renderPedidos();
     });
 });
 
