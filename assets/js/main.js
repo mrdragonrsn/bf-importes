@@ -4,15 +4,6 @@ function openLightbox(src){
     if(lb && img){ img.src = src; lb.classList.add('active'); }
 }
 
-/* ── LOADING FEEDBACK ─────────────── */
-(function(){
-    var loader = document.getElementById('pageLoader');
-    if(loader) {
-        setTimeout(function(){ loader.style.opacity = '0'; }, 50);
-        setTimeout(function(){ loader.style.display = 'none'; }, 300);
-    }
-})();
-
 (function(){
     /* ── DADOS DOS PRODUTOS ─────────── */
     var productData = {
