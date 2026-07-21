@@ -38,6 +38,10 @@
                     <li><a href="contato.html">&#128222; Contato</a></li>
                 </ul>
             </nav>
+            <div class="header-search-wrap" id="headerSearchWrap">
+                <input type="text" class="header-search" id="headerSearch" placeholder="Buscar produtos...">
+                <button class="header-search-btn" id="headerSearchBtn">&#128269;</button>
+            </div>
             <a href="https://wa.me/5516981386747?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es." target="_blank" class="btn-contato">&#128172; Fale Conosco</a>
             <div class="header-actions">
                 <button class="btn-cart-header" id="btnCartHeader" title="Carrinho">
@@ -276,6 +280,7 @@
                         <div class="nf-footer">Agradecemos a preferência! | B&amp;F<br>atendimento@biancoeferreira.com.br | (16) 98138-6747</div>
                     </div>
                     <button class="btn-print-nf" id="btnPrintNF">&#128424; Imprimir Nota Fiscal</button>
+                    <button class="btn-wpp-share" id="btnWppShare">&#128172; Compartilhar pedido no WhatsApp</button>
                 </div>
                 <button class="btn-confirm" id="btnConfirmOrder">Confirmar Pedido</button>
                 <button class="btn-back-cart" id="btnBackToCart">&#8592; Voltar ao carrinho</button>
@@ -373,6 +378,22 @@
          </div>
      </footer>
 
+
+    <!-- ── MEUS PEDIDOS ─────────────────────── -->
+    <div class="pedidos-overlay" id="pedidosOverlay">
+        <div class="pedidos-modal">
+            <div class="pedidos-modal-header">
+                <h3>&#128230; Meus Pedidos</h3>
+                <button class="pedidos-modal-close" id="pedidosClose">&times;</button>
+            </div>
+            <div class="pedidos-modal-body">
+                <table class="pedidos-table">
+                    <thead><tr><th>Pedido</th><th>Data</th><th>Total</th><th>Pagamento</th><th>Status</th><th>Entrega</th></tr></thead>
+                    <tbody id="pedidosBodyCliente"><tr><td colspan="6" style="text-align:center;padding:40px;color:#94a3b8;">Nenhum pedido encontrado.</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <div id="pageLoader" style="position:fixed;inset:0;background:#0a1f3f;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s;">
     <div style="text-align:center;color:#fff;">

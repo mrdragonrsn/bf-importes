@@ -241,7 +241,7 @@ function openLightbox(src){
             var total = subtotal + shipping;
             h += '<div class="checkout-totals">' +
                 '<div class="row"><span>Subtotal</span><span>' + fmtReal(subtotal) + '</span></div>' +
-                '<div class="row"><span>Frete</span><span>' + (shipping === 0 ? 'Grátis' : fmtReal(shipping)) + '</span></div>' +
+                '<div class="row"><span>Frete</span><span id="checkoutShippingRow">' + (shipping === 0 ? 'Grátis' : fmtReal(shipping)) + '</span></div>' +
                 '<div class="row total"><span>Total</span><span id="checkoutTotalValue" data-total="' + total + '">' + fmtReal(total) + '</span></div>' +
             '</div>';
             checkoutSummary.innerHTML = h;
@@ -440,7 +440,7 @@ function openLightbox(src){
     if (authOverlay && boxLogin && boxRegister) {
         function updateAuthUI(){
             if (currentUser && btnLoginHeader) {
-                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnLogout">&#128682; Sair</button></div></div>';
+                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnMeusPedidos">&#128230; Meus Pedidos</button><button id="btnLogout">&#128682; Sair</button></div></div>';
                 var unameBtn = document.getElementById('userNameBtn');
                 if (unameBtn) unameBtn.addEventListener('click', function(e){ e.stopPropagation(); var m = document.getElementById('userMenu'); if (m) m.classList.toggle('open'); });
                 var logoutBtn = document.getElementById('btnLogout');
@@ -753,7 +753,20 @@ function openLightbox(src){
 
             if (data) {
                 if (modalDesc) modalDesc.textContent = data.longDesc;
-                if (mainImg) mainImg.innerHTML = data.images[0];
+
+                if (mainImg) {
+                    var productImg = null;
+                    try {
+                        var stock = JSON.parse(localStorage.getItem('bf_stock')||'{}');
+                        if (stock[title] && stock[title].img) productImg = stock[title].img;
+                    } catch(e){}
+                    if (productImg) {
+                        mainImg.innerHTML = '<img src="'+productImg+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
+                    } else {
+                        mainImg.innerHTML = data.images[0];
+                    }
+                }
+
                 if (thumbs) {
                     thumbs.innerHTML = '';
                     data.images.forEach(function(img, idx){
@@ -768,6 +781,21 @@ function openLightbox(src){
                         });
                         thumbs.appendChild(t);
                     });
+                    try {
+                        var stock = JSON.parse(localStorage.getItem('bf_stock')||'{}');
+                        if (stock[title] && stock[title].img) {
+                            var imgThumb = document.createElement('div');
+                            imgThumb.className = 'modal-thumb';
+                            imgThumb.innerHTML = '<img src="'+stock[title].img+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">';
+                            imgThumb.addEventListener('click', function(){
+                                if (mainImg) mainImg.innerHTML = '<img src="'+stock[title].img+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
+                                var all = thumbs.querySelectorAll('.modal-thumb');
+                                all.forEach(function(a){ a.classList.remove('active'); });
+                                imgThumb.classList.add('active');
+                            });
+                            thumbs.insertBefore(imgThumb, thumbs.firstChild);
+                        }
+                    } catch(e){}
                 }
                 if (modalStock) {
                     var s = data.stock;
@@ -946,6 +974,201 @@ function openLightbox(src){
             if (co) setTimeout(openCheckout, 500);
         }
     } catch(e) {}
+
+    /* ── BARRA DE BUSCA ──────────────── */
+    (function(){
+        var searchWrap = document.getElementById('headerSearchWrap');
+        if(!searchWrap) return;
+        var input = document.getElementById('headerSearch');
+        if(!input) return;
+
+        function doSearch(){
+            var term = input.value.trim().toLowerCase();
+            var cards = document.querySelectorAll('.product-card');
+            var found = 0;
+            cards.forEach(function(card){
+                var title = (card.querySelector('h3')||{}).textContent||'';
+                var desc = (card.querySelector('.desc')||{}).textContent||'';
+                if(!term || title.toLowerCase().indexOf(term) !== -1 || desc.toLowerCase().indexOf(term) !== -1){
+                    card.classList.remove('hidden-by-search');
+                    found++;
+                } else {
+                    card.classList.add('hidden-by-search');
+                }
+            });
+            var noResults = document.getElementById('searchNoResults');
+            if(noResults){
+                noResults.style.display = (term && found === 0) ? 'block' : 'none';
+            }
+
+            var allCards = document.querySelectorAll('.product-card');
+            if(!term){
+                document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+                var btnTodos = document.querySelector('.filter-btn[data-filter="todas"]');
+                if(btnTodos) btnTodos.classList.add('active');
+            }
+        }
+
+        input.addEventListener('input', doSearch);
+        var searchBtn = document.getElementById('headerSearchBtn');
+        if(searchBtn) searchBtn.addEventListener('click', doSearch);
+        input.addEventListener('keydown', function(e){ if(e.key==='Escape'){ input.value=''; doSearch(); input.blur(); } });
+    })();
+
+    /* ── MEUS PEDIDOS ────────────────── */
+    (function(){
+        function openMeusPedidos(){
+            var overlay = document.getElementById('pedidosOverlay');
+            if(!overlay) return;
+
+            var orders = JSON.parse(localStorage.getItem('bf_orders')||'[]');
+            var myOrders = currentUser ? orders.filter(function(o){ return o.email === currentUser.email; }) : [];
+            myOrders.sort(function(a,b){ return b.timestamp - a.timestamp; });
+
+            var tbody = document.getElementById('pedidosBodyCliente');
+            if(!tbody) return;
+
+            if(myOrders.length === 0){
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#94a3b8;">Nenhum pedido encontrado.</td></tr>';
+            } else {
+                var html = '';
+                myOrders.forEach(function(p){
+                    var statusClass = p.status === 'entregue' ? 'badge-verde' : p.status === 'cancelado' ? 'badge-vermelho' : 'badge-amarelo';
+                    var statusText = p.status.charAt(0).toUpperCase() + p.status.slice(1);
+                    var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
+                    var entrega = p.dataEntrega || '—';
+                    html += '<tr>' +
+                        '<td><strong>' + p.id + '</strong></td>' +
+                        '<td>' + p.data + '</td>' +
+                        '<td>R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + '</td>' +
+                        '<td>' + pagLabel + '</td>' +
+                        '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
+                        '<td>' + entrega + '</td>' +
+                    '</tr>';
+                });
+                tbody.innerHTML = html;
+            }
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMeusPedidos(){
+            var overlay = document.getElementById('pedidosOverlay');
+            if(overlay){ overlay.classList.remove('active'); document.body.style.overflow = ''; }
+        }
+
+        var btnMeusPedidos = document.getElementById('btnMeusPedidos');
+        if(btnMeusPedidos) btnMeusPedidos.addEventListener('click', function(e){
+            e.stopPropagation();
+            var m = document.getElementById('userMenu');
+            if(m) m.classList.remove('open');
+            openMeusPedidos();
+        });
+
+        var closePedidosBtn = document.getElementById('pedidosClose');
+        if(closePedidosBtn) closePedidosBtn.addEventListener('click', closeMeusPedidos);
+
+        var pedidosOverlay = document.getElementById('pedidosOverlay');
+        if(pedidosOverlay) pedidosOverlay.addEventListener('click', function(e){
+            if(e.target === pedidosOverlay) closeMeusPedidos();
+        });
+    })();
+
+    /* ── VIACEP ────────────────────────── */
+    (function(){
+        var cepInput = document.getElementById('coCEP');
+        if(!cepInput) return;
+
+        cepInput.addEventListener('blur', function(){
+            var cep = cepInput.value.replace(/\D/g,'');
+            if(cep.length !== 8) return;
+
+            var cityEl = document.getElementById('coCity');
+            var stateEl = document.getElementById('coState');
+            var addrEl = document.getElementById('coAddress');
+            var bairroEl = document.getElementById('coNeighborhood');
+
+            if(cityEl) cityEl.placeholder = 'Buscando...';
+
+            fetch('https://viacep.com.br/ws/' + cep + '/json/')
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    if(data.erro){ showToast('CEP não encontrado.'); if(cityEl) cityEl.placeholder = 'Sua cidade'; return; }
+                    if(cityEl){ cityEl.value = data.localidade || ''; cityEl.placeholder = 'Sua cidade'; }
+                    if(stateEl && data.uf){ stateEl.value = data.uf; }
+                    if(addrEl){ addrEl.value = data.logradouro || ''; }
+                    if(bairroEl){ bairroEl.value = data.bairro || ''; }
+                    showToast('&#128205; Endereço preenchido: ' + (data.localidade||'') + '/' + (data.uf||''));
+                    renderCheckoutSummary();
+                })
+                .catch(function(){
+                    if(cityEl) cityEl.placeholder = 'Sua cidade';
+                    showToast('&#9888; Erro ao consultar CEP.');
+                });
+        });
+
+        renderCheckoutSummary = (function(original){
+            return function(){
+                original();
+                var state = document.getElementById('coState');
+                if(!state) return;
+                var uf = state.value;
+                var totalEl = document.getElementById('checkoutTotalValue');
+                if(!totalEl) return;
+                var subtotal = cartTotal();
+                var shipping = calcFrete(uf, subtotal);
+                var total = subtotal + shipping;
+                totalEl.setAttribute('data-total', total);
+                totalEl.textContent = fmtReal(total);
+
+                var shippingRow = document.getElementById('checkoutShippingRow');
+                if(shippingRow) shippingRow.textContent = (shipping === 0 ? 'Grátis' : fmtReal(shipping));
+                renderInstallments(total);
+            };
+        })(renderCheckoutSummary);
+
+        function calcFrete(uf, subtotal){
+            if(!uf || subtotal > 500) return 0;
+            var sp = ['SP'];
+            var sudeste = ['RJ','MG','ES'];
+            var sul = ['PR','SC','RS'];
+            var centro = ['DF','GO','MT','MS'];
+            var nordeste = ['BA','PE','CE','MA','PB','RN','AL','SE'];
+            var norte = ['AM','PA','RO','TO','AC','AP','RR'];
+            if(sp.indexOf(uf) >= 0) return subtotal > 300 ? 0 : 19.90;
+            if(sudeste.indexOf(uf) >= 0) return 29.90;
+            if(sul.indexOf(uf) >= 0) return 39.90;
+            if(centro.indexOf(uf) >= 0) return 49.90;
+            if(nordeste.indexOf(uf) >= 0) return 59.90;
+            if(norte.indexOf(uf) >= 0) return 69.90;
+            return 29.90;
+        }
+    })();
+
+    /* ── WHATSAPP NOTIFICAÇÃO ─────────── */
+    (function(){
+        var btnWpp = document.getElementById('btnWppShare');
+        if(!btnWpp) return;
+        btnWpp.addEventListener('click', function(){
+            var lastOrder = JSON.parse(localStorage.getItem('bf_orders')||'[]');
+            if(!lastOrder.length) return;
+            var o = lastOrder[lastOrder.length - 1];
+            var msg = '🔹 *Pedido Confirmado* - B&F Importes\n\n';
+            msg += '📦 *Pedido:* ' + o.id + '\n';
+            msg += '📅 *Data:* ' + o.data + '\n';
+            msg += '💳 *Pagamento:* ' + (o.pagamento === 'card' ? 'Cartão' : o.pagamento === 'pix' ? 'PIX' : 'Boleto') + '\n';
+            msg += '💰 *Total:* R$ ' + parseFloat(o.total).toFixed(2).replace('.',',') + '\n\n';
+            msg += '👤 *Cliente:* ' + o.cliente + '\n';
+            msg += '📧 *E-mail:* ' + (o.email || '') + '\n\n';
+            msg += '📋 *Itens:*\n';
+            o.itens.forEach(function(item, i){
+                msg += '  ' + (i+1) + '. ' + item.titulo + ' (' + item.qtd + 'x ' + item.preco + ')\n';
+            });
+            msg += '\nAcompanhe seus pedidos em: https://mrdragonrsn.github.io/bf-importes/';
+            window.open('https://wa.me/5516981386747?text=' + encodeURIComponent(msg), '_blank');
+        });
+    })();
+
 })();
 (function(){
     try {
