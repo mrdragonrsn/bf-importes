@@ -101,6 +101,35 @@ function deleteImageByUrl(url){
     if(m&&m[1]) supabase.storage.from('produtos').remove([m[1]]);
 }
 
+/* === BUSCA AUTOMÁTICA DE IMAGENS (Google Custom Search) === */
+var GOOGLE_API_KEY = 'AIzaSyDhjheKOMBz7BqyJ1QJgLxY_9mppvY696k';
+var GOOGLE_CX = 'e2b363fdb071c43f2';
+
+async function fetchGoogleImage(productName){
+    try {
+        var url = 'https://www.googleapis.com/customsearch/v1?q=' +
+            encodeURIComponent(productName) +
+            '&cx=' + GOOGLE_CX +
+            '&key=' + GOOGLE_API_KEY +
+            '&searchType=image&num=1';
+        var r = await fetch(url);
+        var data = await r.json();
+        if(data && data.items && data.items.length) return data.items[0].link;
+        return null;
+    } catch(e) {
+        return null;
+    }
+}
+
+function placeholderImageUrl(name){
+    return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=random&size=400';
+}
+
+async function resolveProductImage(nome){
+    var googleUrl = await fetchGoogleImage(nome);
+    return googleUrl || placeholderImageUrl(nome);
+}
+
 /* === RENDER ALL === */
 function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories();renderPedidos();renderDashboard()}
 
@@ -151,6 +180,17 @@ function bindStockEdits(tbody){
                 if(res.error){ showToast('&#9888; '+res.error.message); return; }
                 showToast('&#9989; Alteração salva!');
                 if(field==='estoque')renderStock();
+                if(field==='nome'){
+                    var hasImg = !!row.querySelector('.tbl-img-preview');
+                    if(!hasImg){
+                        showToast('&#128269; Buscando imagem do produto automaticamente no Google...');
+                        resolveProductImage(val).then(function(imgUrl){
+                            return supabase.from('produtos').update({imagem_url:imgUrl}).eq('id',id);
+                        }).then(function(r2){
+                            if(r2 && !r2.error) renderStock();
+                        });
+                    }
+                }
             });
         });
     });
@@ -191,7 +231,11 @@ document.getElementById('btnAddProduct').addEventListener('click',function(){
     if(!name){msg.textContent='Informe o nome.';msg.style.color='var(--danger)';return}
     if(!price){msg.textContent='Informe o preço.';msg.style.color='var(--danger)';return}
     msg.textContent='Salvando...';msg.style.color='var(--text-muted)';
-    uploadImageToStorage(prodImgFile).then(function(imgUrl){
+    uploadImageToStorage(prodImgFile).then(async function(imgUrl){
+        if(!imgUrl){
+            showToast('&#128269; Buscando imagem do produto automaticamente no Google...');
+            imgUrl = await resolveProductImage(name);
+        }
         return supabase.from('produtos').insert([{
             nome:name,
             categoria:cat,
