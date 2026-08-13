@@ -10,6 +10,19 @@ function showToast(msg){
     c.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},2800);
 }
 
+/* === HASH (SHA-256 via Web Crypto) === */
+function sha256(text){
+    try {
+        var enc = new TextEncoder();
+        return crypto.subtle.digest('SHA-256', enc.encode(text)).then(function(buf){
+            var arr = Array.from(new Uint8Array(buf));
+            return arr.map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+        });
+    } catch(e) {
+        return Promise.resolve(String(text));
+    }
+}
+
 /* === DEFAULTS === */
 function defaultStock(){return {
 'HP LaserJet Pro M404dn':{cat:'impressoras',price:'2199,00',stock:12,desc:'Monocromática, duplex automático, 40 ppm.',longDesc:'Impressora monocromática de alto desempenho, ideal para escritórios. Duplex automático, 40 ppm, Ethernet e USB.',installments:10,img:''},
@@ -33,10 +46,15 @@ function getAdminSession(){try{return JSON.parse(localStorage.getItem(ADMIN_KEY)
 function login(user,pass){
     var users=load(USERS_KEY,[]);
     if(!users.length){users.push({name:'Admin',email:'admin',pass:'admin',role:'admin'});save(USERS_KEY,users)}
-    var found=users.find(function(u){return (u.email===user||u.name===user)&&u.pass===pass});
-    if(found&&(found.role==='admin'||found.email==='admin')){localStorage.setItem(ADMIN_KEY,JSON.stringify(found));showDashboard();return}
-    if(found){document.getElementById('loginError').textContent='Apenas administradores podem acessar.';}
-    else{document.getElementById('loginError').textContent='Usuário ou senha incorreto.';}
+    var found=users.find(function(u){return (u.email===user||u.name===user)});
+    if(!found){document.getElementById('loginError').textContent='Usuário ou senha incorreto.';return}
+    sha256(pass).then(function(hash){
+        var ok=(found.pass===hash)||(found.pass===pass);
+        if(!ok){document.getElementById('loginError').textContent='Usuário ou senha incorreto.';return}
+        if(found.pass!==hash){found.pass=hash;save(USERS_KEY,users)}
+        if(found.role==='admin'||found.email==='admin'){localStorage.setItem(ADMIN_KEY,JSON.stringify(found));showDashboard();}
+        else{document.getElementById('loginError').textContent='Apenas administradores podem acessar.';}
+    });
 }
 function showDashboard(){loginScreen.style.display='none';adminLayout.classList.add('active');renderAll();refreshPreview()}
 function logout(){localStorage.removeItem(ADMIN_KEY);loginScreen.style.display='flex';adminLayout.classList.remove('active')}
@@ -57,6 +75,7 @@ document.querySelectorAll('#sideNav a').forEach(function(a){
         if(tabName === 'pedidos') renderPedidos();
         if(tabName === 'anuncios') renderAnuncios();
         if(tabName === 'banners') loadBannerForm();
+        if(tabName === 'dashboard') renderDashboard();
     });
 });
 
@@ -76,7 +95,7 @@ document.getElementById('prodImgFile').addEventListener('change',function(e){
 });
 
 /* === RENDER ALL === */
-function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories();renderPedidos()}
+function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories();renderPedidos();renderDashboard()}
 
 /* === STOCK TABLE + ADD === */
 function renderStock(){
@@ -128,6 +147,7 @@ function renderStock(){
             if(field==='stock')renderStock();
         });
     });
+    renderDashboard();
 }
 
 window.uploadTblImg=function(input,name){
@@ -356,6 +376,7 @@ function renderUsers(){
             '</div></td></tr>';
     });
     document.getElementById('usersBody').innerHTML=html||'<tr><td colspan="4" class="empty-state">Nenhum.</td></tr>';
+    renderDashboard();
 }
 
 window.editUser=function(i){
@@ -409,27 +430,38 @@ document.getElementById('btnSaveUser').addEventListener('click',function(){
     var idx=parseInt(document.getElementById('userFormIdx').value);
     if(!name||!email){showToast('&#9888; Nome e e-mail são obrigatórios.');return}
     var users=load(USERS_KEY,[]);
-    if(idx>=0){
-        if(users[idx].email==='admin'&&email!=='admin'){showToast('&#9888; Não pode mudar o e-mail do admin.');return}
-        users[idx].name=name;
-        if(email!==users[idx].email){
-            if(users.find(function(u,i){return i!==idx&&u.email===email})){showToast('&#9888; E-mail já cadastrado.');return}
-            users[idx].email=email;
+
+    function persist(hashedPass){
+        if(idx>=0){
+            if(users[idx].email==='admin'&&email!=='admin'){showToast('&#9888; Não pode mudar o e-mail do admin.');return}
+            users[idx].name=name;
+            if(email!==users[idx].email){
+                if(users.find(function(u,i){return i!==idx&&u.email===email})){showToast('&#9888; E-mail já cadastrado.');return}
+                users[idx].email=email;
+            }
+            if(hashedPass)users[idx].pass=hashedPass;
+            if(users[idx].email==='admin')users[idx].role='admin';
+            else users[idx].role=role;
+            save(USERS_KEY,users);
+            showToast('&#9989; Usuário "'+name+'" atualizado!');
+        }else{
+            if(users.find(function(u){return u.email===email})){showToast('&#9888; E-mail já cadastrado.');return}
+            users.push({name:name,email:email,pass:hashedPass,role:role});
+            save(USERS_KEY,users);
+            showToast('&#9989; Usuário "'+name+'" adicionado!');
         }
-        if(pass&&pass.length>=4)users[idx].pass=pass;
-        if(users[idx].email==='admin')users[idx].role='admin';
-        else users[idx].role=role;
-        save(USERS_KEY,users);
-        showToast('&#9989; Usuário "'+name+'" atualizado!');
-    }else{
-        if(users.find(function(u){return u.email===email})){showToast('&#9888; E-mail já cadastrado.');return}
-        if(!pass||pass.length<4){showToast('&#9888; Senha mínima: 4 caracteres.');return}
-        users.push({name:name,email:email,pass:pass,role:role});
-        save(USERS_KEY,users);
-        showToast('&#9989; Usuário "'+name+'" adicionado!');
+        document.getElementById('userFormCard').style.display='none';
+        renderUsers();
     }
-    document.getElementById('userFormCard').style.display='none';
-    renderUsers();
+
+    if(idx>=0){
+        if(pass&&pass.length<4){showToast('&#9888; Senha mínima: 4 caracteres.');return}
+        if(pass){sha256(pass).then(function(h){persist(h)});}
+        else{persist(null);}
+    }else{
+        if(!pass||pass.length<4){showToast('&#9888; Senha mínima: 4 caracteres.');return}
+        sha256(pass).then(function(h){persist(h)});
+    }
 });
 
 document.getElementById('btnConfirmReset').addEventListener('click',function(){
@@ -440,10 +472,12 @@ document.getElementById('btnConfirmReset').addEventListener('click',function(){
     if(p1!==p2){showToast('&#9888; Senhas não conferem.');return}
     var users=load(USERS_KEY,[]);
     if(!users[idx])return;
-    users[idx].pass=p1;
-    save(USERS_KEY,users);
-    showToast('&#9989; Senha de "'+users[idx].name+'" redefinida!');
-    document.getElementById('resetPassCard').style.display='none';
+    sha256(p1).then(function(hash){
+        users[idx].pass=hash;
+        save(USERS_KEY,users);
+        showToast('&#9989; Senha de "'+users[idx].name+'" redefinida!');
+        document.getElementById('resetPassCard').style.display='none';
+    });
 });
 
 window.deleteUser=function(i){
@@ -481,16 +515,20 @@ function renderPedidos(){
             '<td><span class="badge ' + statusClass + '">' + statusText + '</span></td>' +
             '<td>' + entrega + '</td>' +
             '<td>' +
-                '<select class="tbl-input" onchange="alterarStatusPedido(' + i + ', this.value)" style="width:100px;">' +
-                    '<option value="pendente"' + (p.status === 'pendente' ? ' selected' : '') + '>Pendente</option>' +
-                    '<option value="entregue"' + (p.status === 'entregue' ? ' selected' : '') + '>Entregue</option>' +
-                    '<option value="cancelado"' + (p.status === 'cancelado' ? ' selected' : '') + '>Cancelado</option>' +
-                '</select>' +
+                '<div class="flex-row" style="gap:6px;flex-wrap:nowrap;">' +
+                    '<select class="tbl-input" onchange="alterarStatusPedido(' + i + ', this.value)" style="width:100px;">' +
+                        '<option value="pendente"' + (p.status === 'pendente' ? ' selected' : '') + '>Pendente</option>' +
+                        '<option value="entregue"' + (p.status === 'entregue' ? ' selected' : '') + '>Entregue</option>' +
+                        '<option value="cancelado"' + (p.status === 'cancelado' ? ' selected' : '') + '>Cancelado</option>' +
+                    '</select>' +
+                    '<button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + (p.id || '') + '\')" title="Ver detalhes">&#128065;</button>' +
+                '</div>' +
             '</td>' +
         '</tr>';
     });
 
     tbody.innerHTML = html || '<tr><td colspan="8" class="empty-state">Nenhum pedido encontrado.</td></tr>';
+    renderDashboard();
 }
 window.renderPedidos = renderPedidos;
 
@@ -515,6 +553,172 @@ document.querySelectorAll('.filter-pedido').forEach(function(btn){
         pedidosFilterAtual = btn.getAttribute('data-filter');
         renderPedidos();
     });
+});
+
+/* === DASHBOARD (métricas) === */
+function renderDashboard(){
+    var pedidos = load(PEDIDOS_KEY, []);
+    var users = load(USERS_KEY, []);
+    var stock = load(STOCK_KEY, {});
+    var vendas = 0, pendentes = 0;
+    pedidos.forEach(function(p){
+        if(p.status !== 'cancelado') vendas += parseFloat(p.total) || 0;
+        if(p.status === 'pendente') pendentes++;
+    });
+    var alertas = 0;
+    Object.keys(stock).forEach(function(k){
+        var p = stock[k];
+        if(p && !p._deleted && typeof p.stock === 'number' && p.stock <= 5) alertas++;
+    });
+    document.getElementById('metricVendas').textContent = 'R$ ' + vendas.toFixed(2).replace('.', ',');
+    document.getElementById('metricPendentes').textContent = pendentes;
+    document.getElementById('metricUsuarios').textContent = users.length;
+    document.getElementById('metricAlertas').textContent = alertas;
+}
+
+/* === PESQUISA NAS TABELAS (filtro em tempo real) === */
+function bindTableSearch(inputId, tbodyId){
+    var input = document.getElementById(inputId);
+    var tbody = document.getElementById(tbodyId);
+    if(!input || !tbody) return;
+    input.addEventListener('keyup', function(){
+        var term = this.value.trim().toLowerCase();
+        tbody.querySelectorAll('tr').forEach(function(row){
+            if(row.querySelector('.empty-state')) return;
+            var text = row.textContent.toLowerCase();
+            row.style.display = (text.indexOf(term) !== -1) ? '' : 'none';
+        });
+    });
+}
+bindTableSearch('searchStock', 'stockBody');
+bindTableSearch('searchPedidos', 'pedidosBody');
+
+/* === EXPORTAÇÃO CSV === */
+function csvCell(v){
+    var s = String(v == null ? '' : v);
+    if(/[";\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+}
+function downloadCSV(filename, header, rows){
+    var lines = [header.map(csvCell).join(';')];
+    rows.forEach(function(r){ lines.push(r.map(csvCell).join(';')); });
+    var blob = new Blob(['\uFEFF' + lines.join('\r\n')], {type:'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
+function exportStockCSV(){
+    var stock = load(STOCK_KEY, {});
+    var def = defaultStock();
+    var merged = {};
+    Object.keys(def).forEach(function(k){ merged[k] = Object.assign({}, def[k], stock[k] || {}); });
+    Object.keys(stock).forEach(function(k){ if(!merged[k]) merged[k] = stock[k]; });
+    var term = (document.getElementById('searchStock').value || '').trim().toLowerCase();
+    var header = ['Nome','Categoria','Preço','Estoque','Status'];
+    var rows = [];
+    Object.keys(merged).forEach(function(name){
+        var p = merged[name];
+        if(p && p._deleted) return;
+        var status = p.stock > 20 ? 'OK' : p.stock > 5 ? 'Últimas unidades' : 'Crítico';
+        var hay = (name + ' ' + (p.cat || '') + ' ' + (p.price || '') + ' ' + p.stock).toLowerCase();
+        if(term && hay.indexOf(term) === -1) return;
+        rows.push([name, p.cat || '', p.price || '', p.stock, status]);
+    });
+    if(!rows.length){ showToast('&#9888; Nenhum produto para exportar.'); return; }
+    downloadCSV('estoque.csv', header, rows);
+    showToast('&#128190; Estoque exportado em CSV!');
+}
+
+function exportPedidosCSV(){
+    var pedidos = load(PEDIDOS_KEY, []).slice().sort(function(a,b){ return b.timestamp - a.timestamp; });
+    var term = (document.getElementById('searchPedidos').value || '').trim().toLowerCase();
+    var header = ['Pedido','Cliente','Data','Total','Pagamento','Status','Entrega'];
+    var rows = [];
+    pedidos.forEach(function(p){
+        if(pedidosFilterAtual !== 'todos' && p.status !== pedidosFilterAtual) return;
+        var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
+        var statusText = p.status.charAt(0).toUpperCase() + p.status.slice(1);
+        var hay = (p.id + ' ' + (p.cliente || '') + ' ' + statusText).toLowerCase();
+        if(term && hay.indexOf(term) === -1) return;
+        rows.push([p.id, p.cliente || '—', p.data, 'R$ ' + (parseFloat(p.total)||0).toFixed(2).replace('.',','), pagLabel, statusText, p.dataEntrega || '—']);
+    });
+    if(!rows.length){ showToast('&#9888; Nenhum pedido para exportar.'); return; }
+    downloadCSV('pedidos.csv', header, rows);
+    showToast('&#128190; Pedidos exportados em CSV!');
+}
+
+document.getElementById('btnExportStock').addEventListener('click', exportStockCSV);
+document.getElementById('btnExportPedidos').addEventListener('click', exportPedidosCSV);
+
+/* === DETALHES DO PEDIDO (modal) === */
+window.verDetalhesPedido = function(id){
+    var pedidos = load(PEDIDOS_KEY, []);
+    var p = null;
+    pedidos.forEach(function(o){ if(o.id === id) p = o; });
+    if(!p) return;
+
+    var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
+    var itensHtml = '';
+    (p.itens || []).forEach(function(item){
+        itensHtml += '<tr><td>' + item.titulo + '</td><td class="qtd">' + item.qtd + '</td><td class="num">' + item.preco + '</td></tr>';
+    });
+
+    var html = '';
+    html += '<div class="detail-row"><span class="lbl">Pedido</span><span>' + p.id + '</span></div>';
+    html += '<div class="detail-row"><span class="lbl">Data</span><span>' + p.data + '</span></div>';
+    html += '<div class="detail-row"><span class="lbl">Pagamento</span><span>' + pagLabel + '</span></div>';
+    html += '<div class="detail-row"><span class="lbl">Total</span><span>R$ ' + (parseFloat(p.total) || 0).toFixed(2).replace('.', ',') + '</span></div>';
+    html += '<div class="detail-row"><span class="lbl">Cliente</span><span>' + (p.cliente || '—') + '</span></div>';
+    html += '<div class="detail-row"><span class="lbl">E-mail</span><span>' + (p.email || '—') + '</span></div>';
+    html += '<div class="detail-row"><span class="lbl">Telefone</span><span>' + (p.phone || '—') + '</span></div>';
+    html += '<div class="detail-row" style="align-items:flex-start;"><span class="lbl">Endereço</span><span style="max-width:60%;">' + (p.endereco || '—') + '</span></div>';
+    html += '<h4 class="detail-sub">Itens do Pedido</h4>';
+    html += '<table class="detail-table"><thead><tr><th>Produto</th><th style="width:50px;text-align:center;">Qtd</th><th style="width:90px;text-align:right;">Preço</th></tr></thead><tbody>' +
+        (itensHtml || '<tr><td colspan="3" class="empty-state">Sem itens.</td></tr>') +
+    '</tbody></table>';
+
+    document.getElementById('pedidoDetalhesBody').innerHTML = html;
+    document.getElementById('pedidoDetalhesModal').style.display = 'flex';
+
+    // botão de WhatsApp com mensagem pré-preenchida
+    var btnWpp = document.getElementById('btnWhatsPedido');
+    if(btnWpp){
+        var digits = (p.phone || '').replace(/\D/g, '');
+        if(digits.length >= 10){
+            if(digits.length <= 11) digits = '55' + digits;
+            var msg = 'Olá ' + (p.cliente || 'cliente') + '! Aqui é da B&F Importes, referente ao seu pedido ' + p.id + '.';
+            btnWpp.href = 'https://wa.me/' + digits + '?text=' + encodeURIComponent(msg);
+            btnWpp.style.display = 'inline-flex';
+        } else {
+            btnWpp.style.display = 'none';
+        }
+    }
+};
+
+function closePedidoDetalhes(){
+    document.getElementById('pedidoDetalhesModal').style.display = 'none';
+}
+document.getElementById('closePedidoDetalhes').addEventListener('click', closePedidoDetalhes);
+document.getElementById('pedidoDetalhesModal').addEventListener('click', function(e){
+    if(e.target === this) closePedidoDetalhes();
+});
+document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closePedidoDetalhes();
+});
+
+/* === TOGGLE DO FORMULÁRIO DE PRODUTO === */
+document.getElementById('btnToggleProductForm').addEventListener('click', function(){
+    var card = document.getElementById('productFormCard');
+    var showing = card.style.display !== 'none';
+    card.style.display = showing ? 'none' : 'block';
+    this.innerHTML = showing ? '&#10133; Novo Produto' : '&#10005; Fechar Formulário';
+    if(!showing){
+        card.scrollIntoView({behavior:'smooth'});
+        document.getElementById('prodName').focus();
+    }
 });
 
 /* === PREVIEW === */

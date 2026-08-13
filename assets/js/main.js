@@ -50,6 +50,7 @@ function openLightbox(src){
     };
 
     /* ── SYNC FROM ADMIN ─────────────── */
+    var PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23e2e8f0'/%3E%3Cg transform='translate(188,138)' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E";
     try {
         var adminStock = JSON.parse(localStorage.getItem('bf_stock')||'{}');
         var productGrid = document.querySelector('.product-grid');
@@ -68,7 +69,7 @@ function openLightbox(src){
                     card.className = 'product-card';
                     card.setAttribute('data-category', p.cat||'impressoras');
                     card.setAttribute('data-name', name);
-                    var imgHtml = p.img ? '<img src="'+p.img+'" style="width:100%;height:100%;object-fit:cover;border-radius:8px 8px 0 0;">' : '&#128424;';
+                    var imgHtml = '<img src="' + (p.img || PLACEHOLDER_IMG) + '" alt="' + name + '" loading="lazy">';
                     var priceStr = 'R$ ' + (parseFloat((p.price||'0').replace(',','.'))).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
                     var inst = parseFloat((p.price||'0').replace(',','.')) / (p.installments||10);
                     card.innerHTML = '<div class="thumb">'+imgHtml+'</div>' +
@@ -77,8 +78,11 @@ function openLightbox(src){
                             '<h3>'+name+'</h3>' +
                             '<p class="desc">'+(p.desc||'')+'</p>' +
                             '<div class="stock-info" data-product="'+name+'"></div>' +
-                            '<div class="price">'+priceStr+'</div>' +
-                            '<div class="installment">ou '+(p.installments||10)+'x de R$ '+(inst.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})).replace('.',',')+'</div>' +
+                            '<div class="card-footer">' +
+                                '<div class="price">'+priceStr+'</div>' +
+                                '<div class="installment">ou '+(p.installments||10)+'x de R$ '+(inst.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})).replace('.',',')+'</div>' +
+                                '<button class="btn-card-add" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Adicionar</button>' +
+                            '</div>' +
                         '</div>';
                     productGrid.appendChild(card);
                 }
@@ -105,6 +109,24 @@ function openLightbox(src){
         });
     }
     renderStock();
+
+    /* ── IMAGENS DOS PRODUTOS (placeholder + img do admin) ── */
+    function renderProductImages(){
+        document.querySelectorAll('.product-card').forEach(function(card){
+            var si = card.querySelector('.stock-info');
+            var name = si ? si.getAttribute('data-product') : null;
+            if(!name){
+                var h3 = card.querySelector('h3');
+                name = h3 ? h3.textContent.trim() : '';
+            }
+            var img = card.querySelector('.thumb img');
+            if(!img) return;
+            var data = productData[name] || {};
+            img.src = data.img || PLACEHOLDER_IMG;
+            if(name) img.alt = name;
+        });
+    }
+    renderProductImages();
 
     /* ── CARRINHO ────────────────────── */
     var CART_KEY = 'bf_cart';
@@ -523,6 +545,19 @@ function openLightbox(src){
         });
     })();
 
+    /* ── HASH (SHA-256 via Web Crypto) ── */
+    function sha256(text){
+        try {
+            var enc = new TextEncoder();
+            return crypto.subtle.digest('SHA-256', enc.encode(text)).then(function(buf){
+                var arr = Array.from(new Uint8Array(buf));
+                return arr.map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+            });
+        } catch(e) {
+            return Promise.resolve(String(text));
+        }
+    }
+
     /* ── AUTH ─────────────────────────── */
     var USERS_KEY = 'bf_users';
     var SESSION_KEY = 'bf_session';
@@ -594,16 +629,24 @@ function openLightbox(src){
         if (btnL) btnL.addEventListener('click', function(){
             var login = document.getElementById('loginEmail').value.trim();
             var pass = document.getElementById('loginPass').value;
-            var u = users.find(function(u){ return (u.email === login || u.name === login) && u.pass === pass; });
-            if (u) {
+            var u = users.find(function(u){ return (u.email === login || u.name === login); });
+            if (!u) {
+                var le = document.getElementById('loginError'); if (le) le.textContent = 'Usuário ou senha inválidos.';
+                return;
+            }
+            sha256(pass).then(function(hash){
+                var ok = (u.pass === hash) || (u.pass === pass);
+                if (!ok) {
+                    var le = document.getElementById('loginError'); if (le) le.textContent = 'Usuário ou senha inválidos.';
+                    return;
+                }
+                if (u.pass !== hash) { u.pass = hash; saveUsers(users); }
                 currentUser = u;
                 localStorage.setItem(SESSION_KEY, JSON.stringify(u));
                 authOverlay.classList.remove('active');
                 showToast('&#128100; Bem-vindo, ' + u.name + '!');
                 setTimeout(function(){ location.reload(); }, 600);
-            } else {
-                var le = document.getElementById('loginError'); if (le) le.textContent = 'Usuário ou senha inválidos.';
-            }
+            });
         });
 
         var btnR = document.getElementById('btnRegister');
@@ -614,14 +657,16 @@ function openLightbox(src){
             if (!name || !email || !pass) { var re = document.getElementById('regError'); if (re) re.textContent = 'Preencha todos os campos.'; return; }
             if (pass.length < 4) { var re = document.getElementById('regError'); if (re) re.textContent = 'Senha deve ter ao menos 4 caracteres.'; return; }
             if (users.find(function(u){ return u.email === email; })) { var re = document.getElementById('regError'); if (re) re.textContent = 'Este e-mail já está cadastrado.'; return; }
-            var newUser = {name: name, email: email, pass: pass, role: 'user'};
-            users.push(newUser);
-            saveUsers(users);
-            currentUser = newUser;
-            localStorage.setItem(SESSION_KEY, JSON.stringify(newUser));
-            authOverlay.classList.remove('active');
-            showToast('&#127881; Conta criada com sucesso!');
-            setTimeout(function(){ location.reload(); }, 600);
+            sha256(pass).then(function(hash){
+                var newUser = {name: name, email: email, pass: hash, role: 'user'};
+                users.push(newUser);
+                saveUsers(users);
+                currentUser = newUser;
+                localStorage.setItem(SESSION_KEY, JSON.stringify(newUser));
+                authOverlay.classList.remove('active');
+                showToast('&#127881; Conta criada com sucesso!');
+                setTimeout(function(){ location.reload(); }, 600);
+            });
         });
 
         /* ── FORGOT PASSWORD ───────────── */
@@ -736,14 +781,16 @@ function openLightbox(src){
             if(p1 !== p2) { if(err) err.textContent = 'Senhas não conferem.'; return; }
             if(err) err.textContent = '';
             var u = users.find(function(u){ return u.email === email; });
-            if(u) { u.pass = p1; saveUsers(users); }
-            var rd = getReset();
-            delete rd[email];
-            saveReset(rd);
-            authOverlay.classList.remove('active');
-            if(boxReset) boxReset.style.display = 'none';
-            showToast('&#9989; Senha redefinida com sucesso!');
-            var le = document.getElementById('loginError'); if(le) le.textContent = '';
+            sha256(p1).then(function(hash){
+                if(u) { u.pass = hash; saveUsers(users); }
+                var rd = getReset();
+                delete rd[email];
+                saveReset(rd);
+                authOverlay.classList.remove('active');
+                if(boxReset) boxReset.style.display = 'none';
+                showToast('&#9989; Senha redefinida com sucesso!');
+                var le = document.getElementById('loginError'); if(le) le.textContent = '';
+            });
         });
     }
 
@@ -784,10 +831,15 @@ function openLightbox(src){
     var productGrid = document.querySelector('.product-grid');
     if (productGrid) {
         productGrid.addEventListener('click', function(e){
-            var btn = e.target.closest('.add-to-cart');
-            if (btn) {
+            var addBtn = e.target.closest('.btn-card-add, .add-to-cart');
+            if (addBtn) {
                 e.stopPropagation();
-                var card = btn.closest('.product-card');
+                if (!currentUser) {
+                    showToast('&#128274; Faça login para adicionar ao carrinho.');
+                    if (authOverlay) authOverlay.classList.add('active');
+                    return;
+                }
+                var card = addBtn.closest('.product-card');
                 var title = card.querySelector('h3').textContent.trim();
                 var price = card.querySelector('.price').textContent.trim();
                 addToCart(title, price);
@@ -929,6 +981,9 @@ function openLightbox(src){
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
+
+        // expõe a abertura do modal para reuso (ex.: carrossel da home)
+        window.openProductModal = openModal;
 
         if (modalAddCart) modalAddCart.addEventListener('click', function(){
             if (!currentUser) {
@@ -1559,11 +1614,259 @@ function openLightbox(src){
                 var html = '';
                 anun.forEach(function(a){
                     if(a.data){
-                        html += '<img src="'+a.data+'" alt="'+(a.name||'Anúncio')+'" style="width:100%;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);cursor:pointer;transition:transform .3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform=\'scale(1.03)\'" onmouseout="this.style.transform=\'scale(1)\'">';
+                        html += '<img src="'+a.data+'" alt="'+(a.name||'Anúncio')+'" class="ad-img" loading="lazy">';
                     }
                 });
                 if(html) grid.innerHTML = html;
             }
         }
     } catch(e) {}
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   MELHORIAS DE UX / ANIMAÇÕES / ACESSIBILIDADE (aditivo)
+══════════════════════════════════════════════════════════════════ */
+(function(){
+    'use strict';
+
+    /* ── LIGHTBOX (delegação de eventos) ─────────────────────────── */
+    (function(){
+        var lb = document.getElementById('lightbox');
+        if (!lb) return;
+        var img = document.getElementById('lightboxImg');
+        var closeBtn = lb.querySelector('.lightbox-close');
+
+        function closeLightbox(){ lb.classList.remove('active'); }
+        function openLightbox(src, alt){
+            if (img) { img.src = src; img.alt = alt || ''; }
+            lb.classList.add('active');
+        }
+
+        /* abre ao clicar em qualquer imagem com a classe .ad-img */
+        document.addEventListener('click', function(e){
+            var ad = e.target.closest ? e.target.closest('.ad-img') : null;
+            if (ad) { openLightbox(ad.src, ad.alt || ad.getAttribute('alt') || ''); }
+        });
+
+        /* fecha ao clicar no overlay (fora da imagem) ou no botão */
+        lb.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+        if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+        document.addEventListener('keydown', function(e){
+            if (e.key === 'Escape' && lb.classList.contains('active')) closeLightbox();
+        });
+
+        /* mantém compatibilidade com chamadas antigas */
+        window.openLightbox = openLightbox;
+    })();
+
+    /* ── SCROLL REVEAL / FADE-UP (IntersectionObserver) ───────────── */
+    (function(){
+        // Aplica a classe .fade-up nos elementos-chave e um delay em cascata
+        function applyFadeUp(){
+            var groups = [
+                '.section-title',
+                '.section-subtitle',
+                '.product-grid .product-card',
+                '.diferencial-card',
+                '.service-card',
+                '.about-grid',
+                '.contact-item'
+            ];
+            groups.forEach(function(selector){
+                var items = document.querySelectorAll(selector);
+                items.forEach(function(el, i){
+                    if (el.classList.contains('fade-up')) return;
+                    el.classList.add('fade-up');
+                    el.style.transitionDelay = Math.min(i * 0.08, 0.6) + 's';
+                });
+            });
+        }
+
+        // Observa todos os .fade-up e revela quando entram na viewport
+        function observeFadeUp(){
+            var els = document.querySelectorAll('.fade-up');
+            if (!('IntersectionObserver' in window)) {
+                els.forEach(function(el){ el.classList.add('visible'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function(entries){
+                entries.forEach(function(entry){
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // limpa o delay após a entrada para não atrasar os hovers
+                        entry.target.addEventListener('transitionend', function onEnd(){
+                            entry.target.style.transitionDelay = '';
+                            entry.target.removeEventListener('transitionend', onEnd);
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+            els.forEach(function(el){ observer.observe(el); });
+        }
+
+        // Revela o hero imediatamente após o carregamento, sem depender do
+        // IntersectionObserver (que pode não disparar a tempo para o topo)
+        function revealHero(){
+            var hero = document.getElementById('heroSection');
+            if (!hero || !hero.classList.contains('fade-up')) return;
+            setTimeout(function(){
+                hero.classList.add('visible');
+                hero.style.transitionDelay = '';
+            }, 50);
+        }
+
+        function init(){
+            applyFadeUp();
+            observeFadeUp();
+            revealHero();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+
+    /* ── CARROSSEL DE DESTAQUES (autoplay + responsivo) ───────────── */
+    (function(){
+        var track = document.getElementById('featuredTrack');
+        if (!track) return;
+
+        var prevBtn = document.getElementById('featuredPrev');
+        var nextBtn = document.getElementById('featuredNext');
+        var dotsWrap = document.getElementById('featuredDots');
+        var viewport = track.parentElement;
+        var cards = Array.prototype.slice.call(track.children);
+        if (!cards.length) return;
+
+        var index = 0;
+        var cardsPerView = 4;
+        var autoplayTimer = null;
+        var AUTOPLAY_MS = 4000;
+
+        function cardsPerViewForWidth(){
+            var w = window.innerWidth;
+            if (w >= 1024) return 4;
+            if (w >= 768) return 3;
+            if (w >= 480) return 2;
+            return 1;
+        }
+
+        function maxIndex(){
+            return Math.max(0, cards.length - cardsPerView);
+        }
+
+        function update(){
+            var gap = 20;
+            cards.forEach(function(card){
+                card.style.flex = '0 0 calc((100% - ' + (gap * (cardsPerView - 1)) + 'px) / ' + cardsPerView + ')';
+            });
+            var step = cards[0].getBoundingClientRect().width + gap;
+            track.style.transform = 'translateX(' + (-index * step) + 'px)';
+
+            if (dotsWrap) {
+                var totalDots = maxIndex() + 1;
+                dotsWrap.innerHTML = '';
+                for (var i = 0; i < totalDots; i++) {
+                    (function(slide){
+                        var dot = document.createElement('button');
+                        dot.type = 'button';
+                        dot.className = 'carousel__dot' + (slide === index ? ' active' : '');
+                        dot.setAttribute('aria-label', 'Ir para slide ' + (slide + 1));
+                        dot.addEventListener('click', function(){
+                            index = slide;
+                            update();
+                            restartAutoplay();
+                        });
+                        dotsWrap.appendChild(dot);
+                    })(i);
+                }
+            }
+
+            if (prevBtn) prevBtn.disabled = index === 0;
+            if (nextBtn) nextBtn.disabled = index >= maxIndex();
+        }
+
+        function goNext(){
+            index = index >= maxIndex() ? 0 : index + 1;
+            update();
+        }
+        function goPrev(){
+            index = index <= 0 ? maxIndex() : index - 1;
+            update();
+        }
+
+        function startAutoplay(){
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            stopAutoplay();
+            autoplayTimer = setInterval(goNext, AUTOPLAY_MS);
+        }
+        function stopAutoplay(){
+            if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; }
+        }
+        function restartAutoplay(){ stopAutoplay(); startAutoplay(); }
+
+        function init(){
+            cardsPerView = cardsPerViewForWidth();
+            update();
+            startAutoplay();
+        }
+
+        if (nextBtn) nextBtn.addEventListener('click', function(){ goNext(); restartAutoplay(); });
+        if (prevBtn) prevBtn.addEventListener('click', function(){ goPrev(); restartAutoplay(); });
+
+        // pausa o autoplay ao passar o mouse
+        viewport.addEventListener('mouseenter', stopAutoplay);
+        viewport.addEventListener('mouseleave', startAutoplay);
+
+        // suporte a toque (swipe) no mobile
+        var startX = null;
+        viewport.addEventListener('touchstart', function(e){
+            startX = e.touches[0].clientX;
+        }, { passive: true });
+        viewport.addEventListener('touchend', function(e){
+            if (startX === null) return;
+            var dx = e.changedTouches[0].clientX - startX;
+            startX = null;
+            if (Math.abs(dx) > 40) {
+                if (dx < 0) goNext(); else goPrev();
+                restartAutoplay();
+            }
+        }, { passive: true });
+
+        // recalcula ao redimensionar
+        var resizeTimer;
+        window.addEventListener('resize', function(){
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function(){
+                cardsPerView = cardsPerViewForWidth();
+                if (index > maxIndex()) index = maxIndex();
+                update();
+            }, 150);
+        });
+
+        // abre o modal do produto ao clicar em um card (sem redirecionar)
+        track.addEventListener('click', function(e){
+            var card = e.target.closest('.product-card');
+            if (!card) return;
+            if (typeof window.openProductModal === 'function') {
+                window.openProductModal(card);
+            }
+        });
+
+        // suporte a teclado (Enter/Espaço) para acessibilidade
+        track.addEventListener('keydown', function(e){
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            var card = e.target.closest('.product-card');
+            if (!card) return;
+            e.preventDefault();
+            if (typeof window.openProductModal === 'function') {
+                window.openProductModal(card);
+            }
+        });
+
+        init();
+    })();
 })();

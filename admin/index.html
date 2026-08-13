@@ -25,7 +25,8 @@
     <aside class="sidebar">
         <div class="sidebar-logo"><h2>B&amp;F</h2><small>Painel Admin</small></div>
         <nav class="sidebar-nav" id="sideNav">
-            <a class="active" data-tab="estoque"><span>&#128230;</span> Estoque</a>
+            <a class="active" data-tab="dashboard"><span>&#128200;</span> Dashboard</a>
+            <a data-tab="estoque"><span>&#128230;</span> Estoque</a>
             <a data-tab="banners"><span>&#127912;</span> Banners</a>
             <a data-tab="anuncios"><span>&#128444;</span> Anúncios</a>
             <a data-tab="config"><span>&#9881;</span> Configurações</a>
@@ -39,13 +40,54 @@
 
     <main class="main-content">
 
+        <!-- ========== DASHBOARD (VISÃO GERAL) ========== -->
+        <div class="tab-panel active" id="tab-dashboard">
+            <h1 class="page-title">&#128200; Dashboard</h1>
+            <p class="page-sub">Visão geral do desempenho da loja</p>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">&#128176;</div>
+                    <div class="metric-body">
+                        <span class="metric-label">Vendas Totais</span>
+                        <span class="metric-value" id="metricVendas">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">&#128203;</div>
+                    <div class="metric-body">
+                        <span class="metric-label">Pedidos Pendentes</span>
+                        <span class="metric-value" id="metricPendentes">0</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">&#128101;</div>
+                    <div class="metric-body">
+                        <span class="metric-label">Usuários</span>
+                        <span class="metric-value" id="metricUsuarios">0</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">&#9888;&#65039;</div>
+                    <div class="metric-body">
+                        <span class="metric-label">Produtos em Alerta</span>
+                        <span class="metric-value" id="metricAlertas">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ========== ESTOQUE (UNIFICADO) ========== -->
-        <div class="tab-panel active" id="tab-estoque">
+        <div class="tab-panel" id="tab-estoque">
             <h1 class="page-title">&#128230; Estoque &amp; Produtos</h1>
             <p class="page-sub">Adicione produtos e gerencie tudo em tempo real</p>
 
-            <!-- Add Product Form -->
-            <div class="card">
+            <!-- Botão para alternar o formulário -->
+            <div class="flex-row" style="justify-content:space-between;margin-bottom:12px;">
+                <button class="btn btn-primary" id="btnToggleProductForm">&#10133; Novo Produto</button>
+            </div>
+
+            <!-- Add Product Form (oculto por padrão) -->
+            <div class="card" id="productFormCard" style="display:none;">
                 <h3>&#10133; Adicionar Produto</h3>
                 <div class="form-row">
                     <div class="fg" style="flex:2;"><label>Nome*</label><input type="text" id="prodName" placeholder="Ex: HP LaserJet Pro M404dn"></div>
@@ -88,6 +130,10 @@
             <!-- Stock Table (Fully Editable) -->
             <div class="card">
                 <h3>&#128202; Produtos Cadastrados</h3>
+                <div class="flex-row" style="justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;">
+                    <input type="text" class="search-input" id="searchStock" placeholder="Buscar produto por nome, categoria ou preço..." style="margin:0;flex:1;max-width:340px;">
+                    <button class="btn btn-outline btn-sm" id="btnExportStock">&#128229; Exportar CSV</button>
+                </div>
                 <div style="overflow-x:auto;">
                 <table>
                     <thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Imagem</th><th style="width:40px;">Status</th><th style="width:50px;">Ações</th></tr></thead>
@@ -171,6 +217,10 @@
             <p class="page-sub">Visualize e gerencie os pedidos realizados no site</p>
             <div class="card">
                 <h3>&#128203; Lista de Pedidos <button class="btn btn-outline btn-sm" onclick="renderPedidos()" style="margin-left:12px;">&#8635; Atualizar</button></h3>
+                <div class="flex-row" style="justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;">
+                    <input type="text" class="search-input" id="searchPedidos" placeholder="Buscar pedido por número, cliente ou status..." style="margin:0;flex:1;max-width:340px;">
+                    <button class="btn btn-outline btn-sm" id="btnExportPedidos">&#128229; Exportar CSV</button>
+                </div>
                 <div class="pedidos-filters">
                     <button class="filter-pedido active" data-filter="todos">Todos</button>
                     <button class="filter-pedido" data-filter="pendente">Pendentes</button>
@@ -179,7 +229,7 @@
                 </div>
                 <div style="overflow-x:auto;">
                     <table>
-                        <thead><tr><th>Pedido</th><th>Cliente</th><th>Data</th><th>Total</th><th>Pagamento</th><th>Status</th><th>Entrega</th><th style="width:140px;">Ações</th></tr></thead>
+                        <thead><tr><th>Pedido</th><th>Cliente</th><th>Data</th><th>Total</th><th>Pagamento</th><th>Status</th><th>Entrega</th><th style="width:190px;">Ações</th></tr></thead>
                         <tbody id="pedidosBody"><tr><td colspan="8" class="empty-state">Nenhum pedido encontrado.</td></tr></tbody>
                     </table>
                 </div>
@@ -247,6 +297,20 @@
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- ── MODAL DETALHES DO PEDIDO ── -->
+<div class="modal-overlay-admin" id="pedidoDetalhesModal" style="display:none;">
+    <div class="modal-card-admin">
+        <div class="modal-head-admin">
+            <h3>&#128230; Detalhes do Pedido</h3>
+            <button class="btn-icon" id="closePedidoDetalhes" aria-label="Fechar">&#10005;</button>
+        </div>
+        <div class="modal-body-admin" id="pedidoDetalhesBody"></div>
+        <div class="modal-foot-admin">
+            <a class="btn btn-primary" id="btnWhatsPedido" target="_blank" rel="noopener">&#128172; Falar no WhatsApp</a>
+        </div>
+    </div>
+</div>
 
 <script src="assets/admin.js"></script>
 </body>

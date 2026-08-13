@@ -137,3 +137,36 @@
             .sidebar-nav a.active{border-left:none;border-top-color:var(--accent);}
             .sidebar-footer{display:none;}
         }
+
+        /* ═══ DASHBOARD (métricas) ═══ */
+        .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
+        .metric-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:18px;display:flex;align-items:center;gap:14px;transition:border-color .2s,transform .2s;}
+        .metric-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+        .metric-icon{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(59,130,246,.15);flex-shrink:0;}
+        .metric-body{display:flex;flex-direction:column;min-width:0;}
+        .metric-label{font-size:.72rem;color:var(--text-muted);}
+        .metric-value{font-size:1.4rem;font-weight:800;color:var(--text);white-space:nowrap;}
+
+        /* ═══ PESQUISA NAS TABELAS ═══ */
+        .search-input{width:100%;max-width:340px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;font-family:inherit;outline:none;margin-bottom:12px;transition:border-color .2s;}
+        .search-input:focus{border-color:var(--accent);}
+        .search-input::placeholder{color:var(--text-muted);}
+
+        /* ═══ MODAL DETALHES DO PEDIDO ═══ */
+        .modal-overlay-admin{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;animation:toastIn .25s ease;}
+        .modal-card-admin{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;width:580px;max-width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.5);}
+        .modal-head-admin{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);}
+        .modal-head-admin h3{font-size:.95rem;margin:0;}
+        .modal-body-admin{padding:18px;overflow-y:auto;}
+        .detail-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.8rem;}
+        .detail-row:last-of-type{border-bottom:none;}
+        .detail-row .lbl{color:var(--text-muted);flex-shrink:0;}
+        .detail-row span:not(.lbl){text-align:right;}
+        .detail-sub{font-size:.82rem;margin:14px 0 6px;}
+        .detail-table{width:100%;border-collapse:collapse;margin-top:8px;}
+        .detail-table th,.detail-table td{padding:7px 8px;font-size:.78rem;border-bottom:1px solid var(--border);}
+        .detail-table th{color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:.68rem;letter-spacing:.5px;}
+        .detail-table .qtd{text-align:center;}
+        .detail-table .num{text-align:right;}
+        .modal-foot-admin{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+        .modal-foot-admin .btn{text-decoration:none;display:inline-flex;align-items:center;gap:8px;}

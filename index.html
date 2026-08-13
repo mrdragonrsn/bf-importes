@@ -39,21 +39,28 @@
                     <li><a href="contato.html">&#128222; Contato</a></li>
                 </ul>
             </nav>
-            <div class="header-search-wrap" id="headerSearchWrap">
-                <input type="text" class="header-search" id="headerSearch" placeholder="Buscar produtos...">
-                <button class="header-search-btn" id="headerSearchBtn">&#128269;</button>
+            <div class="header-search-wrap" id="headerSearchWrap" role="search">
+                <label class="sr-only" for="headerSearch">Buscar produtos</label>
+                <input type="search" class="header-search" id="headerSearch" placeholder="Buscar produtos..." aria-label="Buscar produtos" autocomplete="off">
+                <button class="header-search-btn" id="headerSearchBtn" aria-label="Buscar">&#128269;</button>
             </div>
             <div class="header-actions">
-                <button class="btn-cart-header" id="btnCartHeader" title="Carrinho">
+                <button class="btn-cart-header" id="btnCartHeader" title="Carrinho" aria-label="Abrir carrinho de compras">
                     &#128722; Carrinho
-                    <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+                    <span class="cart-badge" id="cartBadge" style="display:none" aria-live="polite">0</span>
                 </button>
-                <button class="btn-login" id="btnLoginHeader">&#128100; Entrar</button>
+                <button class="btn-login" id="btnLoginHeader" aria-label="Entrar ou criar conta">&#128100; Entrar</button>
             </div>
         </div>
     </header>
 
-     <section class="hero" id="heroSection">
+     <section class="hero fade-up" id="heroSection" aria-label="Apresentação">
+         <div class="hero__bg" aria-hidden="true">
+             <span class="hero__orb hero__orb--1"></span>
+             <span class="hero__orb hero__orb--2"></span>
+             <span class="hero__orb hero__orb--3"></span>
+             <span class="hero__orb hero__orb--4"></span>
+         </div>
          <div class="container">
              <h2 id="heroTitle">Impressoras, multifuncionais e peças<br>com garantia e procedência</h2>
              <p id="heroSub">
@@ -64,19 +71,166 @@
          </div>
      </section>
 
+     <!-- ── FAIXA DE CONFIANÇA (Trust Bar) ────── -->
+     <div class="trust-bar">
+         <div class="container trust-grid">
+             <div class="trust-item">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                 <span>Envio em até 24h para todo o Brasil</span>
+             </div>
+             <div class="trust-item">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                 <span>Mais de 2.000 clientes atendidos</span>
+             </div>
+             <div class="trust-item">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                 <span>Garantia estendida e suporte</span>
+             </div>
+             <div class="trust-item">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+                 <span>Condições exclusivas para CNPJ e Locação</span>
+             </div>
+         </div>
+     </div>
+
      <!-- ── ANÚNCIOS ──────────────────────────── -->
      <section style="padding:40px 0; background:var(--cinza-claro);">
          <div class="container">
 
-             <div id="anunciosGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px;">
-                 <img src="assets/images/Anuncio.jpeg" alt="Anúncio 1" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                 <img src="assets/images/Anuncio2.jpg" alt="Anúncio 2" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                 <img src="assets/images/Anuncio 3.jpg" alt="Anúncio 3" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                 <img src="assets/images/anuncio4.jpg" alt="Anúncio 4" style="width:100%;border-radius:10px;box-shadow:var(--sombra);cursor:pointer;transition:transform 0.3s;" onclick="openLightbox(this.src)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+             <div id="anunciosGrid" class="anuncios-grid">
+                 <img src="assets/images/Anuncio.jpeg" alt="Anúncio 1" class="ad-img" loading="lazy">
+                 <img src="assets/images/Anuncio2.jpg" alt="Anúncio 2" class="ad-img" loading="lazy">
+                 <img src="assets/images/Anuncio 3.jpg" alt="Anúncio 3" class="ad-img" loading="lazy">
+                 <img src="assets/images/anuncio4.jpg" alt="Anúncio 4" class="ad-img" loading="lazy">
              </div>
          </div>
      </section>
 
+    <!-- ── PRODUTOS EM DESTAQUE (Carrossel) ───── -->
+    <section id="destaques" style="background:var(--branco);padding:60px 0;">
+        <div class="container">
+            <h2 class="section-title">Produtos em Destaque</h2>
+            <p class="section-subtitle">Ofertas especiais com garantia e entrega para todo o Brasil</p>
+            <div class="divide"></div>
+
+            <div class="carousel" id="featuredCarousel">
+                <div class="carousel__viewport">
+                    <div class="carousel__track" id="featuredTrack">
+
+                        <div class="product-card featured-card" role="button" tabindex="0">
+                            <span class="offer-badge offer-badge--hot">Mais vendido</span>
+                            <div class="thumb">&#128424;</div>
+                            <div class="body">
+                                <span class="cat">Impressora</span>
+                                <h3>HP LaserJet Pro M404dn</h3>
+                                <p class="desc">Monocromática, duplex automático, 40 ppm. Ideal para escritórios.</p>
+                                <div class="stock-info" data-product="HP LaserJet Pro M404dn"></div>
+                                <div class="price">R$ 2.199,00</div>
+                                <div class="installment">ou 10x de R$ 219,90</div>
+                            </div>
+                        </div>
+
+                        <div class="product-card featured-card" role="button" tabindex="0">
+                            <div class="thumb">&#128424;</div>
+                            <div class="body">
+                                <span class="cat">Multifuncional</span>
+                                <h3>Epson EcoTank L3250</h3>
+                                <p class="desc">Tanque de tinta colorida, Wi-Fi. Baixo custo por página.</p>
+                                <div class="stock-info" data-product="Epson EcoTank L3250"></div>
+                                <div class="price">R$ 1.149,00</div>
+                                <div class="installment">ou 10x de R$ 114,90</div>
+                            </div>
+                        </div>
+
+                        <div class="product-card featured-card" role="button" tabindex="0">
+                            <span class="offer-badge offer-badge--deal">Oferta</span>
+                            <div class="thumb">&#129534;</div>
+                            <div class="body">
+                                <span class="cat">Impressora Térmica</span>
+                                <h3>Elgin i9</h3>
+                                <p class="desc">Cupom não fiscal, 250 mm/s, USB. Ideal para PDV e comércio.</p>
+                                <div class="stock-info" data-product="Elgin i9"></div>
+                                <div class="price">R$ 479,00</div>
+                                <div class="installment">ou 10x de R$ 47,90</div>
+                            </div>
+                        </div>
+
+                        <div class="product-card featured-card" role="button" tabindex="0">
+                            <div class="thumb">&#9881;</div>
+                            <div class="body">
+                                <span class="cat">Peça</span>
+                                <h3>Kit Fusor HP LaserJet</h3>
+                                <p class="desc">Compatível com M402/M404/M426. Alta durabilidade.</p>
+                                <div class="stock-info" data-product="Kit Fusor HP LaserJet"></div>
+                                <div class="price">R$ 349,00</div>
+                                <div class="installment">ou 10x de R$ 34,90</div>
+                            </div>
+                        </div>
+
+                        <div class="product-card featured-card" role="button" tabindex="0">
+                            <div class="thumb">&#128424;</div>
+                            <div class="body">
+                                <span class="cat">Multifuncional</span>
+                                <h3>Brother DCP-L5652DN</h3>
+                                <p class="desc">Laser monocromática, duplex, rede, scanner ADF.</p>
+                                <div class="stock-info" data-product="Brother DCP-L5652DN"></div>
+                                <div class="price">R$ 3.299,00</div>
+                                <div class="installment">ou 10x de R$ 329,90</div>
+                            </div>
+                        </div>
+
+                        <div class="product-card featured-card" role="button" tabindex="0">
+                            <div class="thumb">&#9881;</div>
+                            <div class="body">
+                                <span class="cat">Peça</span>
+                                <h3>Placa Lógica Principal</h3>
+                                <p class="desc">Controladora compatível com impressoras Epson. Revisada.</p>
+                                <div class="stock-info" data-product="Placa Lógica Principal"></div>
+                                <div class="price">R$ 289,00</div>
+                                <div class="installment">ou 10x de R$ 28,90</div>
+                            </div>
+                        </div>
+
+                        <div class="product-card featured-card" role="button" tabindex="0">
+                            <div class="thumb">&#128424;</div>
+                            <div class="body">
+                                <span class="cat">Impressora</span>
+                                <h3>Zebra ZD421</h3>
+                                <p class="desc">Etiquetas térmicas, 203 dpi, USB/Ethernet. Logística.</p>
+                                <div class="stock-info" data-product="Zebra ZD421"></div>
+                                <div class="price">R$ 2.799,00</div>
+                                <div class="installment">ou 10x de R$ 279,90</div>
+                            </div>
+                        </div>
+
+                        <div class="product-card featured-card" role="button" tabindex="0">
+                            <span class="offer-badge offer-badge--new">Novo</span>
+                            <div class="thumb">&#128367;</div>
+                            <div class="body">
+                                <span class="cat">Suprimento</span>
+                                <h3>Toner HP 58A Original</h3>
+                                <p class="desc">Cartucho toner preto CF258A. Até 3.000 páginas.</p>
+                                <div class="stock-info" data-product="Toner HP 58A Original"></div>
+                                <div class="price">R$ 419,00</div>
+                                <div class="installment">ou 10x de R$ 41,90</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <button class="carousel__btn carousel__btn--prev" id="featuredPrev" aria-label="Produtos anteriores">&#10094;</button>
+                <button class="carousel__btn carousel__btn--next" id="featuredNext" aria-label="Próximos produtos">&#10095;</button>
+            </div>
+
+            <div class="carousel__dots" id="featuredDots" aria-label="Navegação do carrossel"></div>
+
+            <div style="text-align:center;margin-top:26px;">
+                <a href="produtos.html" class="btn-cta">Ver catálogo completo &#8594;</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── SOBRE NÓS ─────────────────────────── -->
     <section style="background:var(--branco);padding:60px 0;">
         <div class="container">
             <h2 class="section-title">Sobre Nós</h2>
@@ -107,37 +261,6 @@
         </div>
     </section>
 
-    <section style="padding:60px 0;">
-        <div class="container">
-            <h2 class="section-title">Por que nos escolher?</h2>
-            <p class="section-subtitle">Compromisso que faz a diferença</p>
-            <div class="divide"></div>
-
-            <div class="diferenciais-grid">
-                <div class="diferencial-card">
-                    <div style="font-size:2.4rem; margin-bottom:10px;">&#128666;</div>
-                    <h3 style="font-weight:700; color:var(--azul-escuro); margin-bottom:6px;">Entrega Rápida</h3>
-                    <p style="font-size:0.86rem; color:#64748b;">Envio para todo o Brasil com prazos reduzidos e rastreamento online.</p>
-                </div>
-                <div class="diferencial-card">
-                    <div style="font-size:2.4rem; margin-bottom:10px;">&#9989;</div>
-                    <h3 style="font-weight:700; color:var(--azul-escuro); margin-bottom:6px;">Garantia Estendida</h3>
-                    <p style="font-size:0.86rem; color:#64748b;">Produtos com garantia de fábrica e suporte técnico especializado.</p>
-                </div>
-                <div class="diferencial-card">
-                    <div style="font-size:2.4rem; margin-bottom:10px;">&#128176;</div>
-                    <h3 style="font-weight:700; color:var(--azul-escuro); margin-bottom:6px;">Melhor Preço</h3>
-                    <p style="font-size:0.86rem; color:#64748b;">Condições especiais para atacado e contratos de locação.</p>
-                </div>
-                <div class="diferencial-card">
-                    <div style="font-size:2.4rem; margin-bottom:10px;">&#128100;</div>
-                    <h3 style="font-weight:700; color:var(--azul-escuro); margin-bottom:6px;">Atendimento Premium</h3>
-                    <p style="font-size:0.86rem; color:#64748b;">Equipe técnica treinada para orientar a melhor solução para seu negócio.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <footer>
          <div class="container">
              <p id="footerInfo">&copy; 2026 BIANCO &amp; FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA CNPJ: 03.108.169/0001-58</p>
@@ -146,8 +269,8 @@
      </footer>
 
     <!-- ── LIGHTBOX ───────────────────────────── -->
-    <div class="lightbox-overlay" id="lightbox" onclick="this.classList.remove('active')">
-        <button class="lightbox-close">&times;</button>
+    <div class="lightbox-overlay" id="lightbox" role="dialog" aria-modal="true" aria-label="Visualizar imagem">
+        <button class="lightbox-close" aria-label="Fechar">&times;</button>
         <img id="lightboxImg" src="" alt="">
     </div>
 
