@@ -74,6 +74,30 @@
                     </div>
                 </div>
             </div>
+
+            <div class="dash-grid">
+                <div class="dash-col">
+                    <div class="card">
+                        <h3>&#128200; Vendas — últimos 7 dias</h3>
+                        <div class="chart-box"><canvas id="chartVendas"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3>&#128202; Pedidos por Status</h3>
+                        <div class="chart-box"><canvas id="chartStatus"></canvas></div>
+                    </div>
+                </div>
+                <div class="dash-col">
+                    <div class="card">
+                        <h3>&#9203; Últimos Pedidos Pendentes</h3>
+                        <div class="mini-table">
+                            <table>
+                                <thead><tr><th>Pedido</th><th>Cliente</th><th>Total</th><th style="width:42px;"></th></tr></thead>
+                                <tbody id="pedidosPendentesBody"><tr><td colspan="4" class="empty-state">Nenhum pedido pendente.</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ========== ESTOQUE (UNIFICADO) ========== -->
@@ -283,14 +307,22 @@
 
     </main>
 
-    <!-- ── PREVIEW ───────────────────────── -->
+    <!-- ── FAB PRÉ-VISUALIZAÇÃO ───────── -->
+    <button class="preview-fab" id="previewFab" aria-label="Abrir pré-visualização" title="Pré-visualização">&#128065;</button>
+
+    <!-- ── OFFCANVAS PRÉ-VISUALIZAÇÃO ──── -->
     <aside class="preview-panel" id="previewPanel">
         <div class="preview-header">
             <span>&#128065; Pré-visualização</span>
-            <button class="btn-refresh-prev" id="btnRefreshPreview" title="Atualizar">&#8635;</button>
+            <div class="preview-toggles">
+                <button class="preview-mode active" data-mode="mobile" id="previewMobile" title="Modo mobile" type="button">&#128241;</button>
+                <button class="preview-mode" data-mode="desktop" id="previewDesktop" title="Modo desktop" type="button">&#128421;</button>
+            </div>
+            <button class="btn-refresh-prev" id="btnRefreshPreview" title="Atualizar" type="button">&#8635;</button>
+            <button class="preview-close" id="previewClose" title="Fechar" type="button">&#10005;</button>
         </div>
         <div class="preview-frame-wrap">
-            <iframe id="previewFrame" src="../index.html"></iframe>
+            <iframe id="previewFrame" src="../index.html" title="Pré-visualização do site"></iframe>
         </div>
     </aside>
 
@@ -312,6 +344,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="assets/admin.js"></script>
 </body>
 </html>

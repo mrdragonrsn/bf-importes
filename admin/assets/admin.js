@@ -56,7 +56,7 @@ function login(user,pass){
         else{document.getElementById('loginError').textContent='Apenas administradores podem acessar.';}
     });
 }
-function showDashboard(){loginScreen.style.display='none';adminLayout.classList.add('active');renderAll();refreshPreview()}
+function showDashboard(){loginScreen.style.display='none';adminLayout.classList.add('active');renderAll();setTimeout(initCharts,100);refreshPreview()}
 function logout(){localStorage.removeItem(ADMIN_KEY);loginScreen.style.display='flex';adminLayout.classList.remove('active')}
 
 if(getAdminSession())showDashboard();
@@ -574,6 +574,96 @@ function renderDashboard(){
     document.getElementById('metricPendentes').textContent = pendentes;
     document.getElementById('metricUsuarios').textContent = users.length;
     document.getElementById('metricAlertas').textContent = alertas;
+    renderPedidosPendentes();
+}
+
+/* === ÚLTIMOS PEDIDOS PENDENTES (mini-tabela) === */
+function renderPedidosPendentes(){
+    var tbody = document.getElementById('pedidosPendentesBody');
+    if(!tbody) return;
+    var pedidos = load(PEDIDOS_KEY, []);
+    var pendentes = pedidos
+        .filter(function(p){ return p.status === 'pendente'; })
+        .sort(function(a,b){ return b.timestamp - a.timestamp; })
+        .slice(0, 5);
+    var html = '';
+    pendentes.forEach(function(p){
+        html += '<tr>' +
+            '<td><strong>' + p.id + '</strong></td>' +
+            '<td>' + (p.cliente || '—') + '</td>' +
+            '<td>R$ ' + (parseFloat(p.total) || 0).toFixed(2).replace('.', ',') + '</td>' +
+            '<td><button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + (p.id || '') + '\')" title="Ver detalhes">&#128065;</button></td>' +
+        '</tr>';
+    });
+    tbody.innerHTML = html || '<tr><td colspan="4" class="empty-state">Nenhum pedido pendente.</td></tr>';
+}
+
+/* === GRÁFICOS (Chart.js) === */
+var _vendasChart = null;
+var _statusChart = null;
+function initCharts(){
+    if(typeof Chart === 'undefined') return;
+    if(!document.getElementById('chartVendas') || !document.getElementById('chartStatus')) return;
+
+    if(!_vendasChart){
+        var labels = [];
+        for(var i = 6; i >= 0; i--){
+            var d = new Date();
+            d.setDate(d.getDate() - i);
+            labels.push(d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}));
+        }
+        var ctx = document.getElementById('chartVendas').getContext('2d');
+        _vendasChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Vendas (R$)',
+                    data: [1200, 1900, 1500, 2400, 2100, 3000, 2800],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.15)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#3b82f6',
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#94a3b8' } } },
+                scales: {
+                    x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.4)' } },
+                    y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.4)' } }
+                }
+            }
+        });
+    }
+
+    if(!_statusChart){
+        var pedidos = load(PEDIDOS_KEY, []);
+        var counts = { pendente: 0, entregue: 0, cancelado: 0 };
+        pedidos.forEach(function(p){ if(counts[p.status] !== undefined) counts[p.status]++; });
+        var ctx2 = document.getElementById('chartStatus').getContext('2d');
+        _statusChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pendentes', 'Entregues', 'Cancelados'],
+                datasets: [{
+                    data: [counts.pendente, counts.entregue, counts.cancelado],
+                    backgroundColor: ['#f59e0b', '#22c55e', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
+            }
+        });
+    }
 }
 
 /* === PESQUISA NAS TABELAS (filtro em tempo real) === */
@@ -727,6 +817,21 @@ function refreshPreview(){
     if(f) f.src = '../index.html?t=' + Date.now();
 }
 document.getElementById('btnRefreshPreview').addEventListener('click', refreshPreview);
+
+/* ── OFFCANVAS PREVIEW: abrir/fechar e modo mobile/desktop ── */
+var _previewPanel = document.getElementById('previewPanel');
+function openPreview(){ if(_previewPanel) _previewPanel.classList.add('open'); refreshPreview(); }
+function closePreview(){ if(_previewPanel) _previewPanel.classList.remove('open'); }
+document.getElementById('previewFab').addEventListener('click', openPreview);
+document.getElementById('previewClose').addEventListener('click', closePreview);
+function setPreviewMode(mode){
+    var mobile = (mode === 'mobile');
+    if(_previewPanel) _previewPanel.classList.toggle('mode-mobile', mobile);
+    document.getElementById('previewMobile').classList.toggle('active', mobile);
+    document.getElementById('previewDesktop').classList.toggle('active', !mobile);
+}
+document.getElementById('previewMobile').addEventListener('click', function(){ setPreviewMode('mobile'); });
+document.getElementById('previewDesktop').addEventListener('click', function(){ setPreviewMode('desktop'); });
 var _saveIds = ['btnSaveBanner','btnSaveAnuncios','btnSaveConfig','btnAddProduct','btnSaveUser','btnConfirmReset','btnAddCat'];
 _saveIds.forEach(function(id){
     var el = document.getElementById(id);
