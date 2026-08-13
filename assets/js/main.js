@@ -10,101 +10,78 @@ function openLightbox(src){
     var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaXJ4bWNhbHhrdGFtcGJ1anlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjU3MzEsImV4cCI6MjEwMjIwMTczMX0.sr6dx1qSK8cqV4e1g6-jMz99T2WTw9Q0jX1iHb-Vwy4';
     var supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    /* ── DADOS DOS PRODUTOS ─────────── */
-    var productData = {
-        'HP LaserJet Pro M404dn': {
-            images: ['&#128424;','&#128196;','&#128295;','&#128203;'],
-            stock: 12,
-            longDesc: 'A HP LaserJet Pro M404dn é uma impressora monocromática de alto desempenho, ideal para escritórios que precisam de velocidade e qualidade. Com impressão duplex automática e velocidade de até 40 ppm, oferece produtividade sem abrir mão da segurança. Conexão Ethernet e USB, compatível com HP Smart e soluções de gerenciamento em nuvem. Bandeja de 250 folhas e bandeja multiuso para 100 folhas adicionais.'
-        },
-        'Epson EcoTank L3250': {
-            images: ['&#128424;','&#127912;','&#128167;','&#128203;'],
-            stock: 25,
-            longDesc: 'A Epson EcoTank L3250 é a solução perfeita para quem busca economia. Com tanque de tinta de alta capacidade, imprime até 4.500 páginas em preto e 7.500 em cores sem se preocupar com cartuchos. Conexão Wi-Fi integrada, compatível com Epson Smart Panel. Impressão frente e verso manual, velocidade de 10 ppm em preto e 5 ppm em cores. Ideal para uso doméstico e pequenos escritórios.'
-        },
-        'Elgin i9': {
-            images: ['&#129534;','&#128722;','&#128179;','&#128203;'],
-            stock: 40,
-            longDesc: 'A Elgin i9 é uma impressora térmica de cupom não fiscal de alta velocidade, atingindo até 250 mm/s. Com conexão USB, é perfeita para pontos de venda, comércios e estabelecimentos que exigem agilidade na emissão de comprovantes. Design robusto, guilhotina integrada e compatível com os principais sistemas de automação comercial do mercado.'
-        },
-        'Kit Fusor HP LaserJet': {
-            images: ['&#9881;','&#128296;','&#128295;','&#128203;'],
-            stock: 8,
-            longDesc: 'O Kit Fusor para HP LaserJet é compatível com os modelos M402, M404, M426 e similares. Esta unidade de fusão de alta durabilidade garante impressões nítidas e sem falhas. Fabricado com materiais de qualidade premium, oferece vida útil estendida comparado aos fusores convencionais. Fácil instalação com guia passo a passo incluso. Testado individualmente antes do envio.'
-        },
-        'Brother DCP-L5652DN': {
-            images: ['&#128424;','&#128224;','&#128196;','&#128203;'],
-            stock: 6,
-            longDesc: 'A Brother DCP-L5652DN é uma multifuncional laser monocromática completa. Com impressão duplex automática, scanner ADF para múltiplas páginas e conexão de rede, é a escolha certa para grupos de trabalho que precisam de alta produtividade. Velocidade de 40 ppm, bandeja de 250 folhas, display LCD touchscreen de 3,5". Ideal para escritórios de médio a grande porte.'
-        },
-        'Placa Lógica Principal': {
-            images: ['&#128268;','&#128295;','&#128187;','&#128203;'],
-            stock: 15,
-            longDesc: 'Placa lógica principal compatível com diversas impressoras Epson. Revisada e testada individualmente antes do envio. Esta placa controladora é responsável pelo processamento central da impressora, gerenciando desde a comunicação com o computador até o controle dos motores e cabeçotes de impressão. Acompanha manual de instalação e garantia de 90 dias.'
-        },
-        'Zebra ZD421': {
-            images: ['&#127991;','&#128230;','&#128203;','&#128295;'],
-            stock: 10,
-            longDesc: 'A Zebra ZD421 é uma impressora de etiquetas térmicas de alto desempenho com resolução de 203 dpi. Ideal para logística, almoxarifado e varejo. Conexão USB e Ethernet, compatível com as principais linguagens de impressão como ZPL e EPL. Design compacto e construção robusta para ambientes exigentes. Velocidade de impressão de até 152 mm/s.'
-        },
-        'Toner HP 58A Original': {
-            images: ['&#128424;','&#128137;','&#128267;','&#128203;'],
-            stock: 30,
-            longDesc: 'O Toner HP 58A Original (CF258A) é o suprimento oficial para impressoras HP LaserJet. Com rendimento de até 3.000 páginas, garante impressões nítidas e de qualidade profissional. A tecnologia JetIntelligence da HP assegura desempenho consistente página após página, além de proteção contra falsificações. Fácil instalação, design de troca rápida.'
-        }
-    };
+    /* ── DADOS DOS PRODUTOS (fonte: Supabase) ── */
+    var productData = {};
 
-    /* ── SYNC FROM SUPABASE ─────────── */
     var PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23e2e8f0'/%3E%3Cg transform='translate(188,138)' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E";
-    function syncFromSupabase(){
-        if(!supabase) return;
-        supabase.from('produtos').select('*').order('nome',{ascending:true}).then(function(res){
-            if(res.error) return;
-            var rows = res.data||[];
-            var productGrid = document.querySelector('.product-grid');
-            var defaultCatNames = {'impressoras':'Impressora','multifuncionais':'Multifuncional','pecas':'Peça','suprimentos':'Suprimento'};
-            rows.forEach(function(p){
-                var name = p.nome;
-                if(!productData[name]){
-                    productData[name] = {
-                        images: ['&#128424;','&#128196;','&#128295;','&#128203;'],
-                        stock: parseInt(p.estoque)||0,
-                        longDesc: p.descricao_curta || ''
-                    };
-                    if(productGrid && !document.querySelector('.product-card[data-name="'+name.replace(/"/g,'&quot;')+'"]')){
-                        var card = document.createElement('div');
-                        card.className = 'product-card';
-                        card.setAttribute('data-category', p.categoria||'impressoras');
-                        card.setAttribute('data-name', name);
-                        var imgHtml = '<img src="' + (p.imagem_url || PLACEHOLDER_IMG) + '" alt="' + name + '" loading="lazy">';
-                        var priceStr = 'R$ ' + (parseFloat(p.preco||0)).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-                        var inst = (parseFloat(p.preco||0)) / 10;
-                        card.innerHTML = '<div class="thumb">'+imgHtml+'</div>' +
-                            '<div class="body">' +
-                                '<span class="cat">'+(defaultCatNames[p.categoria]||p.categoria||'Produto')+'</span>' +
-                                '<h3>'+name+'</h3>' +
-                                '<p class="desc">'+(p.descricao_curta||'')+'</p>' +
-                                '<div class="stock-info" data-product="'+name+'"></div>' +
-                                '<div class="card-footer">' +
-                                    '<div class="price">'+priceStr+'</div>' +
-                                    '<div class="installment">ou 10x de R$ '+(inst.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})).replace('.',',')+'</div>' +
-                                    '<button class="btn-card-add" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Adicionar</button>' +
-                                '</div>' +
-                            '</div>';
-                        productGrid.appendChild(card);
-                    }
-                }
-                if(productData[name]){
-                    productData[name].stock = parseInt(p.estoque)||0;
-                    if(p.imagem_url) productData[name].img = p.imagem_url;
-                    if(p.preco != null) productData[name].preco = parseFloat(p.preco);
-                }
-            });
-            renderStock();
-            renderProductImages();
-        });
+    var defaultCatNames = {'impressoras':'Impressora','multifuncionais':'Multifuncional','pecas':'Peça','suprimentos':'Suprimento'};
+
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    function buildProductCard(p){
+        var name = esc(p.nome);
+        var cat = defaultCatNames[p.categoria] || p.categoria || 'Produto';
+        var img = p.imagem_url || PLACEHOLDER_IMG;
+        var preco = parseFloat(p.preco) || 0;
+        var priceStr = 'R$ ' + preco.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+        var inst = preco / 10;
+        return '<div class="product-card" data-category="'+esc(p.categoria||'impressoras')+'" data-name="'+name+'">' +
+            '<div class="thumb"><img src="'+esc(img)+'" alt="'+name+'" loading="lazy"></div>' +
+            '<div class="body">' +
+                '<span class="cat">'+esc(cat)+'</span>' +
+                '<h3>'+name+'</h3>' +
+                '<p class="desc">'+esc(p.descricao_curta||'')+'</p>' +
+                '<div class="stock-info" data-product="'+name+'"></div>' +
+                '<div class="card-footer">' +
+                    '<div class="price">'+priceStr+'</div>' +
+                    '<div class="installment">ou 10x de R$ '+inst.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}).replace('.',',')+'</div>' +
+                    '<button class="btn-card-add" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Adicionar</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
     }
-    syncFromSupabase();
+
+    async function renderProducts(){
+        var grid = document.getElementById('productGrid') || document.querySelector('.product-grid');
+        if(!grid) return;
+
+        if(!supabase){
+            grid.innerHTML = '<div class="empty-state">Não foi possível conectar ao servidor.</div>';
+            return;
+        }
+
+        grid.innerHTML = '<div class="empty-state">Carregando produtos...</div>';
+
+        var res = await supabase.from('produtos').select('*').order('nome',{ascending:true});
+        if(res.error){
+            grid.innerHTML = '<div class="empty-state">Erro ao carregar produtos.</div>';
+            return;
+        }
+
+        var rows = res.data || [];
+        if(rows.length === 0){
+            grid.innerHTML = '<div class="empty-state">Nenhum produto disponível no momento.</div>';
+            return;
+        }
+
+        productData = {};
+        var html = '';
+        rows.forEach(function(p){
+            productData[p.nome] = {
+                images: ['&#128424;','&#128196;','&#128295;','&#128203;'],
+                stock: parseInt(p.estoque)||0,
+                longDesc: p.descricao_curta || '',
+                img: p.imagem_url || '',
+                preco: parseFloat(p.preco)||0
+            };
+            html += buildProductCard(p);
+        });
+        grid.innerHTML = html;
+
+        renderStock();
+        renderProductImages();
+    }
+    renderProducts();
 
     /* ── RENDER ESTOQUE ──────────────── */
     function renderStock() {

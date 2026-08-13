@@ -264,6 +264,13 @@
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 28px;
         }
+        .product-grid .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
         .product-card {
             background: #ffffff;
             border-radius: 16px;
