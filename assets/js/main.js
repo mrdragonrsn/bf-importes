@@ -5,6 +5,11 @@ function openLightbox(src){
 }
 
 (function(){
+    /* ── SUPABASE CLIENT ───────────── */
+    var SUPABASE_URL = 'https://trirxmcalxktampbujyr.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaXJ4bWNhbHhrdGFtcGJ1anlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjU3MzEsImV4cCI6MjEwMjIwMTczMX0.sr6dx1qSK8cqV4e1g6-jMz99T2WTw9Q0jX1iHb-Vwy4';
+    var supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
     /* ── DADOS DOS PRODUTOS ─────────── */
     var productData = {
         'HP LaserJet Pro M404dn': {
@@ -49,50 +54,57 @@ function openLightbox(src){
         }
     };
 
-    /* ── SYNC FROM ADMIN ─────────────── */
+    /* ── SYNC FROM SUPABASE ─────────── */
     var PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23e2e8f0'/%3E%3Cg transform='translate(188,138)' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E";
-    try {
-        var adminStock = JSON.parse(localStorage.getItem('bf_stock')||'{}');
-        var productGrid = document.querySelector('.product-grid');
-        var defaultCatNames = {'impressoras':'Impressora','multifuncionais':'Multifuncional','pecas':'Peça','suprimentos':'Suprimento'};
-        Object.keys(adminStock).forEach(function(name){
-            if(adminStock[name]._deleted) return;
-            if(!productData[name]){
-                productData[name] = {
-                    images: ['&#128424;','&#128196;','&#128295;','&#128203;'],
-                    stock: adminStock[name].stock || 0,
-                    longDesc: adminStock[name].longDesc || adminStock[name].desc || ''
-                };
-                if(productGrid && !document.querySelector('.product-card[data-name="'+name.replace(/"/g,'&quot;')+'"]')){
-                    var p = adminStock[name];
-                    var card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.setAttribute('data-category', p.cat||'impressoras');
-                    card.setAttribute('data-name', name);
-                    var imgHtml = '<img src="' + (p.img || PLACEHOLDER_IMG) + '" alt="' + name + '" loading="lazy">';
-                    var priceStr = 'R$ ' + (parseFloat((p.price||'0').replace(',','.'))).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-                    var inst = parseFloat((p.price||'0').replace(',','.')) / (p.installments||10);
-                    card.innerHTML = '<div class="thumb">'+imgHtml+'</div>' +
-                        '<div class="body">' +
-                            '<span class="cat">'+(defaultCatNames[p.cat]||p.cat||'Produto')+'</span>' +
-                            '<h3>'+name+'</h3>' +
-                            '<p class="desc">'+(p.desc||'')+'</p>' +
-                            '<div class="stock-info" data-product="'+name+'"></div>' +
-                            '<div class="card-footer">' +
-                                '<div class="price">'+priceStr+'</div>' +
-                                '<div class="installment">ou '+(p.installments||10)+'x de R$ '+(inst.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})).replace('.',',')+'</div>' +
-                                '<button class="btn-card-add" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Adicionar</button>' +
-                            '</div>' +
-                        '</div>';
-                    productGrid.appendChild(card);
+    function syncFromSupabase(){
+        if(!supabase) return;
+        supabase.from('produtos').select('*').order('nome',{ascending:true}).then(function(res){
+            if(res.error) return;
+            var rows = res.data||[];
+            var productGrid = document.querySelector('.product-grid');
+            var defaultCatNames = {'impressoras':'Impressora','multifuncionais':'Multifuncional','pecas':'Peça','suprimentos':'Suprimento'};
+            rows.forEach(function(p){
+                var name = p.nome;
+                if(!productData[name]){
+                    productData[name] = {
+                        images: ['&#128424;','&#128196;','&#128295;','&#128203;'],
+                        stock: parseInt(p.estoque)||0,
+                        longDesc: p.descricao_curta || ''
+                    };
+                    if(productGrid && !document.querySelector('.product-card[data-name="'+name.replace(/"/g,'&quot;')+'"]')){
+                        var card = document.createElement('div');
+                        card.className = 'product-card';
+                        card.setAttribute('data-category', p.categoria||'impressoras');
+                        card.setAttribute('data-name', name);
+                        var imgHtml = '<img src="' + (p.imagem_url || PLACEHOLDER_IMG) + '" alt="' + name + '" loading="lazy">';
+                        var priceStr = 'R$ ' + (parseFloat(p.preco||0)).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+                        var inst = (parseFloat(p.preco||0)) / 10;
+                        card.innerHTML = '<div class="thumb">'+imgHtml+'</div>' +
+                            '<div class="body">' +
+                                '<span class="cat">'+(defaultCatNames[p.categoria]||p.categoria||'Produto')+'</span>' +
+                                '<h3>'+name+'</h3>' +
+                                '<p class="desc">'+(p.descricao_curta||'')+'</p>' +
+                                '<div class="stock-info" data-product="'+name+'"></div>' +
+                                '<div class="card-footer">' +
+                                    '<div class="price">'+priceStr+'</div>' +
+                                    '<div class="installment">ou 10x de R$ '+(inst.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})).replace('.',',')+'</div>' +
+                                    '<button class="btn-card-add" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Adicionar</button>' +
+                                '</div>' +
+                            '</div>';
+                        productGrid.appendChild(card);
+                    }
                 }
-            }
-            if(productData[name]){
-                if(typeof adminStock[name].stock === 'number') productData[name].stock = adminStock[name].stock;
-                if(adminStock[name].img) productData[name].img = adminStock[name].img;
-            }
+                if(productData[name]){
+                    productData[name].stock = parseInt(p.estoque)||0;
+                    if(p.imagem_url) productData[name].img = p.imagem_url;
+                    if(p.preco != null) productData[name].preco = parseFloat(p.preco);
+                }
+            });
+            renderStock();
+            renderProductImages();
         });
-    } catch(e){}
+    }
+    syncFromSupabase();
 
     /* ── RENDER ESTOQUE ──────────────── */
     function renderStock() {
@@ -914,11 +926,7 @@ function openLightbox(src){
                 if (modalDesc) modalDesc.textContent = data.longDesc;
 
                 if (mainImg) {
-                    var productImg = null;
-                    try {
-                        var stock = JSON.parse(localStorage.getItem('bf_stock')||'{}');
-                        if (stock[title] && stock[title].img) productImg = stock[title].img;
-                    } catch(e){}
+                    var productImg = (data && data.img) ? data.img : null;
                     if (productImg) {
                         mainImg.innerHTML = '<img src="'+productImg+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
                     } else {
@@ -940,21 +948,19 @@ function openLightbox(src){
                         });
                         thumbs.appendChild(t);
                     });
-                    try {
-                        var stock = JSON.parse(localStorage.getItem('bf_stock')||'{}');
-                        if (stock[title] && stock[title].img) {
-                            var imgThumb = document.createElement('div');
-                            imgThumb.className = 'modal-thumb';
-                            imgThumb.innerHTML = '<img src="'+stock[title].img+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">';
-                            imgThumb.addEventListener('click', function(){
-                                if (mainImg) mainImg.innerHTML = '<img src="'+stock[title].img+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
-                                var all = thumbs.querySelectorAll('.modal-thumb');
-                                all.forEach(function(a){ a.classList.remove('active'); });
-                                imgThumb.classList.add('active');
-                            });
-                            thumbs.insertBefore(imgThumb, thumbs.firstChild);
-                        }
-                    } catch(e){}
+                    var dbImg = (data && data.img) ? data.img : null;
+                    if (dbImg) {
+                        var imgThumb = document.createElement('div');
+                        imgThumb.className = 'modal-thumb';
+                        imgThumb.innerHTML = '<img src="'+dbImg+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">';
+                        imgThumb.addEventListener('click', function(){
+                            if (mainImg) mainImg.innerHTML = '<img src="'+dbImg+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
+                            var all = thumbs.querySelectorAll('.modal-thumb');
+                            all.forEach(function(a){ a.classList.remove('active'); });
+                            imgThumb.classList.add('active');
+                        });
+                        thumbs.insertBefore(imgThumb, thumbs.firstChild);
+                    }
                 }
                 if (modalStock) {
                     var s = data.stock;

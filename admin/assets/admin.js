@@ -1,8 +1,16 @@
 (function(){
-var USERS_KEY='bf_users', STOCK_KEY='bf_stock', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', ADMIN_KEY='bf_admin_session', CATEGORIES_KEY='bf_categories', PEDIDOS_KEY='bf_orders';
+var USERS_KEY='bf_users', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', ADMIN_KEY='bf_admin_session', CATEGORIES_KEY='bf_categories', PEDIDOS_KEY='bf_orders';
+
+var SUPABASE_URL = 'https://trirxmcalxktampbujyr.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaXJ4bWNhbHhrdGFtcGJ1anlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjU3MzEsImV4cCI6MjEwMjIwMTczMX0.sr6dx1qSK8cqV4e1g6-jMz99T2WTw9Q0jX1iHb-Vwy4';
+var supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 function load(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback}catch(e){return fallback||{}}}
 function save(key,obj){localStorage.setItem(key,JSON.stringify(obj))}
+
+function escAttr(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function formatPrice(n){n=parseFloat(n)||0;return n.toFixed(2).replace('.',',');}
+function parsePrice(s){return parseFloat(String(s==null?'':s).replace(/[^\d.,-]/g,'').replace(/\./g,'').replace(',','.'))||0;}
 
 function showToast(msg){
     var c=document.getElementById('toastContainer');
@@ -24,17 +32,6 @@ function sha256(text){
 }
 
 /* === DEFAULTS === */
-function defaultStock(){return {
-'HP LaserJet Pro M404dn':{cat:'impressoras',price:'2199,00',stock:12,desc:'Monocromática, duplex automático, 40 ppm.',longDesc:'Impressora monocromática de alto desempenho, ideal para escritórios. Duplex automático, 40 ppm, Ethernet e USB.',installments:10,img:''},
-'Epson EcoTank L3250':{cat:'multifuncionais',price:'1149,00',stock:25,desc:'Tanque de tinta colorida, Wi-Fi, baixo custo.',longDesc:'Solução perfeita para economia. Tanque de tinta de alta capacidade, Wi-Fi integrado.',installments:10,img:''},
-'Elgin i9':{cat:'impressoras',price:'479,00',stock:40,desc:'Impressora de cupom não fiscal, 250 mm/s, USB.',longDesc:'Impressora térmica de cupom, 250 mm/s, USB. Ideal para PDV e comércio.',installments:10,img:''},
-'Kit Fusor HP LaserJet':{cat:'pecas',price:'349,00',stock:8,desc:'Compatível com M402/M404/M426.',longDesc:'Kit Fusor compatível com HP LaserJet. Unidade de fusão premium.',installments:10,img:''},
-'Brother DCP-L5652DN':{cat:'multifuncionais',price:'3299,00',stock:6,desc:'Laser monocromática, duplex, ADF.',longDesc:'Multifuncional laser monocromática. Duplex, ADF, rede, 40 ppm.',installments:10,img:''},
-'Placa Lógica Principal':{cat:'pecas',price:'289,00',stock:15,desc:'Placa controladora compatível com Epson.',longDesc:'Placa lógica principal compatível com diversas Epson. Revisada e testada.',installments:10,img:''},
-'Zebra ZD421':{cat:'impressoras',price:'2799,00',stock:10,desc:'Etiquetas térmicas, 203 dpi, USB/Ethernet.',longDesc:'Impressora de etiquetas térmicas. 203 dpi, USB/Ethernet, ZPL/EPL.',installments:10,img:''},
-'Toner HP 58A Original':{cat:'suprimentos',price:'419,00',stock:30,desc:'Cartucho toner preto CF258A. 3.000 pág.',longDesc:'Toner HP 58A Original. Rendimento de até 3.000 páginas. JetIntelligence.',installments:10,img:''}
-}}
-
 function defaultBanner(){return{title:'Impressoras, multifuncionais e peças',title2:'com garantia e procedência',subtitle:'Desde equipamentos e suprimentos até peças originais e genéricas.',bgUrl:'',bgColor:'linear-gradient(170deg, #0d2f5e 0%, #0a1f3f 100%)',btnText:'Ver Produtos'}}
 function defaultConfig(){return{company:'BIANCO & FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA',brand:'B&F Importes',cnpj:'03.108.169/0001-58',phone:'(16) 98138-6747',email:'atendimento@biancoeferreira.com.br',hours:'Seg–Sex 8h às 18h | Sáb 8h às 13h',address:'R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090',cep:'14870-090',cityState:'Jaboticabal — SP'}}
 function defaultCategories(){return['impressoras','multifuncionais','pecas','suprimentos']}
@@ -97,81 +94,78 @@ document.getElementById('prodImgFile').addEventListener('change',function(e){
 /* === RENDER ALL === */
 function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories();renderPedidos();renderDashboard()}
 
-/* === STOCK TABLE + ADD === */
+/* === STOCK TABLE + ADD (Supabase) === */
 function renderStock(){
-    var stock=load(STOCK_KEY,{});
-    var def=defaultStock();
-    var merged={};
-    Object.keys(def).forEach(function(k){merged[k]=Object.assign({},def[k],stock[k]||{})});
-    Object.keys(stock).forEach(function(k){if(!merged[k])merged[k]=stock[k]});
-    save(STOCK_KEY,merged);
-
-    var tbody=document.getElementById('stockBody'),html='';
-    Object.keys(merged).forEach(function(name){
-        var p=merged[name],statusBadge=p.stock>20?'badge-green':p.stock>5?'badge-yellow':'badge-red';
-        var statusText=p.stock>20?'OK':p.stock>5?'Últimas!!':'Crítico';
-        var imgHtml=p.img?'<img src="'+p.img+'" class="tbl-img-preview">':'<span style="font-size:.64rem;color:var(--text-muted);">sem img</span>';
-        html+='<tr data-name="'+name.replace(/"/g,'&quot;')+'">'+
-            '<td><input class="tbl-input" value="'+name.replace(/"/g,'&quot;')+'" data-field="name" style="min-width:140px;"></td>'+
-            '<td><select class="tbl-input" data-field="cat" style="min-width:110px;">'+
-                catOptions().map(function(c){return '<option value="'+c+'"'+(p.cat===c?' selected':'')+'>'+c+'</option>'}).join('')+
-            '</select></td>'+
-            '<td><input class="tbl-input" value="'+(p.price||'')+'" data-field="price" style="width:90px;"></td>'+
-            '<td><input class="tbl-input" type="number" value="'+p.stock+'" data-field="stock" min="0" style="width:65px;"></td>'+
-            '<td><div class="flex-row" style="gap:6px;">'+imgHtml+'<label class="tbl-img-upload" title="Alterar imagem"><input type="file" accept="image/*" style="display:none;" onchange="uploadTblImg(this,\''+name.replace(/'/g,"\\'")+'\')">&#128247;</label></div></td>'+
-            '<td><span class="badge '+statusBadge+'">'+statusText+'</span></td>'+
-            '<td><button class="btn-icon danger" onclick="deleteProduct(\''+name.replace(/'/g,"\\'")+'\')" title="Remover">&#128465;</button></td>'+
-        '</tr>';
-    });
-    tbody.innerHTML=html||'<tr><td colspan="7" class="empty-state">Nenhum produto.</td></tr>';
-
-    tbody.querySelectorAll('.tbl-input').forEach(function(inp){
-        inp.addEventListener('change',function(){
-            var row=inp.closest('tr'),oldName=row.getAttribute('data-name');
-            var field=inp.getAttribute('data-field'),val=inp.value.trim();
-            var stock=load(STOCK_KEY,{});
-            if(field==='name'){
-                if(!val||val===oldName)return;
-                stock[val]=Object.assign({},stock[oldName]||{});
-                delete stock[oldName];
-                row.setAttribute('data-name',val);
-            }else if(field==='stock'){
-                if(!stock[oldName])stock[oldName]={};
-                stock[oldName].stock=parseInt(val)||0;
-            }else{
-                if(!stock[oldName])stock[oldName]={};
-                stock[oldName][field]=val;
-            }
-            save(STOCK_KEY,stock);
-            showToast('&#9989; Alteração salva!');
-            if(field==='stock')renderStock();
+    var tbody=document.getElementById('stockBody');
+    tbody.innerHTML='<tr><td colspan="7" class="empty-state">Carregando produtos...</td></tr>';
+    supabase.from('produtos').select('*').order('nome',{ascending:true}).then(function(res){
+        if(res.error){ tbody.innerHTML='<tr><td colspan="7" class="empty-state">Erro ao carregar produtos.</td></tr>'; showToast('&#9888; '+res.error.message); return; }
+        var produtos=res.data||[];
+        var html='';
+        produtos.forEach(function(p){
+            var stock=parseInt(p.estoque)||0;
+            var statusBadge=stock>20?'badge-green':stock>5?'badge-yellow':'badge-red';
+            var statusText=stock>20?'OK':stock>5?'Últimas!!':'Crítico';
+            var imgHtml=p.imagem_url?'<img src="'+escAttr(p.imagem_url)+'" class="tbl-img-preview">':'<span style="font-size:.64rem;color:var(--text-muted);">sem img</span>';
+            html+='<tr data-id="'+p.id+'" data-name="'+escAttr(p.nome)+'">'+
+                '<td><input class="tbl-input" value="'+escAttr(p.nome)+'" data-field="nome" style="min-width:140px;"></td>'+
+                '<td><select class="tbl-input" data-field="categoria" style="min-width:110px;">'+
+                    catOptions().map(function(c){return '<option value="'+c+'"'+(p.categoria===c?' selected':'')+'>'+c+'</option>'}).join('')+
+                '</select></td>'+
+                '<td><input class="tbl-input" value="'+formatPrice(p.preco)+'" data-field="preco" style="width:90px;"></td>'+
+                '<td><input class="tbl-input" type="number" value="'+stock+'" data-field="estoque" min="0" style="width:65px;"></td>'+
+                '<td><div class="flex-row" style="gap:6px;">'+imgHtml+'<label class="tbl-img-upload" title="Alterar imagem"><input type="file" accept="image/*" style="display:none;" onchange="uploadTblImg(this,\''+p.id+'\')">&#128247;</label></div></td>'+
+                '<td><span class="badge '+statusBadge+'">'+statusText+'</span></td>'+
+                '<td><button class="btn-icon danger" onclick="deleteProduct(\''+p.id+'\')" title="Remover">&#128465;</button></td>'+
+            '</tr>';
         });
+        tbody.innerHTML=html||'<tr><td colspan="7" class="empty-state">Nenhum produto cadastrado.</td></tr>';
+        bindStockEdits(tbody);
+        renderDashboard();
     });
-    renderDashboard();
 }
 
-window.uploadTblImg=function(input,name){
+function bindStockEdits(tbody){
+    tbody.querySelectorAll('.tbl-input').forEach(function(inp){
+        inp.addEventListener('change',function(){
+            var row=inp.closest('tr'),id=row.getAttribute('data-id');
+            var field=inp.getAttribute('data-field'),val=inp.value.trim();
+            if(!id)return;
+            var update={};
+            if(field==='nome'){ if(!val)return; update.nome=val; }
+            else if(field==='categoria'){ update.categoria=val; }
+            else if(field==='preco'){ update.preco=parsePrice(val); }
+            else if(field==='estoque'){ update.estoque=parseInt(val)||0; }
+            else return;
+            supabase.from('produtos').update(update).eq('id',id).then(function(res){
+                if(res.error){ showToast('&#9888; '+res.error.message); return; }
+                showToast('&#9989; Alteração salva!');
+                if(field==='estoque')renderStock();
+            });
+        });
+    });
+}
+
+window.uploadTblImg=function(input,id){
     var file=input.files[0];if(!file)return;
     var reader=new FileReader();
     reader.onload=function(ev){
-        var stock=load(STOCK_KEY,{});
-        if(!stock[name])stock[name]={};
-        stock[name].img=ev.target.result;
-        save(STOCK_KEY,stock);
-        showToast('&#128247; Imagem de "'+name+'" atualizada!');
-        renderStock();
+        supabase.from('produtos').update({imagem_url:ev.target.result}).eq('id',id).then(function(res){
+            if(res.error){ showToast('&#9888; '+res.error.message); return; }
+            showToast('&#128247; Imagem atualizada!');
+            renderStock();
+        });
     };
     reader.readAsDataURL(file);
 };
 
-window.deleteProduct=function(name){
-    if(!confirm('Remover "'+name+'" permanentemente?'))return;
-    var stock=load(STOCK_KEY,{});
-    var def=defaultStock();
-    if(def[name]){if(!stock[name])stock[name]={};stock[name]._deleted=true;save(STOCK_KEY,stock)}
-    else{delete stock[name];save(STOCK_KEY,stock)}
-    showToast('&#128465; "'+name+'" removido.');
-    renderStock();
+window.deleteProduct=function(id){
+    if(!confirm('Remover produto permanentemente?'))return;
+    supabase.from('produtos').delete().eq('id',id).then(function(res){
+        if(res.error){ showToast('&#9888; '+res.error.message); return; }
+        showToast('&#128465; Produto removido.');
+        renderStock();
+    });
 };
 
 document.getElementById('btnAddProduct').addEventListener('click',function(){
@@ -185,20 +179,30 @@ document.getElementById('btnAddProduct').addEventListener('click',function(){
     var msg=document.getElementById('prodAddMsg');
     if(!name){msg.textContent='Informe o nome.';msg.style.color='var(--danger)';return}
     if(!price){msg.textContent='Informe o preço.';msg.style.color='var(--danger)';return}
-    var stockData=load(STOCK_KEY,{});
-    if(stockData[name]&&!stockData[name]._deleted){msg.textContent='Já existe.';msg.style.color='var(--danger)';return}
-    stockData[name]={cat:cat,price:price.replace(',','.'),stock:stock,desc:desc||name,longDesc:longDesc||desc||name,installments:installments,img:prodImgData};
-    delete stockData[name]._deleted;
-    save(STOCK_KEY,stockData);
-    showToast('&#9989; "'+name+'" adicionado!');
-    renderStock();
-    ['prodName','prodPrice','prodDesc','prodLongDesc','prodImgFile'].forEach(function(id){document.getElementById(id).value=''});
-    document.getElementById('prodImgName').textContent='Nenhuma';
-    document.getElementById('prodImgPreview').style.display='none';
-    prodImgData='';
-    document.getElementById('prodStock').value='10';
-    msg.textContent='Adicionado com sucesso!';msg.style.color='var(--success)';
-    setTimeout(function(){msg.textContent=''},3000);
+    msg.textContent='Salvando...';msg.style.color='var(--text-muted)';
+    supabase.from('produtos').insert([{
+        nome:name,
+        categoria:cat,
+        preco:parsePrice(price),
+        estoque:stock,
+        descricao_curta:desc||name,
+        imagem_url:prodImgData||null
+    }]).then(function(res){
+        if(res.error){
+            msg.textContent='Erro ao salvar.';msg.style.color='var(--danger)';
+            showToast('&#9888; '+res.error.message);
+            return;
+        }
+        showToast('&#9989; "'+name+'" adicionado!');
+        renderStock();
+        ['prodName','prodPrice','prodDesc','prodLongDesc','prodImgFile'].forEach(function(id){document.getElementById(id).value=''});
+        document.getElementById('prodImgName').textContent='Nenhuma';
+        document.getElementById('prodImgPreview').style.display='none';
+        prodImgData='';
+        document.getElementById('prodStock').value='10';
+        msg.textContent='Adicionado com sucesso!';msg.style.color='var(--success)';
+        setTimeout(function(){msg.textContent=''},3000);
+    });
 });
 
 /* === CATEGORIES === */
@@ -210,7 +214,7 @@ function getCategories(){
 function catOptions(){return getCategories()}
 function updateCatSelects(){
     var cats=getCategories();
-    document.querySelectorAll('#prodCat, select[data-field="cat"]').forEach(function(sel){
+    document.querySelectorAll('#prodCat, select[data-field="categoria"]').forEach(function(sel){
         var cur=sel.value;
         sel.innerHTML=cats.map(function(c){return '<option value="'+c+'">'+c+'</option>'}).join('');
         if(cats.indexOf(cur)>=0)sel.value=cur;
@@ -559,21 +563,20 @@ document.querySelectorAll('.filter-pedido').forEach(function(btn){
 function renderDashboard(){
     var pedidos = load(PEDIDOS_KEY, []);
     var users = load(USERS_KEY, []);
-    var stock = load(STOCK_KEY, {});
     var vendas = 0, pendentes = 0;
     pedidos.forEach(function(p){
         if(p.status !== 'cancelado') vendas += parseFloat(p.total) || 0;
         if(p.status === 'pendente') pendentes++;
     });
-    var alertas = 0;
-    Object.keys(stock).forEach(function(k){
-        var p = stock[k];
-        if(p && !p._deleted && typeof p.stock === 'number' && p.stock <= 5) alertas++;
-    });
     document.getElementById('metricVendas').textContent = 'R$ ' + vendas.toFixed(2).replace('.', ',');
     document.getElementById('metricPendentes').textContent = pendentes;
     document.getElementById('metricUsuarios').textContent = users.length;
-    document.getElementById('metricAlertas').textContent = alertas;
+    document.getElementById('metricAlertas').textContent = '...';
+    supabase.from('produtos').select('estoque').then(function(res){
+        var alertas = 0;
+        (res.data||[]).forEach(function(p){ if((parseInt(p.estoque)||0) <= 5) alertas++; });
+        if(!res.error) document.getElementById('metricAlertas').textContent = alertas;
+    });
     renderPedidosPendentes();
 }
 
@@ -720,25 +723,23 @@ function downloadCSV(filename, header, rows){
 }
 
 function exportStockCSV(){
-    var stock = load(STOCK_KEY, {});
-    var def = defaultStock();
-    var merged = {};
-    Object.keys(def).forEach(function(k){ merged[k] = Object.assign({}, def[k], stock[k] || {}); });
-    Object.keys(stock).forEach(function(k){ if(!merged[k]) merged[k] = stock[k]; });
-    var term = (document.getElementById('searchStock').value || '').trim().toLowerCase();
-    var header = ['Nome','Categoria','Preço','Estoque','Status'];
-    var rows = [];
-    Object.keys(merged).forEach(function(name){
-        var p = merged[name];
-        if(p && p._deleted) return;
-        var status = p.stock > 20 ? 'OK' : p.stock > 5 ? 'Últimas unidades' : 'Crítico';
-        var hay = (name + ' ' + (p.cat || '') + ' ' + (p.price || '') + ' ' + p.stock).toLowerCase();
-        if(term && hay.indexOf(term) === -1) return;
-        rows.push([name, p.cat || '', p.price || '', p.stock, status]);
+    supabase.from('produtos').select('*').order('nome',{ascending:true}).then(function(res){
+        if(res.error){ showToast('&#9888; '+res.error.message); return; }
+        var produtos=res.data||[];
+        var term = (document.getElementById('searchStock').value || '').trim().toLowerCase();
+        var header = ['Nome','Categoria','Preço','Estoque','Status'];
+        var rows = [];
+        produtos.forEach(function(p){
+            var stock=parseInt(p.estoque)||0;
+            var status = stock > 20 ? 'OK' : stock > 5 ? 'Últimas unidades' : 'Crítico';
+            var hay = (p.nome + ' ' + (p.categoria || '') + ' ' + formatPrice(p.preco) + ' ' + stock).toLowerCase();
+            if(term && hay.indexOf(term) === -1) return;
+            rows.push([p.nome, p.categoria || '', formatPrice(p.preco), stock, status]);
+        });
+        if(!rows.length){ showToast('&#9888; Nenhum produto para exportar.'); return; }
+        downloadCSV('estoque.csv', header, rows);
+        showToast('&#128190; Estoque exportado em CSV!');
     });
-    if(!rows.length){ showToast('&#9888; Nenhum produto para exportar.'); return; }
-    downloadCSV('estoque.csv', header, rows);
-    showToast('&#128190; Estoque exportado em CSV!');
 }
 
 function exportPedidosCSV(){
@@ -891,15 +892,14 @@ _saveIds.forEach(function(id){
 });
 /* updateStock with refresh */
 window.updateStock = function(el){
-    var name = el.getAttribute('data-product');
+    var id = el.getAttribute('data-id');
     var val = parseInt(el.value) || 0;
-    var stock = load(STOCK_KEY, {});
-    if (!stock[name]) stock[name] = {};
-    stock[name].stock = val;
-    save(STOCK_KEY, stock);
-    showToast('&#9989; Estoque de "' + name + '" atualizado para ' + val + ' un.');
-    setTimeout(renderStock, 300);
-    setTimeout(refreshPreview, 500);
+    supabase.from('produtos').update({estoque: val}).eq('id', id).then(function(res){
+        if(res.error){ showToast('&#9888; '+res.error.message); return; }
+        showToast('&#9989; Estoque atualizado para ' + val + ' un.');
+        setTimeout(renderStock, 300);
+        setTimeout(refreshPreview, 500);
+    });
 };
 
 })();
