@@ -2495,6 +2495,89 @@ textarea:focus-visible {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   CARDS DE DESTAQUE (Facebook)
+══════════════════════════════════════════════════════════════════ */
+.fb-highlight {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    background: #ffffff;
+    border: 1px solid rgba(10, 31, 63, 0.08);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(10, 31, 63, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.fb-highlight:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 44px rgba(10, 31, 63, 0.16);
+}
+.fb-highlight__media {
+    flex: 0 0 240px;
+    height: 200px;
+    align-self: stretch;
+}
+.fb-highlight__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.fb-highlight__body {
+    flex: 1;
+    padding: 24px 28px 24px 0;
+}
+.fb-highlight__tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--azul-padrao);
+    background: rgba(26, 86, 184, 0.10);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+.fb-highlight__title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--azul-escuro);
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+.fb-highlight__text {
+    font-size: 0.92rem;
+    color: #475569;
+    line-height: 1.65;
+    margin-bottom: 18px;
+}
+.fb-highlight__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--azul-padrao);
+    color: #fff;
+    padding: 11px 24px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 14px rgba(26, 86, 184, 0.25);
+}
+.fb-highlight__cta:hover {
+    background: var(--azul-medio);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(26, 86, 184, 0.35);
+}
+@media (max-width: 640px) {
+    .fb-highlight { flex-direction: column; align-items: stretch; }
+    .fb-highlight__media { flex: none; height: 180px; }
+    .fb-highlight__body { padding: 20px 22px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
    FAIXA DE CONFIANÇA (Trust Bar)
 ══════════════════════════════════════════════════════════════════ */
 .trust-bar {
