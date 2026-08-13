@@ -41,29 +41,9 @@ function openLightbox(src){
         '</div>';
     }
 
-    async function renderProducts(){
+    function renderGrid(rows){
         var grid = document.getElementById('productGrid') || document.querySelector('.product-grid');
         if(!grid) return;
-
-        if(!supabase){
-            grid.innerHTML = '<div class="empty-state">Não foi possível conectar ao servidor.</div>';
-            return;
-        }
-
-        grid.innerHTML = '<div class="empty-state">Carregando produtos...</div>';
-
-        var res = await supabase.from('produtos').select('*').order('nome',{ascending:true});
-        if(res.error){
-            grid.innerHTML = '<div class="empty-state">Erro ao carregar produtos.</div>';
-            return;
-        }
-
-        var rows = res.data || [];
-        if(rows.length === 0){
-            grid.innerHTML = '<div class="empty-state">Nenhum produto disponível no momento.</div>';
-            return;
-        }
-
         productData = {};
         var html = '';
         rows.forEach(function(p){
@@ -77,9 +57,66 @@ function openLightbox(src){
             html += buildProductCard(p);
         });
         grid.innerHTML = html;
-
         renderStock();
         renderProductImages();
+    }
+
+    async function renderProducts(){
+        var grid = document.getElementById('productGrid') || document.querySelector('.product-grid');
+        if(!grid) return;
+
+        if(!supabase){
+            grid.innerHTML = '<div class="empty-state">Não foi possível conectar ao servidor.</div>';
+            return;
+        }
+
+        grid.innerHTML = '<div class="empty-state">Carregando produtos...</div>';
+
+        // lê ?busca= da URL
+        var params = new URLSearchParams(window.location.search);
+        var termo = (params.get('busca') || '').trim();
+
+        if(termo){
+            var titleEl = document.querySelector('.section-title');
+            if(titleEl) titleEl.textContent = 'Resultados para: ' + termo;
+
+            var res = await supabase.rpc('buscar_produtos_inteligente', { termo_busca: termo });
+            if(res.error){
+                // fallback: função RPC ainda não criada — usa ilike direto
+                res = await supabase.from('produtos').select('*').ilike('nome', '%'+termo+'%').order('nome',{ascending:true});
+            }
+            if(res.error){
+                grid.innerHTML = '<div class="empty-state">Erro ao buscar produtos.</div>';
+                return;
+            }
+
+            var found = res.data || [];
+            if(found.length === 0){
+                grid.innerHTML =
+                    '<div class="empty-state" style="text-align:center;padding:70px 20px;">' +
+                        '<div style="font-size:3rem;margin-bottom:12px;">&#128269;</div>' +
+                        '<p style="font-size:1.05rem;font-weight:700;color:#334155;margin-bottom:6px;">Nenhum produto encontrado para "'+esc(termo)+'"</p>' +
+                        '<p style="font-size:.9rem;color:#64748b;margin-bottom:22px;">Verifique a ortografia ou tente termos mais gerais.</p>' +
+                        '<a href="produtos.html" class="btn-cta" style="display:inline-block;">Ver catálogo completo</a>' +
+                    '</div>';
+                return;
+            }
+            renderGrid(found);
+            return;
+        }
+
+        var res = await supabase.from('produtos').select('*').order('nome',{ascending:true});
+        if(res.error){
+            grid.innerHTML = '<div class="empty-state">Erro ao carregar produtos.</div>';
+            return;
+        }
+
+        var rows = res.data || [];
+        if(rows.length === 0){
+            grid.innerHTML = '<div class="empty-state">Nenhum produto disponível no momento.</div>';
+            return;
+        }
+        renderGrid(rows);
     }
     renderProducts();
 
@@ -1120,44 +1157,186 @@ function openLightbox(src){
         }
     } catch(e) {}
 
-    /* ── BARRA DE BUSCA ──────────────── */
+    /* ── BUSCA INTELIGENTE (Autocomplete + Histórico) ── */
     (function(){
-        var searchWrap = document.getElementById('headerSearchWrap');
-        if(!searchWrap) return;
+        var wrap = document.getElementById('headerSearchWrap');
+        if(!wrap) return;
         var input = document.getElementById('headerSearch');
         if(!input) return;
+        var dropdown = document.getElementById('searchDropdown');
+        var searchBtn = document.getElementById('headerSearchBtn');
 
-        function doSearch(){
-            var term = input.value.trim().toLowerCase();
-            var cards = document.querySelectorAll('.product-card');
-            var found = 0;
-            cards.forEach(function(card){
-                var title = (card.querySelector('h3')||{}).textContent||'';
-                var desc = (card.querySelector('.desc')||{}).textContent||'';
-                if(!term || title.toLowerCase().indexOf(term) !== -1 || desc.toLowerCase().indexOf(term) !== -1){
-                    card.classList.remove('hidden-by-search');
-                    found++;
-                } else {
-                    card.classList.add('hidden-by-search');
-                }
-            });
-            var noResults = document.getElementById('searchNoResults');
-            if(noResults){
-                noResults.style.display = (term && found === 0) ? 'block' : 'none';
-            }
+        var RECENT_KEY = 'bf_search_recent';
+        var activeIndex = -1;
+        var items = [];
+        var debounceTimer = null;
 
-            var allCards = document.querySelectorAll('.product-card');
-            if(!term){
-                document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
-                var btnTodos = document.querySelector('.filter-btn[data-filter="todas"]');
-                if(btnTodos) btnTodos.classList.add('active');
-            }
+        function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+        function getRecent(){
+            try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch(e){ return []; }
+        }
+        function saveRecent(term){
+            var list = getRecent().filter(function(t){ return t.toLowerCase() !== term.toLowerCase(); });
+            list.unshift(term);
+            list = list.slice(0, 6);
+            localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+        }
+        function clearRecent(){ localStorage.removeItem(RECENT_KEY); }
+
+        function closeDropdown(){ if(dropdown) dropdown.classList.remove('open'); activeIndex = -1; items = []; }
+
+        function fmtPrice(n){
+            n = parseFloat(n) || 0;
+            return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
         }
 
-        input.addEventListener('input', doSearch);
-        var searchBtn = document.getElementById('headerSearchBtn');
-        if(searchBtn) searchBtn.addEventListener('click', doSearch);
-        input.addEventListener('keydown', function(e){ if(e.key==='Escape'){ input.value=''; doSearch(); input.blur(); } });
+        function renderRecent(){
+            var recent = getRecent();
+            if(!recent.length){
+                dropdown.innerHTML = '<div class="search-empty">Comece a digitar para buscar produtos.</div>';
+                dropdown.classList.add('open');
+                items = [];
+                return;
+            }
+            var html = '<div class="sd-header"><span>Buscas recentes</span><button type="button" class="sd-clear" id="sdClearRecent">Limpar</button></div>';
+            recent.forEach(function(term){
+                html += '<div class="search-recent-item" data-term="'+esc(term)+'" role="option">' +
+                    '<span class="sr-icon">&#128269;</span><span>'+esc(term)+'</span></div>';
+            });
+            dropdown.innerHTML = html;
+            dropdown.classList.add('open');
+
+            var clearBtn = document.getElementById('sdClearRecent');
+            if(clearBtn) clearBtn.addEventListener('click', function(e){
+                e.stopPropagation();
+                clearRecent();
+                closeDropdown();
+            });
+
+            items = Array.prototype.slice.call(dropdown.querySelectorAll('.search-recent-item'));
+            items.forEach(function(el, i){
+                el.addEventListener('click', function(){
+                    var t = el.getAttribute('data-term');
+                    input.value = t;
+                    saveRecent(t);
+                    submitSearch(t);
+                });
+                el.addEventListener('mouseenter', function(){ setActive(i); });
+            });
+        }
+
+        function renderResults(rows, term){
+            if(!rows || !rows.length){
+                dropdown.innerHTML = '<div class="search-empty">Nenhum produto encontrado para "'+esc(term)+'".</div>';
+                dropdown.classList.add('open');
+                items = [];
+                return;
+            }
+            var html = '<div class="sd-header"><span>Produtos</span></div>';
+            rows.forEach(function(p){
+                var img = p.imagem_url
+                    ? '<img class="si-img" src="'+esc(p.imagem_url)+'" alt="">'
+                    : '<span class="si-img">&#128424;</span>';
+                html += '<div class="search-item" data-term="'+esc(p.nome)+'" role="option">' +
+                    img +
+                    '<div class="si-info">' +
+                        '<div class="si-name">'+esc(p.nome)+'</div>' +
+                        '<div class="si-cat">'+esc(p.categoria||'')+'</div>' +
+                    '</div>' +
+                    '<div class="si-price">'+fmtPrice(p.preco)+'</div>' +
+                '</div>';
+            });
+            dropdown.innerHTML = html;
+            dropdown.classList.add('open');
+
+            items = Array.prototype.slice.call(dropdown.querySelectorAll('.search-item'));
+            items.forEach(function(el, i){
+                el.addEventListener('click', function(){
+                    var t = el.getAttribute('data-term');
+                    input.value = t;
+                    saveRecent(t);
+                    submitSearch(t);
+                });
+                el.addEventListener('mouseenter', function(){ setActive(i); });
+            });
+        }
+
+        function setActive(i){
+            activeIndex = i;
+            items.forEach(function(el, idx){ el.classList.toggle('active', idx === i); });
+        }
+
+        function submitSearch(term){
+            closeDropdown();
+            input.blur();
+            window.location.href = 'produtos.html?busca=' + encodeURIComponent(term);
+        }
+
+        async function runAutocomplete(term){
+            if(!supabase){
+                dropdown.innerHTML = '<div class="search-empty">Busca indisponível no momento.</div>';
+                dropdown.classList.add('open');
+                return;
+            }
+            var res = await supabase.rpc('buscar_produtos_inteligente', { termo_busca: term });
+            if(res.error){
+                // fallback: função RPC ainda não criada — usa ilike direto na tabela
+                res = await supabase.from('produtos').select('*').ilike('nome', '%'+term+'%').limit(10);
+            }
+            if(res.error){ renderResults([], term); return; }
+            renderResults(res.data || [], term);
+        }
+
+        input.addEventListener('input', function(){
+            var term = input.value.trim();
+            if(!term){ closeDropdown(); return; }
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function(){
+                runAutocomplete(term);
+            }, 300);
+        });
+
+        input.addEventListener('focus', function(){
+            if(!input.value.trim()) renderRecent();
+        });
+
+        input.addEventListener('keydown', function(e){
+            if(e.key === 'Escape'){ closeDropdown(); input.blur(); return; }
+            if(!dropdown.classList.contains('open')) return;
+
+            if(e.key === 'ArrowDown'){
+                e.preventDefault();
+                if(!items.length) return;
+                activeIndex = (activeIndex + 1) % items.length;
+                setActive(activeIndex);
+            } else if(e.key === 'ArrowUp'){
+                e.preventDefault();
+                if(!items.length) return;
+                activeIndex = (activeIndex - 1 + items.length) % items.length;
+                setActive(activeIndex);
+            } else if(e.key === 'Enter'){
+                var term = input.value.trim();
+                if(!term) return;
+                if(activeIndex >= 0 && items[activeIndex]){
+                    var chosen = items[activeIndex].getAttribute('data-term');
+                    if(chosen){ e.preventDefault(); input.value = chosen; term = chosen; }
+                }
+                saveRecent(term);
+                submitSearch(term);
+            }
+        });
+
+        if(searchBtn) searchBtn.addEventListener('click', function(){
+            var term = input.value.trim();
+            if(!term){ input.focus(); return; }
+            saveRecent(term);
+            submitSearch(term);
+        });
+
+        document.addEventListener('click', function(e){
+            if(!wrap.contains(e.target)) closeDropdown();
+        });
     })();
 
     /* ── MEUS PEDIDOS ────────────────── */

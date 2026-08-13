@@ -42,8 +42,9 @@
             </nav>
             <div class="header-search-wrap" id="headerSearchWrap" role="search">
                 <label class="sr-only" for="headerSearch">Buscar produtos</label>
-                <input type="search" class="header-search" id="headerSearch" placeholder="Buscar produtos..." aria-label="Buscar produtos" autocomplete="off">
+                <input type="search" class="header-search" id="headerSearch" placeholder="Buscar produtos..." aria-label="Buscar produtos" autocomplete="off" aria-autocomplete="list" aria-controls="searchDropdown">
                 <button class="header-search-btn" id="headerSearchBtn" aria-label="Buscar">&#128269;</button>
+                <div class="search-dropdown" id="searchDropdown" role="listbox" aria-label="Sugestões de busca"></div>
             </div>
             <div class="header-actions">
                 <button class="btn-cart-header" id="btnCartHeader" title="Carrinho" aria-label="Abrir carrinho de compras">
