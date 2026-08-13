@@ -91,7 +91,7 @@
 
         /* ── FAB PRÉ-VISUALIZAÇÃO ── */
         .preview-fab{
-            position:fixed;bottom:24px;right:24px;z-index:4000;
+            position:fixed;bottom:24px;right:24px;z-index:10000;
             width:56px;height:56px;border-radius:50%;
             background:var(--accent);color:#fff;border:none;
             font-size:1.5rem;cursor:pointer;
@@ -101,24 +101,27 @@
         }
         .preview-fab:hover{background:var(--accent-hover);transform:scale(1.08);}
 
-        /* ── OFFCANVAS PRÉ-VISUALIZAÇÃO ── */
+        /* ── JANELA FLUTUANTE DE PRÉ-VISUALIZAÇÃO ── */
         .preview-panel{
-            position:fixed;top:0;right:0;bottom:0;
-            width:min(520px,94vw);
+            position:fixed;top:50px;right:20px;z-index:9999;
+            width:1000px;max-width:calc(100vw - 40px);
+            height:640px;max-height:calc(100vh - 80px);
             background:var(--bg-card);
-            border-left:1px solid var(--border);
-            display:flex;flex-direction:column;
-            z-index:4500;
-            transform:translateX(100%);
-            transition:transform .3s ease;
-            box-shadow:-10px 0 30px rgba(0,0,0,.45);
+            border:1px solid var(--border);
+            border-radius:16px;overflow:hidden;
+            display:none;flex-direction:column;
+            box-shadow:0 20px 40px rgba(0,0,0,.3);
+            transition:width .3s ease;
         }
-        .preview-panel.open{transform:translateX(0);}
+        .preview-panel.open{display:flex;}
+        .preview-panel.mode-mobile{width:375px;}
         .preview-header{
             display:flex;align-items:center;gap:10px;
             padding:12px 16px;background:var(--bg-input);border-bottom:1px solid var(--border);
             font-size:.78rem;font-weight:700;color:var(--text-muted);flex-shrink:0;
+            cursor:grab;user-select:none;
         }
+        .preview-header.grabbing{cursor:grabbing;}
         .preview-header > span{flex:1;}
         .preview-toggles{display:flex;gap:6px;}
         .preview-mode{
@@ -131,9 +134,8 @@
         .btn-refresh-prev:hover{color:var(--accent);background:rgba(255,255,255,.05);}
         .preview-close{background:none;border:none;color:var(--text-muted);font-size:1.1rem;cursor:pointer;padding:4px 6px;border-radius:4px;}
         .preview-close:hover{color:var(--danger);background:rgba(255,255,255,.05);}
-        .preview-frame-wrap{flex:1;overflow:hidden;background:#0b1220;display:flex;justify-content:center;}
-        .preview-frame-wrap iframe{width:100%;height:100%;border:none;background:#fff;transition:width .3s ease;}
-        .preview-panel.mode-mobile .preview-frame-wrap iframe{width:375px;max-width:100%;box-shadow:0 0 20px rgba(0,0,0,.5);}
+        .preview-frame-wrap{flex:1;overflow:hidden;background:#0b1220;}
+        .preview-frame-wrap iframe{width:100%;height:100%;border:none;background:#fff;}
 
         .pedidos-filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
         .filter-pedido{padding:6px 14px;background:var(--bg-input);border:1px solid var(--border);border-radius:20px;color:var(--text-muted);font-size:.76rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}

@@ -75,7 +75,7 @@ document.querySelectorAll('#sideNav a').forEach(function(a){
         if(tabName === 'pedidos') renderPedidos();
         if(tabName === 'anuncios') renderAnuncios();
         if(tabName === 'banners') loadBannerForm();
-        if(tabName === 'dashboard') renderDashboard();
+        if(tabName === 'dashboard'){ renderDashboard(); initCharts(); }
     });
 });
 
@@ -584,8 +584,17 @@ function renderPedidosPendentes(){
     var pedidos = load(PEDIDOS_KEY, []);
     var pendentes = pedidos
         .filter(function(p){ return p.status === 'pendente'; })
-        .sort(function(a,b){ return b.timestamp - a.timestamp; })
+        .sort(function(a,b){ return (b.timestamp || 0) - (a.timestamp || 0); })
         .slice(0, 5);
+
+    // dados fictícios temporários (apenas visual) quando não há pedidos pendentes
+    if(pendentes.length === 0){
+        pendentes = [
+            { id: 'BF-DEMO01', cliente: 'Maria Oliveira', total: 1149.00 },
+            { id: 'BF-DEMO02', cliente: 'João Pereira', total: 479.00 }
+        ];
+    }
+
     var html = '';
     pendentes.forEach(function(p){
         html += '<tr>' +
@@ -595,7 +604,7 @@ function renderPedidosPendentes(){
             '<td><button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + (p.id || '') + '\')" title="Ver detalhes">&#128065;</button></td>' +
         '</tr>';
     });
-    tbody.innerHTML = html || '<tr><td colspan="4" class="empty-state">Nenhum pedido pendente.</td></tr>';
+    tbody.innerHTML = html;
 }
 
 /* === GRÁFICOS (Chart.js) === */
@@ -603,7 +612,9 @@ var _vendasChart = null;
 var _statusChart = null;
 function initCharts(){
     if(typeof Chart === 'undefined') return;
-    if(!document.getElementById('chartVendas') || !document.getElementById('chartStatus')) return;
+    var canvasVendas = document.getElementById('chartVendas');
+    var canvasStatus = document.getElementById('chartStatus');
+    if(!canvasVendas || !canvasStatus) return;
 
     if(!_vendasChart){
         var labels = [];
@@ -612,7 +623,10 @@ function initCharts(){
             d.setDate(d.getDate() - i);
             labels.push(d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}));
         }
-        var ctx = document.getElementById('chartVendas').getContext('2d');
+        var ctx = canvasVendas.getContext('2d');
+        var grad = ctx.createLinearGradient(0, 0, 0, 240);
+        grad.addColorStop(0, 'rgba(59,130,246,0.35)');
+        grad.addColorStop(1, 'rgba(59,130,246,0)');
         _vendasChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -621,21 +635,24 @@ function initCharts(){
                     label: 'Vendas (R$)',
                     data: [1200, 1900, 1500, 2400, 2100, 3000, 2800],
                     borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59,130,246,0.15)',
+                    backgroundColor: grad,
                     fill: true,
                     tension: 0.4,
-                    borderWidth: 2,
-                    pointBackgroundColor: '#3b82f6',
-                    pointRadius: 3
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#60a5fa',
+                    pointBorderColor: '#0f172a',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { labels: { color: '#94a3b8' } } },
+                plugins: { legend: { labels: { color: '#94a3b8', boxWidth: 12 } } },
                 scales: {
                     x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.4)' } },
-                    y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.4)' } }
+                    y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.4)' } }
                 }
             }
         });
@@ -645,7 +662,7 @@ function initCharts(){
         var pedidos = load(PEDIDOS_KEY, []);
         var counts = { pendente: 0, entregue: 0, cancelado: 0 };
         pedidos.forEach(function(p){ if(counts[p.status] !== undefined) counts[p.status]++; });
-        var ctx2 = document.getElementById('chartStatus').getContext('2d');
+        var ctx2 = canvasStatus.getContext('2d');
         _statusChart = new Chart(ctx2, {
             type: 'doughnut',
             data: {
@@ -653,14 +670,16 @@ function initCharts(){
                 datasets: [{
                     data: [counts.pendente, counts.entregue, counts.cancelado],
                     backgroundColor: ['#f59e0b', '#22c55e', '#ef4444'],
-                    borderWidth: 0
+                    borderColor: '#1e293b',
+                    borderWidth: 2,
+                    hoverOffset: 8
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: '65%',
-                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
+                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 12 } } }
             }
         });
     }
@@ -818,12 +837,23 @@ function refreshPreview(){
 }
 document.getElementById('btnRefreshPreview').addEventListener('click', refreshPreview);
 
-/* ── OFFCANVAS PREVIEW: abrir/fechar e modo mobile/desktop ── */
+/* ── JANELA FLUTUANTE: abrir/fechar, modo mobile/desktop e arrastar ── */
 var _previewPanel = document.getElementById('previewPanel');
-function openPreview(){ if(_previewPanel) _previewPanel.classList.add('open'); refreshPreview(); }
-function closePreview(){ if(_previewPanel) _previewPanel.classList.remove('open'); }
+var _previewHeader = _previewPanel.querySelector('.preview-header');
+
+function openPreview(){
+    if(!_previewPanel) return;
+    _previewPanel.classList.add('open');
+    refreshPreview();
+}
+function closePreview(){
+    if(!_previewPanel) return;
+    _previewPanel.classList.remove('open');
+}
 document.getElementById('previewFab').addEventListener('click', openPreview);
 document.getElementById('previewClose').addEventListener('click', closePreview);
+
+/* alterna Mobile (375px) / Desktop (1000px) */
 function setPreviewMode(mode){
     var mobile = (mode === 'mobile');
     if(_previewPanel) _previewPanel.classList.toggle('mode-mobile', mobile);
@@ -832,6 +862,28 @@ function setPreviewMode(mode){
 }
 document.getElementById('previewMobile').addEventListener('click', function(){ setPreviewMode('mobile'); });
 document.getElementById('previewDesktop').addEventListener('click', function(){ setPreviewMode('desktop'); });
+
+/* arrastar a janela pelo cabeçalho */
+var _drag = null;
+_previewHeader.addEventListener('mousedown', function(e){
+    if(e.target.closest('button')) return;
+    var rect = _previewPanel.getBoundingClientRect();
+    _drag = { offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top };
+    _previewPanel.style.right = 'auto';
+    _previewPanel.style.left = rect.left + 'px';
+    _previewPanel.style.top = rect.top + 'px';
+    _previewHeader.classList.add('grabbing');
+    e.preventDefault();
+});
+document.addEventListener('mousemove', function(e){
+    if(!_drag) return;
+    _previewPanel.style.left = (e.clientX - _drag.offsetX) + 'px';
+    _previewPanel.style.top = (e.clientY - _drag.offsetY) + 'px';
+});
+document.addEventListener('mouseup', function(){
+    _drag = null;
+    if(_previewHeader) _previewHeader.classList.remove('grabbing');
+});
 var _saveIds = ['btnSaveBanner','btnSaveAnuncios','btnSaveConfig','btnAddProduct','btnSaveUser','btnConfirmReset','btnAddCat'];
 _saveIds.forEach(function(id){
     var el = document.getElementById(id);
