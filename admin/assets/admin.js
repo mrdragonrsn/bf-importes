@@ -102,7 +102,7 @@ function deleteImageByUrl(url){
 }
 
 /* === BUSCA AUTOMÁTICA DE IMAGENS (Google Custom Search) === */
-var GOOGLE_API_KEY = 'AIzaSyDhjheKOMBz7BqyJ1QJgLxY_9mppvY696k';
+var GOOGLE_API_KEY = 'AIzaSyBlaAXpPXusJ7w5MKD15c8_vzu7cERNg2A';
 var GOOGLE_CX = 'e2b363fdb071c43f2';
 
 async function fetchGoogleImage(productName){
