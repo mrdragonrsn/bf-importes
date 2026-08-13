@@ -76,20 +76,38 @@ document.querySelectorAll('#sideNav a').forEach(function(a){
     });
 });
 
-/* === PRODUCT IMAGE UPLOAD === */
-var prodImgData='';
+/* === PRODUCT IMAGE UPLOAD (Storage) === */
+var prodImgFile=null;
 document.getElementById('prodImgFile').addEventListener('change',function(e){
     var file=e.target.files[0];if(!file)return;
+    prodImgFile=file;
     document.getElementById('prodImgName').textContent=file.name;
     var reader=new FileReader();
     reader.onload=function(ev){
-        prodImgData=ev.target.result;
-        document.getElementById('prodImgPreview').src=prodImgData;
+        document.getElementById('prodImgPreview').src=ev.target.result;
         document.getElementById('prodImgPreview').style.display='block';
-        showToast('&#128247; Imagem carregada!');
     };
     reader.readAsDataURL(file);
 });
+
+function uploadImageToStorage(file){
+    return new Promise(function(resolve,reject){
+        if(!file) return resolve(null);
+        var ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+        var path='produtos/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
+        supabase.storage.from('produtos').upload(path,file,{cacheControl:'3600',upsert:false}).then(function(res){
+            if(res.error){ reject(res.error); return; }
+            var url=supabase.storage.from('produtos').getPublicUrl(res.data.path);
+            resolve(url.data.publicUrl);
+        });
+    });
+}
+
+function deleteImageByUrl(url){
+    if(!url) return;
+    var m=url.match(/\/object\/public\/produtos\/(.+)$/);
+    if(m&&m[1]) supabase.storage.from('produtos').remove([m[1]]);
+}
 
 /* === RENDER ALL === */
 function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories();renderPedidos();renderDashboard()}
@@ -148,20 +166,21 @@ function bindStockEdits(tbody){
 
 window.uploadTblImg=function(input,id){
     var file=input.files[0];if(!file)return;
-    var reader=new FileReader();
-    reader.onload=function(ev){
-        supabase.from('produtos').update({imagem_url:ev.target.result}).eq('id',id).then(function(res){
-            if(res.error){ showToast('&#9888; '+res.error.message); return; }
-            showToast('&#128247; Imagem atualizada!');
-            renderStock();
-        });
-    };
-    reader.readAsDataURL(file);
+    uploadImageToStorage(file).then(function(url){
+        return supabase.from('produtos').update({imagem_url:url}).eq('id',id);
+    }).then(function(res){
+        if(res.error){ showToast('&#9888; '+res.error.message); return; }
+        showToast('&#128247; Imagem atualizada!');
+        renderStock();
+    }).catch(function(err){ showToast('&#9888; '+(err.message||err)); });
 };
 
 window.deleteProduct=function(id){
     if(!confirm('Remover produto permanentemente?'))return;
-    supabase.from('produtos').delete().eq('id',id).then(function(res){
+    supabase.from('produtos').select('imagem_url').eq('id',id).single().then(function(res){
+        if(res.data&&res.data.imagem_url) deleteImageByUrl(res.data.imagem_url);
+        return supabase.from('produtos').delete().eq('id',id);
+    }).then(function(res){
         if(res.error){ showToast('&#9888; '+res.error.message); return; }
         showToast('&#128465; Produto removido.');
         renderStock();
@@ -180,14 +199,16 @@ document.getElementById('btnAddProduct').addEventListener('click',function(){
     if(!name){msg.textContent='Informe o nome.';msg.style.color='var(--danger)';return}
     if(!price){msg.textContent='Informe o preço.';msg.style.color='var(--danger)';return}
     msg.textContent='Salvando...';msg.style.color='var(--text-muted)';
-    supabase.from('produtos').insert([{
-        nome:name,
-        categoria:cat,
-        preco:parsePrice(price),
-        estoque:stock,
-        descricao_curta:desc||name,
-        imagem_url:prodImgData||null
-    }]).then(function(res){
+    uploadImageToStorage(prodImgFile).then(function(imgUrl){
+        return supabase.from('produtos').insert([{
+            nome:name,
+            categoria:cat,
+            preco:parsePrice(price),
+            estoque:stock,
+            descricao_curta:desc||name,
+            imagem_url:imgUrl
+        }]);
+    }).then(function(res){
         if(res.error){
             msg.textContent='Erro ao salvar.';msg.style.color='var(--danger)';
             showToast('&#9888; '+res.error.message);
@@ -195,14 +216,15 @@ document.getElementById('btnAddProduct').addEventListener('click',function(){
         }
         showToast('&#9989; "'+name+'" adicionado!');
         renderStock();
-        ['prodName','prodPrice','prodDesc','prodLongDesc','prodImgFile'].forEach(function(id){document.getElementById(id).value=''});
+        ['prodName','prodPrice','prodDesc','prodLongDesc'].forEach(function(id){document.getElementById(id).value=''});
+        document.getElementById('prodImgFile').value='';
         document.getElementById('prodImgName').textContent='Nenhuma';
         document.getElementById('prodImgPreview').style.display='none';
-        prodImgData='';
+        prodImgFile=null;
         document.getElementById('prodStock').value='10';
         msg.textContent='Adicionado com sucesso!';msg.style.color='var(--success)';
         setTimeout(function(){msg.textContent=''},3000);
-    });
+    }).catch(function(err){ msg.textContent='Erro ao salvar.';msg.style.color='var(--danger)'; showToast('&#9888; '+(err.message||err)); });
 });
 
 /* === CATEGORIES === */
