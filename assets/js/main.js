@@ -2032,3 +2032,80 @@ function openLightbox(src){
         init();
     })();
 })();
+
+/* ══════════════════════════════════════════════════════════════════
+   ANÚNCIOS DINÂMICOS (Rotação aleatória de promos do Facebook)
+══════════════════════════════════════════════════════════════════ */
+(function(){
+    'use strict';
+
+    var PROMOS = [
+        { img: 'assets/images/promos/promo1.jpg', tag: 'Locação Comercial', title: 'Economize com Locação de Impressoras', text: 'Solução ideal para empresas imprimirem sem custos extras com compra de equipamentos.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid024EgBApiJszkqFSrxEWeMCvrf1scVPa3Z6WkNntgf3teMqEwQEXuLB8v2yX95d6nFl' },
+        { img: 'assets/images/promos/promo2.jpg', tag: 'Suprimentos', title: 'Sua Impressora Pronta para a Semana', text: 'Inicie a semana com estoque de tintas e cartuchos renovados.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid036BVL8xTLTJTzrUiErTCPvLgspjmxd2NfmG3xTPKFDwLp8oZRSHAjvbHf7a7dRy2Ml' },
+        { img: 'assets/images/promos/promo3.svg', tag: 'Assistência Técnica', title: 'Luz Vermelha Piscando?', text: 'Se a sua impressora apresentou falha ou luz de alerta, chame nossa assistência especializada.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid0TU7QFKtihHe6ApZBB9X11xAEgP8d2EwFjL7EdsQNiNQ61vtZY5rEVwE8sTgDcbBMl' },
+        { img: 'assets/images/promos/promo4.jpg', tag: 'Planos Corporativos', title: 'Planos de Locação sem Custo Inicial', text: 'Equipamentos modernos com manutenção inclusa e flexibilidade para o seu negócio.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid036SfnM8N1Vj8vm71FpriZt4SNRDjctN8uLrnMV3prwgZ7jqJtRgAmnkXHhheJ12QFl' },
+        { img: 'assets/images/promos/promo5.jpg', tag: 'Loja Física', title: 'Recarga Rápida de Cartuchos', text: 'Traga seu cartucho até nossa loja física para recarga rápida com valor especial.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid02UmnxVnfUTnjaLLRqmXDuPvcMEHoMVTEpp2xdLpiAgVkhUiLwMgRacgv4Q8Z7ELeul' },
+        { img: 'assets/images/promos/promo6.jpg', tag: 'Solução Rápida', title: 'Papel em Branco? A Gente Resolve', text: 'Quando a folha sai em branco ou falhada, conte com a nossa assistência para voltar a imprimir.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid02tdA6Uytg81ssnQ1nUkh2Lw4wBX4dhrGfUHerEtw9PZprCa65WqJfbXN6AXCxGPQCl' },
+        { img: 'assets/images/promos/promo7.jpg', tag: 'Atendimento', title: 'Produtos com a Melhor Qualidade', text: 'Oferecemos a melhor qualidade e atendimento para nossos clientes. Vem pra B&F!', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid02ZzrKnC44gqEBc4DWccRSB9zSNmCQa5BhSNT3P7GYfDd1i5g5uV7wPeFxmVXgj3eVl' },
+        { img: 'assets/images/promos/promo8.jpg', tag: 'Rotina', title: 'Hora de Voltar aos Trabalhos', text: 'Garanta todos os suprimentos necessários para manter a produtividade em dia.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid0ERirNtEkeYAp1fpCbiXc8bFSYP5ZAK3HB14eHFEsSe6wnXADK4j5csFKx1vtcV2yl' },
+        { img: 'assets/images/promos/promo9.jpg', tag: 'Referência', title: 'Referência em Impressoras e Cartuchos', text: 'Conheça nossos produtos e serviços e descubra por que somos referência na região.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid0Ej5zF7EvFv6UDExkAfwvQKsgvpWCpokjwbpDDicLvAEp5qUFJELjQHsJrAnFCFonl' },
+        { img: 'assets/images/promos/promo10.jpg', tag: 'Guia de Compra', title: 'Pensando em Comprar uma Impressora Nova?', text: 'Confira as dicas que podem ajudar na hora da decisão de compra.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid02kSXipBp9ReXvxua6W6jTkjv8AYrPvE6nQpC5bEiSzyqxR5a6ZZqYzLL1SQiXHUthl' }
+    ];
+
+    function shuffle(arr){
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+        }
+        return a;
+    }
+
+    function initPromos(){
+        var slots = Array.prototype.slice.call(document.querySelectorAll('[data-promo-slot]'));
+        if(!slots.length) return;
+
+        var lastSelection = [];
+
+        function applySelection(){
+            var selection = shuffle(PROMOS).slice(0, slots.length);
+            // evita repetir o mesmo anúncio no mesmo slot entre ciclos consecutivos
+            slots.forEach(function(slot, idx){
+                if(selection[idx] && lastSelection[idx] && selection[idx].img === lastSelection[idx].img){
+                    var alt = PROMOS.find(function(p){ return p.img !== selection[idx].img && selection.indexOf(p) === -1; });
+                    if(alt) selection[idx] = alt;
+                }
+            });
+            lastSelection = selection;
+
+            slots.forEach(function(slot, idx){
+                var promo = selection[idx];
+                if(!promo) return;
+                var img = slot.querySelector('[data-promo-img]');
+                var tag = slot.querySelector('[data-promo-tag]');
+                var title = slot.querySelector('[data-promo-title]');
+                var text = slot.querySelector('[data-promo-text]');
+                var link = slot.querySelector('[data-promo-link]');
+
+                slot.classList.add('is-swapping');
+                setTimeout(function(){
+                    if(img){ img.src = promo.img; img.alt = promo.title; }
+                    if(tag) tag.textContent = promo.tag;
+                    if(title) title.textContent = promo.title;
+                    if(text) text.textContent = promo.text;
+                    if(link) link.href = promo.link;
+                    slot.classList.remove('is-swapping');
+                }, 400);
+            });
+        }
+
+        applySelection();
+        setInterval(applySelection, 7000);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPromos);
+    } else {
+        initPromos();
+    }
+})();

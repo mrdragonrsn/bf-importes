@@ -2577,6 +2577,15 @@ textarea:focus-visible {
     .fb-highlight__body { padding: 20px 22px; }
 }
 
+/* transição fade para rotação de anúncios */
+.fb-highlight__media img,
+.fb-highlight__body {
+    transition: opacity 0.4s ease;
+}
+.fb-highlight.is-swapping {
+    opacity: 0;
+}
+
 /* ══════════════════════════════════════════════════════════════════
    FAIXA DE CONFIANÇA (Trust Bar)
 ══════════════════════════════════════════════════════════════════ */
