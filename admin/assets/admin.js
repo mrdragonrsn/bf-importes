@@ -1,5 +1,5 @@
 (function(){
-var USERS_KEY='bf_users', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', ADMIN_KEY='bf_admin_session', CATEGORIES_KEY='bf_categories', PEDIDOS_KEY='bf_orders';
+var USERS_KEY='bf_users', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', CATEGORIES_KEY='bf_categories', PEDIDOS_KEY='bf_orders';
 
 var SUPABASE_URL = 'https://trirxmcalxktampbujyr.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaXJ4bWNhbHhrdGFtcGJ1anlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjU3MzEsImV4cCI6MjEwMjIwMTczMX0.sr6dx1qSK8cqV4e1g6-jMz99T2WTw9Q0jX1iHb-Vwy4';
@@ -36,29 +36,21 @@ function defaultBanner(){return{title:'Impressoras, multifuncionais e peças',ti
 function defaultConfig(){return{company:'BIANCO & FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA',brand:'B&F Importes',cnpj:'03.108.169/0001-58',phone:'(16) 98138-6747',email:'atendimento@biancoeferreira.com.br',hours:'Seg–Sex 8h às 18h | Sáb 8h às 13h',address:'R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090',cep:'14870-090',cityState:'Jaboticabal — SP'}}
 function defaultCategories(){return['impressoras','multifuncionais','pecas','suprimentos']}
 
-/* === AUTH === */
-var loginScreen=document.getElementById('loginScreen'),adminLayout=document.getElementById('adminLayout'),btnLogin=document.getElementById('btnAdminLogin');
+/* === AUTH (Supabase) === */
+var adminLayout=document.getElementById('adminLayout');
 
-function getAdminSession(){try{return JSON.parse(localStorage.getItem(ADMIN_KEY))}catch(e){return null}}
-function login(user,pass){
-    var users=load(USERS_KEY,[]);
-    if(!users.length){users.push({name:'Admin',email:'admin',pass:'admin',role:'admin'});save(USERS_KEY,users)}
-    var found=users.find(function(u){return (u.email===user||u.name===user)});
-    if(!found){document.getElementById('loginError').textContent='Usuário ou senha incorreto.';return}
-    sha256(pass).then(function(hash){
-        var ok=(found.pass===hash)||(found.pass===pass);
-        if(!ok){document.getElementById('loginError').textContent='Usuário ou senha incorreto.';return}
-        if(found.pass!==hash){found.pass=hash;save(USERS_KEY,users)}
-        if(found.role==='admin'||found.email==='admin'){localStorage.setItem(ADMIN_KEY,JSON.stringify(found));showDashboard();}
-        else{document.getElementById('loginError').textContent='Apenas administradores podem acessar.';}
+function showDashboard(){adminLayout.classList.add('active');renderAll();setTimeout(initCharts,100);refreshPreview()}
+function logout(){
+    supabase.auth.signOut().then(function(){
+        window.location.replace('login.html');
     });
 }
-function showDashboard(){loginScreen.style.display='none';adminLayout.classList.add('active');renderAll();setTimeout(initCharts,100);refreshPreview()}
-function logout(){localStorage.removeItem(ADMIN_KEY);loginScreen.style.display='flex';adminLayout.classList.remove('active')}
 
-if(getAdminSession())showDashboard();
-btnLogin.addEventListener('click',function(){login(document.getElementById('adminUser').value.trim()||'admin',document.getElementById('adminPass').value||'admin')});
-document.getElementById('adminPass').addEventListener('keydown',function(e){if(e.key==='Enter')btnLogin.click()});
+/* proteção da rota: sem sessão, volta para o login */
+supabase.auth.getSession().then(function(res){
+    if(!res.data || !res.data.session){ window.location.replace('login.html'); return; }
+    showDashboard();
+});
 document.getElementById('btnAdminLogout').addEventListener('click',logout);
 
 /* === TABS === */

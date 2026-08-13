@@ -10,18 +10,6 @@
 </head>
 <body>
 
-<div class="login-screen" id="loginScreen">
-    <div class="login-card">
-        <h1>&#128274; Painel Admin</h1>
-        <p class="sub">B&amp;F Importes</p>
-        <div class="login-field"><label>Usuário</label><input type="text" id="adminUser" placeholder="admin"></div>
-        <div class="login-field"><label>Senha</label><input type="password" id="adminPass" placeholder="admin"></div>
-        <div class="login-error" id="loginError"></div>
-        <button class="btn-login" id="btnAdminLogin">Entrar</button>
-        <p class="back-site"><a href="../index.html">&#8592; Voltar ao site</a></p>
-    </div>
-</div>
-
 <div class="admin-layout" id="adminLayout">
     <aside class="sidebar">
         <div class="sidebar-logo"><h2>B&amp;F</h2><small>Painel Admin</small></div>
@@ -346,6 +334,15 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (async function(){
+        var SUPABASE_URL = 'https://trirxmcalxktampbujyr.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaXJ4bWNhbHhrdGFtcGJ1anlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjU3MzEsImV4cCI6MjEwMjIwMTczMX0.sr6dx1qSK8cqV4e1g6-jMz99T2WTw9Q0jX1iHb-Vwy4';
+        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        var res = await supabase.auth.getSession();
+        if(!res.data || !res.data.session){ window.location.replace('login.html'); }
+    })();
+</script>
 <script src="assets/admin.js"></script>
 </body>
 </html>
