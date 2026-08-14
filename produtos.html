@@ -214,7 +214,7 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-box" id="authBoxLogin">
             <h3>&#128274; Entrar</h3>
-            <form id="loginForm" novalidate>
+            <form id="loginForm" onsubmit="fazerLogin(event)" novalidate>
             <div class="auth-field"><label>Usuário</label><input type="text" id="loginEmail" placeholder="usuário ou email"></div>
             <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" placeholder="••••••"></div>
             <div class="auth-error" id="loginError"></div>

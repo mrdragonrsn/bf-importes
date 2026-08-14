@@ -726,16 +726,23 @@ function openLightbox(src){
             });
         }
 
-        var loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.addEventListener('submit', function(e){
-                e.preventDefault();
-                doLogin();
-            });
-        } else {
-            var btnL = document.getElementById('btnLogin');
-            if (btnL) btnL.addEventListener('click', doLogin);
+        function fazerLogin(e){
+            if (e) e.preventDefault();
+            doLogin();
         }
+        window.fazerLogin = fazerLogin;
+
+        ['loginEmail','loginPass'].forEach(function(id){
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('keydown', function(e){
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    var btn = document.getElementById('btnLogin');
+                    if (btn) btn.click();
+                    else fazerLogin();
+                }
+            });
+        });
 
         var btnR = document.getElementById('btnRegister');
         if (btnR) btnR.addEventListener('click', function(){
