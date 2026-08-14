@@ -18,15 +18,29 @@ function openLightbox(src){
 
     function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+    /* Normaliza as imagens de um produto em array de URLs.
+       Compatível com: `imagens` (array), `imagem_url` (string), `image`/`imagem` (string legada). */
+    function getImages(p){
+        if(!p) return [];
+        var arr = [];
+        if(Array.isArray(p.imagens)) arr = p.imagens.filter(function(u){ return u; });
+        if(!arr.length && p.imagem_url) arr = [p.imagem_url];
+        if(!arr.length && p.imagem) arr = [p.imagem];
+        if(!arr.length && p.image) arr = [p.image];
+        return arr;
+    }
+
     function buildProductCard(p){
         var name = esc(p.nome);
         var cat = defaultCatNames[p.categoria] || p.categoria || 'Produto';
-        var img = p.imagem_url || PLACEHOLDER_IMG;
+        var imgs = getImages(p);
+        var img = imgs[0] || PLACEHOLDER_IMG;
         var preco = parseFloat(p.preco) || 0;
         var priceStr = 'R$ ' + preco.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
         var inst = preco / 10;
+        var photoBadge = imgs.length > 1 ? '<span class="thumb-photo-count">'+imgs.length+' fotos</span>' : '';
         return '<div class="product-card" data-category="'+esc(p.categoria||'impressoras')+'" data-name="'+name+'">' +
-            '<div class="thumb"><img src="'+esc(img)+'" alt="'+name+'" loading="lazy"></div>' +
+            '<div class="thumb">'+photoBadge+'<img src="'+esc(img)+'" alt="'+name+'" loading="lazy"></div>' +
             '<div class="body">' +
                 '<span class="cat">'+esc(cat)+'</span>' +
                 '<h3>'+name+'</h3>' +
@@ -48,10 +62,10 @@ function openLightbox(src){
         var html = '';
         rows.forEach(function(p){
             productData[p.nome] = {
-                images: ['&#128424;','&#128196;','&#128295;','&#128203;'],
+                images: getImages(p),
                 stock: parseInt(p.estoque)||0,
                 longDesc: p.descricao_curta || '',
-                img: p.imagem_url || '',
+                img: getImages(p)[0] || '',
                 preco: parseFloat(p.preco)||0
             };
             html += buildProductCard(p);
@@ -120,6 +134,41 @@ function openLightbox(src){
     }
     renderProducts();
 
+    /* ── CARROSSEL DE DESTAQUES DA HOME (dinâmico do Supabase) ── */
+    async function renderHomeFeatured(){
+        var track = document.getElementById('featuredTrack');
+        if(!track || !supabase) return;
+
+        var res = await supabase.from('produtos').select('*').order('nome',{ascending:true});
+        if(res.error || !res.data || !res.data.length) return;
+
+        var rows = res.data;
+        // popula productData para stock-info e modal funcionarem na home
+        rows.forEach(function(p){
+            productData[p.nome] = {
+                images: getImages(p),
+                stock: parseInt(p.estoque)||0,
+                longDesc: p.descricao_curta || '',
+                img: getImages(p)[0] || '',
+                preco: parseFloat(p.preco)||0
+            };
+        });
+
+        var html = '';
+        rows.forEach(function(p){
+            html += buildProductCard(p);
+        });
+        track.innerHTML = html;
+
+        renderStock();
+        renderProductImages();
+
+        if(typeof window.initFeaturedCarousel === 'function'){
+            window.initFeaturedCarousel();
+        }
+    }
+    renderHomeFeatured();
+
     /* ── RENDER ESTOQUE ──────────────── */
     function renderStock() {
         document.querySelectorAll('.stock-info').forEach(function(el){
@@ -148,7 +197,8 @@ function openLightbox(src){
             var img = card.querySelector('.thumb img');
             if(!img) return;
             var data = productData[name] || {};
-            img.src = data.img || PLACEHOLDER_IMG;
+            var imgs = data.images || [];
+            img.src = imgs[0] || PLACEHOLDER_IMG;
             if(name) img.alt = name;
         });
     }
@@ -194,7 +244,8 @@ function openLightbox(src){
         } else {
             var h = '';
             cart.forEach(function(item, idx){
-                var thumb = productData[item.title] && productData[item.title].images ? productData[item.title].images[0] : '&#128424;';
+                var pd = productData[item.title];
+                var thumb = (pd && pd.images && pd.images[0]) ? '<img src="'+pd.images[0]+'" alt="" style="width:100%;height:100%;object-fit:cover;">' : '&#128424;';
                 h += '<div class="cart-item">' +
                     '<div class="cart-item-img">' + thumb + '</div>' +
                     '<div class="cart-item-info">' +
@@ -264,7 +315,8 @@ function openLightbox(src){
         function renderCheckoutSummary(){
             var h = '<h4>&#128722; Resumo do Pedido</h4>';
             cart.forEach(function(item){
-                var thumb = productData[item.title] && productData[item.title].images ? productData[item.title].images[0] : '&#128424;';
+                var pd = productData[item.title];
+                var thumb = (pd && pd.images && pd.images[0]) ? '<img src="'+pd.images[0]+'" alt="" style="width:100%;height:100%;object-fit:cover;">' : '&#128424;';
                 h += '<div class="checkout-item-mini">' +
                     '<div class="checkout-item-img">' + thumb + '</div>' +
                     '<div class="info"><strong>' + item.title + '</strong><span>' + item.qty + 'x ' + item.price + '</span></div>' +
@@ -651,8 +703,7 @@ function openLightbox(src){
             var re = document.getElementById('regError'); if (re) re.textContent = '';
         });
 
-        var btnL = document.getElementById('btnLogin');
-        if (btnL) btnL.addEventListener('click', function(){
+        function doLogin(){
             var login = document.getElementById('loginEmail').value.trim();
             var pass = document.getElementById('loginPass').value;
             var u = users.find(function(u){ return (u.email === login || u.name === login); });
@@ -673,7 +724,18 @@ function openLightbox(src){
                 showToast('&#128100; Bem-vindo, ' + u.name + '!');
                 setTimeout(function(){ location.reload(); }, 600);
             });
-        });
+        }
+
+        var loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e){
+                e.preventDefault();
+                doLogin();
+            });
+        } else {
+            var btnL = document.getElementById('btnLogin');
+            if (btnL) btnL.addEventListener('click', doLogin);
+        }
 
         var btnR = document.getElementById('btnRegister');
         if (btnR) btnR.addEventListener('click', function(){
@@ -939,41 +1001,31 @@ function openLightbox(src){
             if (data) {
                 if (modalDesc) modalDesc.textContent = data.longDesc;
 
+                var gallery = (data.images && data.images.length) ? data.images : (data.img ? [data.img] : []);
+
                 if (mainImg) {
-                    var productImg = (data && data.img) ? data.img : null;
-                    if (productImg) {
-                        mainImg.innerHTML = '<img src="'+productImg+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
+                    if (gallery.length) {
+                        mainImg.innerHTML = '<img src="'+gallery[0]+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
                     } else {
-                        mainImg.innerHTML = data.images[0];
+                        mainImg.innerHTML = '&#128424;';
                     }
                 }
 
                 if (thumbs) {
                     thumbs.innerHTML = '';
-                    data.images.forEach(function(img, idx){
-                        var t = document.createElement('div');
-                        t.className = 'modal-thumb' + (idx === 0 ? ' active' : '');
-                        t.innerHTML = img;
-                        t.addEventListener('click', function(){
-                            if (mainImg) mainImg.innerHTML = img;
-                            var all = thumbs.querySelectorAll('.modal-thumb');
-                            all.forEach(function(a){ a.classList.remove('active'); });
-                            t.classList.add('active');
+                    if (gallery.length > 1) {
+                        gallery.forEach(function(url, idx){
+                            var t = document.createElement('div');
+                            t.className = 'modal-thumb' + (idx === 0 ? ' active' : '');
+                            t.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">';
+                            t.addEventListener('click', function(){
+                                if (mainImg) mainImg.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
+                                var all = thumbs.querySelectorAll('.modal-thumb');
+                                all.forEach(function(a){ a.classList.remove('active'); });
+                                t.classList.add('active');
+                            });
+                            thumbs.appendChild(t);
                         });
-                        thumbs.appendChild(t);
-                    });
-                    var dbImg = (data && data.img) ? data.img : null;
-                    if (dbImg) {
-                        var imgThumb = document.createElement('div');
-                        imgThumb.className = 'modal-thumb';
-                        imgThumb.innerHTML = '<img src="'+dbImg+'" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">';
-                        imgThumb.addEventListener('click', function(){
-                            if (mainImg) mainImg.innerHTML = '<img src="'+dbImg+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
-                            var all = thumbs.querySelectorAll('.modal-thumb');
-                            all.forEach(function(a){ a.classList.remove('active'); });
-                            imgThumb.classList.add('active');
-                        });
-                        thumbs.insertBefore(imgThumb, thumbs.firstChild);
                     }
                 }
                 if (modalStock) {
@@ -1235,8 +1287,9 @@ function openLightbox(src){
             }
             var html = '<div class="sd-header"><span>Produtos</span></div>';
             rows.forEach(function(p){
-                var img = p.imagem_url
-                    ? '<img class="si-img" src="'+esc(p.imagem_url)+'" alt="">'
+                var firstImg = getImages(p)[0];
+                var img = firstImg
+                    ? '<img class="si-img" src="'+esc(firstImg)+'" alt="">'
                     : '<span class="si-img">&#128424;</span>';
                 html += '<div class="search-item" data-term="'+esc(p.nome)+'" role="option">' +
                     img +
@@ -1900,13 +1953,12 @@ function openLightbox(src){
         var nextBtn = document.getElementById('featuredNext');
         var dotsWrap = document.getElementById('featuredDots');
         var viewport = track.parentElement;
-        var cards = Array.prototype.slice.call(track.children);
-        if (!cards.length) return;
 
         var index = 0;
         var cardsPerView = 4;
         var autoplayTimer = null;
         var AUTOPLAY_MS = 4000;
+        var cards = [];
 
         function cardsPerViewForWidth(){
             var w = window.innerWidth;
@@ -1921,6 +1973,7 @@ function openLightbox(src){
         }
 
         function update(){
+            if(!cards.length) return;
             var gap = 20;
             cards.forEach(function(card){
                 card.style.flex = '0 0 calc((100% - ' + (gap * (cardsPerView - 1)) + 'px) / ' + cardsPerView + ')';
@@ -1971,10 +2024,16 @@ function openLightbox(src){
         function restartAutoplay(){ stopAutoplay(); startAutoplay(); }
 
         function init(){
+            cards = Array.prototype.slice.call(track.children);
+            if (!cards.length) return;
             cardsPerView = cardsPerViewForWidth();
+            index = 0;
             update();
             startAutoplay();
         }
+
+        // expõe re-inicialização após renderização dinâmica
+        window.initFeaturedCarousel = init;
 
         if (nextBtn) nextBtn.addEventListener('click', function(){ goNext(); restartAutoplay(); });
         if (prevBtn) prevBtn.addEventListener('click', function(){ goPrev(); restartAutoplay(); });

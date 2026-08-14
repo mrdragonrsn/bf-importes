@@ -112,13 +112,13 @@
                 <div class="form-row">
                     <div class="fg" style="flex:3;"><label>Descrição Curta</label><input type="text" id="prodDesc" placeholder="Breve descrição..."></div>
                     <div class="fg" style="flex:2;align-items:center;">
-                        <label>Imagem do Produto</label>
-                        <input type="file" id="prodImgFile" accept="image/*" style="display:none;">
+                        <label>Imagens do Produto</label>
+                        <input type="file" id="prodImgFile" accept="image/*" multiple style="display:none;">
                         <div class="flex-row" style="width:100%;">
-                            <button class="btn btn-outline btn-sm" onclick="document.getElementById('prodImgFile').click()">&#128247; Escolher</button>
+                            <button class="btn btn-outline btn-sm" id="btnProdImgChoose" type="button">&#128247; Escolher Imagens</button>
                             <span id="prodImgName" style="font-size:.72rem;color:var(--text-muted);">Nenhuma</span>
-                            <img id="prodImgPreview" style="width:36px;height:36px;object-fit:cover;border-radius:4px;display:none;">
                         </div>
+                        <div id="prodImgThumbs" class="prod-img-thumbs" style="display:none;"></div>
                     </div>
                 </div>
                 <div class="form-row">

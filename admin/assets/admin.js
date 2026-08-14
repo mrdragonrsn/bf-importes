@@ -68,31 +68,66 @@ document.querySelectorAll('#sideNav a').forEach(function(a){
     });
 });
 
-/* === PRODUCT IMAGE UPLOAD (Storage) === */
-var prodImgFile=null;
-document.getElementById('prodImgFile').addEventListener('change',function(e){
-    var file=e.target.files[0];if(!file)return;
-    prodImgFile=file;
-    document.getElementById('prodImgName').textContent=file.name;
-    var reader=new FileReader();
-    reader.onload=function(ev){
-        document.getElementById('prodImgPreview').src=ev.target.result;
-        document.getElementById('prodImgPreview').style.display='block';
-    };
-    reader.readAsDataURL(file);
+/* === PRODUCT IMAGE UPLOAD (Storage - múltiplas imagens) === */
+var prodImgFiles = [];
+
+function renderProdImgThumbs(){
+    var wrap = document.getElementById('prodImgThumbs');
+    if(!wrap) return;
+    if(!prodImgFiles.length){
+        wrap.style.display = 'none';
+        wrap.innerHTML = '';
+        document.getElementById('prodImgName').textContent = 'Nenhuma';
+        return;
+    }
+    document.getElementById('prodImgName').textContent = prodImgFiles.length + ' imagem(ns) selecionada(s)';
+    wrap.style.display = 'flex';
+    wrap.innerHTML = '';
+    prodImgFiles.forEach(function(file, idx){
+        var div = document.createElement('div');
+        div.className = 'prod-img-thumb';
+        var img = document.createElement('img');
+        var reader = new FileReader();
+        reader.onload = function(ev){ img.src = ev.target.result; };
+        reader.readAsDataURL(file);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'prod-img-thumb-remove';
+        btn.textContent = '×';
+        btn.title = 'Remover imagem';
+        btn.addEventListener('click', function(){
+            prodImgFiles.splice(idx, 1);
+            renderProdImgThumbs();
+        });
+        div.appendChild(img);
+        div.appendChild(btn);
+        wrap.appendChild(div);
+    });
+}
+
+document.getElementById('btnProdImgChoose').addEventListener('click', function(){
+    document.getElementById('prodImgFile').click();
+});
+document.getElementById('prodImgFile').addEventListener('change', function(e){
+    var files = Array.prototype.slice.call(e.target.files || []);
+    if(!files.length) return;
+    files.forEach(function(f){ prodImgFiles.push(f); });
+    renderProdImgThumbs();
 });
 
-function uploadImageToStorage(file){
-    return new Promise(function(resolve,reject){
-        if(!file) return resolve(null);
-        var ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
-        var path='produtos/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
-        supabase.storage.from('produtos').upload(path,file,{cacheControl:'3600',upsert:false}).then(function(res){
-            if(res.error){ reject(res.error); return; }
-            var url=supabase.storage.from('produtos').getPublicUrl(res.data.path);
-            resolve(url.data.publicUrl);
+function uploadImagesToStorage(files){
+    if(!files || !files.length) return Promise.resolve([]);
+    return Promise.all(files.map(function(file){
+        return new Promise(function(resolve, reject){
+            var ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+            var path='produtos/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
+            supabase.storage.from('produtos').upload(path,file,{cacheControl:'3600',upsert:false}).then(function(res){
+                if(res.error){ reject(res.error); return; }
+                var url=supabase.storage.from('produtos').getPublicUrl(res.data.path);
+                resolve(url.data.publicUrl);
+            });
         });
-    });
+    }));
 }
 
 function deleteImageByUrl(url){
@@ -158,7 +193,8 @@ function bindStockEdits(tbody){
 
 window.uploadTblImg=function(input,id){
     var file=input.files[0];if(!file)return;
-    uploadImageToStorage(file).then(function(url){
+    uploadImagesToStorage([file]).then(function(urls){
+        var url = urls[0] || null;
         return supabase.from('produtos').update({imagem_url:url}).eq('id',id);
     }).then(function(res){
         if(res.error){ showToast('&#9888; '+res.error.message); return; }
@@ -169,8 +205,13 @@ window.uploadTblImg=function(input,id){
 
 window.deleteProduct=function(id){
     if(!confirm('Remover produto permanentemente?'))return;
-    supabase.from('produtos').select('imagem_url').eq('id',id).single().then(function(res){
-        if(res.data&&res.data.imagem_url) deleteImageByUrl(res.data.imagem_url);
+    supabase.from('produtos').select('imagem_url,imagens').eq('id',id).single().then(function(res){
+        if(res.data){
+            var urls = [];
+            if(res.data.imagem_url) urls.push(res.data.imagem_url);
+            if(Array.isArray(res.data.imagens)) urls = urls.concat(res.data.imagens);
+            urls.forEach(function(u){ deleteImageByUrl(u); });
+        }
         return supabase.from('produtos').delete().eq('id',id);
     }).then(function(res){
         if(res.error){ showToast('&#9888; '+res.error.message); return; }
@@ -191,14 +232,17 @@ document.getElementById('btnAddProduct').addEventListener('click',function(){
     if(!name){msg.textContent='Informe o nome.';msg.style.color='var(--danger)';return}
     if(!price){msg.textContent='Informe o preço.';msg.style.color='var(--danger)';return}
     msg.textContent='Salvando...';msg.style.color='var(--text-muted)';
-    uploadImageToStorage(prodImgFile).then(function(imgUrl){
+    uploadImagesToStorage(prodImgFiles).then(function(urls){
+        var primary = urls[0] || null;
+        var rest = urls.slice(1);
         return supabase.from('produtos').insert([{
             nome:name,
             categoria:cat,
             preco:parsePrice(price),
             estoque:stock,
             descricao_curta:desc||name,
-            imagem_url:imgUrl
+            imagem_url:primary,
+            imagens: rest.length ? rest : null
         }]);
     }).then(function(res){
         if(res.error){
@@ -210,9 +254,8 @@ document.getElementById('btnAddProduct').addEventListener('click',function(){
         renderStock();
         ['prodName','prodPrice','prodDesc','prodLongDesc'].forEach(function(id){document.getElementById(id).value=''});
         document.getElementById('prodImgFile').value='';
-        document.getElementById('prodImgName').textContent='Nenhuma';
-        document.getElementById('prodImgPreview').style.display='none';
-        prodImgFile=null;
+        prodImgFiles = [];
+        renderProdImgThumbs();
         document.getElementById('prodStock').value='10';
         msg.textContent='Adicionado com sucesso!';msg.style.color='var(--success)';
         setTimeout(function(){msg.textContent=''},3000);

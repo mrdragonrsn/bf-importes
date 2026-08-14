@@ -148,108 +148,7 @@
 
             <div class="carousel" id="featuredCarousel">
                 <div class="carousel__viewport">
-                    <div class="carousel__track" id="featuredTrack">
-
-                        <div class="product-card featured-card" role="button" tabindex="0">
-                            <span class="offer-badge offer-badge--hot">Mais vendido</span>
-                            <div class="thumb">&#128424;</div>
-                            <div class="body">
-                                <span class="cat">Impressora</span>
-                                <h3>HP LaserJet Pro M404dn</h3>
-                                <p class="desc">Monocromática, duplex automático, 40 ppm. Ideal para escritórios.</p>
-                                <div class="stock-info" data-product="HP LaserJet Pro M404dn"></div>
-                                <div class="price">R$ 2.199,00</div>
-                                <div class="installment">ou 10x de R$ 219,90</div>
-                            </div>
-                        </div>
-
-                        <div class="product-card featured-card" role="button" tabindex="0">
-                            <div class="thumb">&#128424;</div>
-                            <div class="body">
-                                <span class="cat">Multifuncional</span>
-                                <h3>Epson EcoTank L3250</h3>
-                                <p class="desc">Tanque de tinta colorida, Wi-Fi. Baixo custo por página.</p>
-                                <div class="stock-info" data-product="Epson EcoTank L3250"></div>
-                                <div class="price">R$ 1.149,00</div>
-                                <div class="installment">ou 10x de R$ 114,90</div>
-                            </div>
-                        </div>
-
-                        <div class="product-card featured-card" role="button" tabindex="0">
-                            <span class="offer-badge offer-badge--deal">Oferta</span>
-                            <div class="thumb">&#129534;</div>
-                            <div class="body">
-                                <span class="cat">Impressora Térmica</span>
-                                <h3>Elgin i9</h3>
-                                <p class="desc">Cupom não fiscal, 250 mm/s, USB. Ideal para PDV e comércio.</p>
-                                <div class="stock-info" data-product="Elgin i9"></div>
-                                <div class="price">R$ 479,00</div>
-                                <div class="installment">ou 10x de R$ 47,90</div>
-                            </div>
-                        </div>
-
-                        <div class="product-card featured-card" role="button" tabindex="0">
-                            <div class="thumb">&#9881;</div>
-                            <div class="body">
-                                <span class="cat">Peça</span>
-                                <h3>Kit Fusor HP LaserJet</h3>
-                                <p class="desc">Compatível com M402/M404/M426. Alta durabilidade.</p>
-                                <div class="stock-info" data-product="Kit Fusor HP LaserJet"></div>
-                                <div class="price">R$ 349,00</div>
-                                <div class="installment">ou 10x de R$ 34,90</div>
-                            </div>
-                        </div>
-
-                        <div class="product-card featured-card" role="button" tabindex="0">
-                            <div class="thumb">&#128424;</div>
-                            <div class="body">
-                                <span class="cat">Multifuncional</span>
-                                <h3>Brother DCP-L5652DN</h3>
-                                <p class="desc">Laser monocromática, duplex, rede, scanner ADF.</p>
-                                <div class="stock-info" data-product="Brother DCP-L5652DN"></div>
-                                <div class="price">R$ 3.299,00</div>
-                                <div class="installment">ou 10x de R$ 329,90</div>
-                            </div>
-                        </div>
-
-                        <div class="product-card featured-card" role="button" tabindex="0">
-                            <div class="thumb">&#9881;</div>
-                            <div class="body">
-                                <span class="cat">Peça</span>
-                                <h3>Placa Lógica Principal</h3>
-                                <p class="desc">Controladora compatível com impressoras Epson. Revisada.</p>
-                                <div class="stock-info" data-product="Placa Lógica Principal"></div>
-                                <div class="price">R$ 289,00</div>
-                                <div class="installment">ou 10x de R$ 28,90</div>
-                            </div>
-                        </div>
-
-                        <div class="product-card featured-card" role="button" tabindex="0">
-                            <div class="thumb">&#128424;</div>
-                            <div class="body">
-                                <span class="cat">Impressora</span>
-                                <h3>Zebra ZD421</h3>
-                                <p class="desc">Etiquetas térmicas, 203 dpi, USB/Ethernet. Logística.</p>
-                                <div class="stock-info" data-product="Zebra ZD421"></div>
-                                <div class="price">R$ 2.799,00</div>
-                                <div class="installment">ou 10x de R$ 279,90</div>
-                            </div>
-                        </div>
-
-                        <div class="product-card featured-card" role="button" tabindex="0">
-                            <span class="offer-badge offer-badge--new">Novo</span>
-                            <div class="thumb">&#128367;</div>
-                            <div class="body">
-                                <span class="cat">Suprimento</span>
-                                <h3>Toner HP 58A Original</h3>
-                                <p class="desc">Cartucho toner preto CF258A. Até 3.000 páginas.</p>
-                                <div class="stock-info" data-product="Toner HP 58A Original"></div>
-                                <div class="price">R$ 419,00</div>
-                                <div class="installment">ou 10x de R$ 41,90</div>
-                            </div>
-                        </div>
-
-                    </div>
+                    <div class="carousel__track" id="featuredTrack"></div>
                 </div>
                 <button class="carousel__btn carousel__btn--prev" id="featuredPrev" aria-label="Produtos anteriores">&#10094;</button>
                 <button class="carousel__btn carousel__btn--next" id="featuredNext" aria-label="Próximos produtos">&#10095;</button>
@@ -466,10 +365,12 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-box" id="authBoxLogin">
             <h3>&#128274; Entrar</h3>
+            <form id="loginForm" novalidate>
             <div class="auth-field"><label>Usuário</label><input type="text" id="loginEmail" placeholder="usuário ou email"></div>
             <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" placeholder="••••••"></div>
             <div class="auth-error" id="loginError"></div>
-            <button class="btn-auth" id="btnLogin">Entrar</button>
+            <button class="btn-auth" id="btnLogin" type="submit">Entrar</button>
+            </form>
             <div class="auth-switch">Não tem conta? <a id="switchToRegister">Cadastre-se</a></div>
             <a class="forgot-link" id="forgotLink">Esqueci a senha?</a>
         </div>

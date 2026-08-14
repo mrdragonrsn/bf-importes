@@ -287,10 +287,12 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-box" id="authBoxLogin">
             <h3>&#128274; Entrar</h3>
+            <form id="loginForm" novalidate>
             <div class="auth-field"><label>Usuário</label><input type="text" id="loginEmail" placeholder="usuário ou email"></div>
             <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" placeholder="••••••"></div>
             <div class="auth-error" id="loginError"></div>
-            <button class="btn-auth" id="btnLogin">Entrar</button>
+            <button class="btn-auth" id="btnLogin" type="submit">Entrar</button>
+            </form>
             <div class="auth-switch">Não tem conta? <a id="switchToRegister">Cadastre-se</a></div>
             <a class="forgot-link" id="forgotLink">Esqueci a senha?</a>
         </div>

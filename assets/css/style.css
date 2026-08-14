@@ -298,6 +298,20 @@
             overflow: hidden;
             border-top-left-radius: 16px;
             border-top-right-radius: 16px;
+            position: relative;
+        }
+        .thumb-photo-count {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            z-index: 2;
+            background: rgba(10, 31, 63, 0.75);
+            color: #fff;
+            font-size: 0.66rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 12px;
+            letter-spacing: 0.3px;
         }
         .product-card .thumb img {
             width: 100%;
