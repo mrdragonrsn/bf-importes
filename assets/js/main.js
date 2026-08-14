@@ -23,8 +23,8 @@ function openLightbox(src){
     function getImages(p){
         if(!p) return [];
         var arr = [];
-        if(Array.isArray(p.imagens)) arr = p.imagens.filter(function(u){ return u; });
-        if(!arr.length && p.imagem_url) arr = [p.imagem_url];
+        if(p.imagem_url) arr.push(p.imagem_url);
+        if(Array.isArray(p.imagens)) arr = arr.concat(p.imagens.filter(function(u){ return u; }));
         if(!arr.length && p.imagem) arr = [p.imagem];
         if(!arr.length && p.image) arr = [p.image];
         return arr;
