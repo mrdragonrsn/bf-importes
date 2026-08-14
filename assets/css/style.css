@@ -980,7 +980,6 @@
             .contact-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
             .brands-grid { gap: 16px; }
             .brand-item { padding: 14px 18px; }
-            .brand-icon { font-size: 1.8rem; }
             .brand-item span { font-size: 0.7rem; }
             section { padding: 40px 0; }
             footer .container { flex-direction: column; text-align: center; font-size: 0.74rem; }
@@ -1449,19 +1448,23 @@
             background: var(--cinza-claro);
         }
         .brand-item:hover { transform: translateY(-4px); box-shadow: var(--sombra-hover); }
-        .brand-icon {
+        .logo-wrapper {
+            height: 80px;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-        }
-        .brand-icon img {
-            height: 45px;
-            width: auto;
-            max-width: 90%;
-            object-fit: contain;
-            display: block;
             margin-bottom: 15px;
+        }
+        .logo-wrapper img {
+            max-height: 100%;
+            width: auto;
+            max-width: 150px;
+            object-fit: contain;
+        }
+        .logo-brother img,
+        .logo-elgin img {
+            transform: scale(1.2);
         }
         .brand-item span {
             font-size: 0.82rem;
