@@ -1450,6 +1450,13 @@
             font-weight: 800;
             color: var(--azul-escuro);
         }
+        .brand-icon img {
+            height: 52px;
+            width: auto;
+            max-width: 180px;
+            object-fit: contain;
+            display: block;
+        }
         .brand-item span {
             font-size: 0.82rem;
             font-weight: 600;
