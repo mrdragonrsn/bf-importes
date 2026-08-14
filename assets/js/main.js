@@ -111,7 +111,7 @@ function openLightbox(src){
                         '<div style="font-size:3rem;margin-bottom:12px;">&#128269;</div>' +
                         '<p style="font-size:1.05rem;font-weight:700;color:#334155;margin-bottom:6px;">Nenhum produto encontrado para "'+esc(termo)+'"</p>' +
                         '<p style="font-size:.9rem;color:#64748b;margin-bottom:22px;">Verifique a ortografia ou tente termos mais gerais.</p>' +
-                        '<a href="produtos.html" class="btn-cta" style="display:inline-block;">Ver catálogo completo</a>' +
+                        '<a href="/produtos" class="btn-cta" style="display:inline-block;">Ver catálogo completo</a>' +
                     '</div>';
                 return;
             }
@@ -658,7 +658,7 @@ function openLightbox(src){
     if (authOverlay && boxLogin && boxRegister) {
         function updateAuthUI(){
             if (currentUser && btnLoginHeader) {
-                var adminBtn = currentUser.role === 'admin' ? '<a href="admin/" class="user-menu-link" style="display:flex;align-items:center;gap:6px;padding:10px 18px;font-size:0.84rem;color:#334155;text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background=\'var(--cinza-claro)\'" onmouseout="this.style.background=\'none\'">&#128736; Painel Admin</a>' : '';
+                var adminBtn = currentUser.role === 'admin' ? '<a href="/admin" class="user-menu-link" style="display:flex;align-items:center;gap:6px;padding:10px 18px;font-size:0.84rem;color:#334155;text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background=\'var(--cinza-claro)\'" onmouseout="this.style.background=\'none\'">&#128736; Painel Admin</a>' : '';
                 btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnPerfil">&#9881; Perfil</button><button id="btnMeusPedidos">&#128230; Meus Pedidos</button>'+adminBtn+'<button id="btnLogout">&#128682; Sair</button></div></div>';
                 var unameBtn = document.getElementById('userNameBtn');
                 if (unameBtn) unameBtn.addEventListener('click', function(e){ e.stopPropagation(); var m = document.getElementById('userMenu'); if (m) m.classList.toggle('open'); });
@@ -1330,7 +1330,7 @@ function openLightbox(src){
         function submitSearch(term){
             closeDropdown();
             input.blur();
-            window.location.href = 'produtos.html?busca=' + encodeURIComponent(term);
+            window.location.href = '/produtos?busca=' + encodeURIComponent(term);
         }
 
         async function runAutocomplete(term){

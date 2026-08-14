@@ -113,7 +113,7 @@
         <h1>404</h1>
         <p class="sub">Página não encontrada</p>
         <p class="desc">Parece que o papel <strong>entalou</strong>!<br>A página que você procura não está aqui.<br>Que tal voltar ao início e tentar de novo?</p>
-        <a href="index.html" class="btn-home">&#127968; Voltar ao Início</a>
+        <a href="/" class="btn-home">&#127968; Voltar ao Início</a>
         <br>
         <button class="repair-link" onclick="document.querySelector('.printer').style.animation='none';setTimeout(function(){document.querySelector('.printer').style.animation=''},100);this.textContent='🔧 Desentalando...';setTimeout(function(){document.querySelector('.printer .paper').style.display='none';document.querySelector('.printer').textContent='🖨️✅';document.querySelector('.dots').textContent='✅ Recuperado!';document.querySelector('.printer .paper').remove();document.querySelector('.repair-link').textContent='✔️ Impressora recuperada!';},1500);">🔧 Desentalar impressora</button>
         <p class="smoke">Se o problema persistir, chame o suporte técnico.</p>

@@ -42,13 +42,13 @@ var adminLayout=document.getElementById('adminLayout');
 function showDashboard(){adminLayout.classList.add('active');renderAll();setTimeout(initCharts,100);refreshPreview()}
 function logout(){
     supabase.auth.signOut().then(function(){
-        window.location.replace('login.html');
+        window.location.replace('/admin/login');
     });
 }
 
 /* proteção da rota: sem sessão, volta para o login */
 supabase.auth.getSession().then(function(res){
-    if(!res.data || !res.data.session){ window.location.replace('login.html'); return; }
+    if(!res.data || !res.data.session){ window.location.replace('/admin/login'); return; }
     showDashboard();
 });
 document.getElementById('btnAdminLogout').addEventListener('click',logout);
@@ -891,7 +891,7 @@ document.getElementById('btnToggleProductForm').addEventListener('click', functi
 /* === PREVIEW === */
 function refreshPreview(){
     var f = document.getElementById('previewFrame');
-    if(f) f.src = '../index.html?t=' + Date.now();
+    if(f) f.src = '/?t=' + Date.now();
 }
 document.getElementById('btnRefreshPreview').addEventListener('click', refreshPreview);
 

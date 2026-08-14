@@ -129,7 +129,7 @@
             <button type="submit" class="btn-login" id="btnSubmit">Entrar</button>
         </form>
 
-        <a class="back-site" href="../index.html">&larr; Voltar ao site</a>
+        <a class="back-site" href="/">&larr; Voltar ao site</a>
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
@@ -163,7 +163,7 @@
 
             /* se já estiver autenticado, vai direto para o painel */
             supabase.auth.getSession().then(function(res){
-                if(res.data && res.data.session){ window.location.replace('index.html'); }
+                if(res.data && res.data.session){ window.location.replace('/admin'); }
             });
 
             document.getElementById('loginForm').addEventListener('submit', async function(e){
@@ -186,7 +186,7 @@
                     showToast(msg);
                     return;
                 }
-                window.location.replace('index.html');
+                window.location.replace('/admin');
             });
         })();
     </script>
