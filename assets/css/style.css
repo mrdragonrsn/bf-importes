@@ -21,7 +21,7 @@
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
 
-        /* ── TOPO ──────────────────────────── */
+
         .top-bar {
             background: var(--azul-escuro);
             color: var(--branco);
@@ -37,7 +37,7 @@
         }
         .top-bar span { display: flex; align-items: center; gap: 6px; }
 
-        /* ── CABEÇALHO (Glassmorphism) ───────── */
+
         .header {
             position: sticky;
             top: 0;
@@ -113,7 +113,7 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 14px rgba(0,0,0,0.2);
         }
-        /* ── LAYOUT ──────────────────────────── */
+
         .container {
             width: 100%;
             max-width: 1280px;
@@ -142,7 +142,7 @@
             border-radius: 2px;
         }
 
-        /* ── FUNDO TEXTURIZADO (Dot Grid) — seção de produtos ── */
+
         #produtos {
             background-color: #f8fafc;
             background-image: radial-gradient(circle, rgba(13, 47, 94, 0.09) 1px, transparent 1px);
@@ -150,7 +150,7 @@
             padding: 60px 0;
         }
 
-        /* ── HERO ────────────────────────────── */
+
         .hero {
             position: relative;
             overflow: hidden;
@@ -166,7 +166,7 @@
             50%  { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        /* camada de orbes flutuantes (decorativa) */
+
         .hero__bg {
             position: absolute;
             inset: 0;
@@ -217,7 +217,7 @@
             33%      { transform: translate(40px, -30px) scale(1.2); }
             66%      { transform: translate(-30px, 20px) scale(0.95); }
         }
-        /* mantém o texto acima das orbes */
+
         .hero .container {
             position: relative;
             z-index: 2;
@@ -258,7 +258,7 @@
             box-shadow: 0 10px 28px rgba(96, 165, 250, 0.5);
         }
 
-        /* ── CARD DE PRODUTO ─────────────────── */
+
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -400,7 +400,7 @@
             transform: translateY(-1px);
         }
 
-        /* ── SERVIÇOS ────────────────────────── */
+
         .service-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -436,7 +436,7 @@
             color: #475569;
         }
 
-        /* ── DEPOIMENTOS ──────────────────────── */
+
         .testimonial-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -476,7 +476,7 @@
             color: #64748b;
         }
 
-        /* ── CONTATO ─────────────────────────── */
+
         .contact-section {
             background: linear-gradient(135deg, var(--azul-medio) 0%, var(--azul-padrao) 100%);
             color: var(--branco);
@@ -501,7 +501,7 @@
         }
         .contact-item p { font-size: 0.9rem; opacity: 0.9; }
 
-        /* ── RODAPÉ ──────────────────────────── */
+
         footer {
             background: var(--azul-escuro);
             color: var(--branco);
@@ -517,7 +517,7 @@
         }
         footer .legal { opacity: 0.7; }
 
-        /* ── FILTRO ───────────────────────────── */
+
         .filter-bar {
             display: flex;
             gap: 10px;
@@ -546,7 +546,7 @@
         }
         .product-card.hidden { display: none; }
 
-        /* ── CHAT WIDGET ──────────────────────── */
+
         .chat-widget {
             position: fixed;
             bottom: 24px;
@@ -690,8 +690,8 @@
             .chat-panel { width: calc(100vw - 40px); height: 400px; }
         }
 
-        /* ── RESPONSIVO ──────────────────────── */
-        /* ── MODAL DE PRODUTO ────────────────── */
+
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -734,7 +734,7 @@
         }
         .modal-close:hover { color: #1e293b; }
 
-        /* ── MODAL TABS ──────────────────── */
+
         .modal-tabs {
             display: flex;
             border-bottom: 1px solid #e2e8f0;
@@ -759,11 +759,11 @@
         .modal-tab:hover { color: var(--azul-padrao); }
         .modal-tab.active { color: var(--azul-padrao); border-bottom-color: var(--azul-padrao); }
 
-        /* ── MODAL TAB PANEL ─────────────── */
+
         .modal-tab-panel { display: none; padding: 24px 22px; overflow-y: auto; flex: 1; }
         .modal-tab-panel.active { display: block; }
 
-        /* painel galeria */
+
         .modal-main-img {
             width: 100%;
             height: 260px;
@@ -798,7 +798,7 @@
         .modal-thumb:hover { border-color: var(--azul-brilho); transform: scale(1.08); }
         .modal-thumb.active { border-color: var(--azul-padrao); }
 
-        /* painel descrição */
+
         .modal-cat {
             font-size: 0.78rem;
             color: var(--azul-padrao);
@@ -828,7 +828,7 @@
             font-weight: 600;
         }
 
-        /* ── MODAL FOOTER ────────────────── */
+
         .modal-footer-bar {
             border-top: 1px solid #e2e8f0;
             padding: 16px 22px 20px;
@@ -909,7 +909,7 @@
         }
         .btn-modal-buy:hover { background: #15803d; transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 22px rgba(22, 163, 74, 0.45); }
 
-        /* ── LOGIN GATE ─────────────────── */
+
         .login-gate {
             text-align: center;
             padding: 40px 20px;
@@ -953,7 +953,7 @@
             .hero p { font-size: 1rem; }
         }
 
-        /* ── MOBILE GERAL (≤600px) ────────── */
+
         @media (max-width: 600px) {
             .container { padding: 0 14px; }
             .top-bar .container { font-size: 0.7rem; gap: 4px; justify-content: center; }
@@ -997,7 +997,7 @@
             .btn-hero { padding: 12px 24px; font-size: 0.88rem; }
         }
 
-        /* ── HEADER ACTIONS ────────────────── */
+
         .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1128,7 +1128,7 @@
         }
         .user-menu button:hover { background: var(--cinza-claro); }
 
-        /* ── ESTOQUE ────────────────────────── */
+
         .stock-info {
             display: flex;
             align-items: center;
@@ -1150,7 +1150,7 @@
         .stock-text.medium { color: #b45309; }
         .stock-text.low { color: #dc2626; }
 
-        /* ── CARRINHO SIDEBAR ──────────────── */
+
         .cart-overlay {
             position: fixed;
             inset: 0;
@@ -1296,7 +1296,7 @@
         }
         .btn-clear-cart:hover { background: #fef2f2; border-color: #fecaca; color: #ef4444; }
 
-        /* ── AUTH MODAL ─────────────────────── */
+
         .auth-overlay {
             position: fixed;
             inset: 0;
@@ -1400,7 +1400,7 @@
         .btn-resend:hover { text-decoration: underline; }
         .btn-resend:disabled { color: #94a3b8; cursor: not-allowed; }
 
-        /* ── TOAST ──────────────────────────── */
+
         .toast-container {
             position: fixed;
             top: 20px;
@@ -1424,7 +1424,7 @@
         @keyframes toastIn { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(80px); } }
 
-        /* ── CERTIFICAÇÕES ──────────────────── */
+
         .brands-section { background: var(--branco); text-align: center; }
         .brands-grid {
             display: flex;
@@ -1474,7 +1474,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* ── CONTATO INTERATIVO ────────────── */
+
         .contact-clickable {
             cursor: pointer;
             transition: all 0.2s;
@@ -1499,7 +1499,7 @@
         }
         @keyframes popIn { from { opacity: 0; transform: translateX(-50%) scale(0.8); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
 
-        /* ── CHECKOUT ──────────────────────── */
+
         .checkout-overlay {
             position: fixed;
             inset: 0;
@@ -1744,7 +1744,7 @@
         .order-success h3 { font-size: 1.3rem; margin-bottom: 6px; }
         .order-success p { color: #64748b; font-size: 0.88rem; }
 
-        /* ── NOTA FISCAL ─────────────────── */
+
         .nf-container {
             background: #fff;
             border: 2px solid #333;
@@ -1872,7 +1872,7 @@
             .checkout-row.triple { grid-template-columns: 1fr 1fr; }
         }
 
-        /* ── LIGHTBOX ─────────────────────── */
+
         .lightbox-overlay {
             position: fixed;
             inset: 0;
@@ -1906,7 +1906,7 @@
         .lightbox-close:hover { opacity: 0.7; }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
 
-        /* ── BARRA DE BUSCA ─────────────────── */
+
         .header-search-wrap {
             display: flex;
             align-items: center;
@@ -1948,7 +1948,7 @@
         .header-search-btn:hover { background: rgba(255,255,255,0.25); }
         .product-card.hidden-by-search { display: none !important; }
 
-        /* ── DROPDOWN DE BUSCA (Autocomplete) ── */
+
         .search-dropdown {
             position: absolute;
             top: calc(100% + 8px);
@@ -2033,7 +2033,7 @@
             font-size: 0.92rem;
         }
 
-        /* ── MEUS PEDIDOS ──────────────────── */
+
         .pedidos-overlay {
             position: fixed;
             inset: 0;
@@ -2113,7 +2113,7 @@
         .status-badge.badge-amarelo { background: rgba(245,158,11,.15); color: #b45309; }
         .status-badge.badge-vermelho { background: rgba(239,68,68,.15); color: #dc2626; }
 
-        /* ── WHATSAPP SHARE ──────────────── */
+
         .btn-wpp-share {
             display: block;
             width: 100%;
@@ -2131,7 +2131,7 @@
         }
         .btn-wpp-share:hover { background: #1da851; }
 
-        /* ── RESPONSIVE HEADER ───────────── */
+
         @media (max-width: 900px) {
             .header-search-wrap { flex: 0 1 200px; min-width: 120px; }
             .header-search { font-size: 0.76rem; padding: 7px 10px; }
@@ -2147,7 +2147,7 @@
             .pedidos-table th, .pedidos-table td { padding: 6px 8px; font-size: 0.7rem; }
         }
 
-        /* ── PERFIL MODAL ──────────────────── */
+
         .perfil-overlay {
             position: fixed;
             inset: 0;
@@ -2228,7 +2228,7 @@
             font-family: inherit; margin: 10px 0; transition: all 0.2s;
         }
         .btn-add-cartao:hover { background: #eff6ff; }
-        /* ── CARTÃO 3D FLIP ────────────── */
+
         .cartao-3d-wrap {
             perspective: 800px;
             width: 100%;
@@ -2315,15 +2315,12 @@
             .perfil-row { flex-direction: column; gap: 8px; }
         }
 
-/* ══════════════════════════════════════════════════════════════════
-   MELHORIAS DE UX / ACESSIBILIDADE / ANIMAÇÕES
-   (aditivo — não altera o comportamento existente)
-══════════════════════════════════════════════════════════════════ */
 
-/* Rolagem suave ao clicar em âncoras */
+
+
 html { scroll-behavior: smooth; }
 
-/* Texto acessível apenas para leitores de tela */
+
 .sr-only {
     position: absolute;
     width: 1px; height: 1px;
@@ -2334,7 +2331,7 @@ html { scroll-behavior: smooth; }
     border: 0;
 }
 
-/* ── Grid de anúncios (4 colunas no desktop) ── */
+
 .anuncios-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -2352,7 +2349,7 @@ html { scroll-behavior: smooth; }
     box-shadow: var(--sombra-hover);
 }
 
-/* ── Utilidade de animação: fade-up ── */
+
 .fade-up {
     opacity: 0;
     transform: translateY(40px);
@@ -2364,7 +2361,7 @@ html { scroll-behavior: smooth; }
     transform: translateY(0);
 }
 
-/* ── Foco visível (acessibilidade por teclado) ── */
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -2375,12 +2372,12 @@ textarea:focus-visible {
     border-radius: 4px;
 }
 
-/* ── Transições suaves nos cards principais ── */
+
 .testimonial {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* ── Respeita usuários que preferem menos movimento ── */
+
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after {
@@ -2391,9 +2388,7 @@ textarea:focus-visible {
     .fade-up { opacity: 1; transform: none; }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   CARROSSEL DE DESTAQUES
-══════════════════════════════════════════════════════════════════ */
+
 .carousel {
     position: relative;
 }
@@ -2405,7 +2400,7 @@ textarea:focus-visible {
     gap: 20px;
     transition: transform 0.5s ease;
 }
-/* cards do carrossel mantêm o Soft UI + hover, com largura definida via JS */
+
 .carousel__track .product-card {
     flex: 0 0 calc((100% - 60px) / 4);
     min-width: 0;
@@ -2415,7 +2410,7 @@ textarea:focus-visible {
     position: relative;
 }
 
-/* botões de navegação */
+
 .carousel__btn {
     position: absolute;
     top: 50%;
@@ -2452,7 +2447,7 @@ textarea:focus-visible {
 .carousel__btn--prev { left: -12px; }
 .carousel__btn--next { right: -12px; }
 
-/* indicadores (dots) */
+
 .carousel__dots {
     display: flex;
     justify-content: center;
@@ -2474,7 +2469,7 @@ textarea:focus-visible {
     width: 26px;
 }
 
-/* badge de oferta nos cards */
+
 .offer-badge {
     position: absolute;
     top: 12px;
@@ -2492,7 +2487,7 @@ textarea:focus-visible {
 .offer-badge--deal { background: #16a34a; }
 .offer-badge--new  { background: var(--azul-padrao); }
 
-/* CTA "ver catálogo" */
+
 .btn-cta {
     display: inline-block;
     background: var(--azul-padrao);
@@ -2511,7 +2506,7 @@ textarea:focus-visible {
     box-shadow: 0 10px 28px rgba(26, 86, 184, 0.4);
 }
 
-/* responsivo do carrossel */
+
 @media (max-width: 1024px) {
     .carousel__track .product-card { flex-basis: calc((100% - 40px) / 3); }
 }
@@ -2525,9 +2520,7 @@ textarea:focus-visible {
     .carousel__btn { width: 38px; height: 38px; font-size: 1rem; }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   CARDS DE DESTAQUE (Facebook)
-══════════════════════════════════════════════════════════════════ */
+
 .fb-highlight {
     display: flex;
     align-items: center;
@@ -2608,7 +2601,7 @@ textarea:focus-visible {
     .fb-highlight__body { padding: 20px 22px; }
 }
 
-/* transição fade para rotação de anúncios */
+
 .fb-highlight__media img,
 .fb-highlight__body {
     transition: opacity 0.4s ease;
@@ -2617,9 +2610,7 @@ textarea:focus-visible {
     opacity: 0;
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   FAIXA DE CONFIANÇA (Trust Bar)
-══════════════════════════════════════════════════════════════════ */
+
 .trust-bar {
     background-color: #ffffff;
     border-bottom: 1px solid #e2e8f0;
@@ -2645,7 +2636,7 @@ textarea:focus-visible {
     flex-shrink: 0;
 }
 
-/* responsivo: trust bar + anúncios */
+
 @media (max-width: 992px) {
     .trust-grid,
     .anuncios-grid {

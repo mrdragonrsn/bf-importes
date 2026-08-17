@@ -1,5 +1,5 @@
 (function(){
-var USERS_KEY='bf_users', BANNER_KEY='bf_banner', ANUNCIOS_KEY='bf_anuncios', CONFIG_KEY='bf_config', CATEGORIES_KEY='bf_categories', PEDIDOS_KEY='bf_orders';
+var USERS_KEY='bf_users', BANNER_KEY='bf_banner', CONFIG_KEY='bf_config', CATEGORIES_KEY='bf_categories', PEDIDOS_KEY='bf_orders';
 
 var SUPABASE_URL = 'https://trirxmcalxktampbujyr.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaXJ4bWNhbHhrdGFtcGJ1anlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjU3MzEsImV4cCI6MjEwMjIwMTczMX0.sr6dx1qSK8cqV4e1g6-jMz99T2WTw9Q0jX1iHb-Vwy4';
@@ -18,7 +18,7 @@ function showToast(msg){
     c.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},2800);
 }
 
-/* === HASH (SHA-256 via Web Crypto) === */
+
 function sha256(text){
     try {
         var enc = new TextEncoder();
@@ -31,12 +31,12 @@ function sha256(text){
     }
 }
 
-/* === DEFAULTS === */
+
 function defaultBanner(){return{title:'Impressoras, multifuncionais e peças',title2:'com garantia e procedência',subtitle:'Desde equipamentos e suprimentos até peças originais e genéricas.',bgUrl:'',bgColor:'linear-gradient(170deg, #0d2f5e 0%, #0a1f3f 100%)',btnText:'Ver Produtos'}}
 function defaultConfig(){return{company:'BIANCO & FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA',brand:'B&F Importes',cnpj:'03.108.169/0001-58',phone:'(16) 98138-6747',email:'atendimento@biancoeferreira.com.br',hours:'Seg–Sex 8h às 18h | Sáb 8h às 13h',address:'R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090',cep:'14870-090',cityState:'Jaboticabal — SP'}}
 function defaultCategories(){return['impressoras','multifuncionais','pecas','suprimentos']}
 
-/* === AUTH (Supabase) === */
+
 var adminLayout=document.getElementById('adminLayout');
 
 function showDashboard(){adminLayout.classList.add('active');renderAll();setTimeout(initCharts,100);refreshPreview()}
@@ -46,14 +46,14 @@ function logout(){
     });
 }
 
-/* proteção da rota: sem sessão, volta para o login */
+
 supabase.auth.getSession().then(function(res){
     if(!res.data || !res.data.session){ window.location.replace('/admin/login'); return; }
     showDashboard();
 });
 document.getElementById('btnAdminLogout').addEventListener('click',logout);
 
-/* === TABS === */
+
 document.querySelectorAll('#sideNav a').forEach(function(a){
     a.addEventListener('click',function(){
         document.querySelectorAll('#sideNav a').forEach(function(l){l.classList.remove('active')});
@@ -68,7 +68,7 @@ document.querySelectorAll('#sideNav a').forEach(function(a){
     });
 });
 
-/* === PRODUCT IMAGE UPLOAD (Storage - múltiplas imagens) === */
+
 var prodImgFiles = [];
 
 function renderProdImgThumbs(){
@@ -136,10 +136,10 @@ function deleteImageByUrl(url){
     if(m&&m[1]) supabase.storage.from('produtos').remove([m[1]]);
 }
 
-/* === RENDER ALL === */
+
 function renderAll(){renderStock();renderAnuncios();loadBannerForm();loadConfigForm();renderUsers();renderCategories();renderPedidos();renderDashboard()}
 
-/* === STOCK TABLE + ADD (Supabase) === */
+
 function renderStock(){
     var tbody=document.getElementById('stockBody');
     tbody.innerHTML='<tr><td colspan="7" class="empty-state">Carregando produtos...</td></tr>';
@@ -173,96 +173,30 @@ function renderStock(){
 function bindStockEdits(tbody){
     tbody.querySelectorAll('.tbl-input').forEach(function(inp){
         inp.addEventListener('change',function(){
-            var row=inp.closest('tr'),id=row.getAttribute('data-id');
-            var field=inp.getAttribute('data-field'),val=inp.value.trim();
+            var row=inp.closest('tr'),id=row.getAttribute('data-id'),field=inp.getAttribute('data-field'),val=inp.value.trim();
             if(!id)return;
             var update={};
-            if(field==='nome'){ if(!val)return; update.nome=val; }
-            else if(field==='categoria'){ update.categoria=val; }
-            else if(field==='preco'){ update.preco=parsePrice(val); }
-            else if(field==='estoque'){ update.estoque=parseInt(val)||0; }
-            else return;
-            supabase.from('produtos').update(update).eq('id',id).then(function(res){
-                if(res.error){ showToast('&#9888; '+res.error.message); return; }
-                showToast('&#9989; Alteração salva!');
-                if(field==='estoque')renderStock();
-            });
+            if(field==='nome'){if(!val)return;update.nome=val}else if(field==='categoria')update.categoria=val;else if(field==='preco')update.preco=parsePrice(val);else if(field==='estoque')update.estoque=parseInt(val)||0;else return;
+            supabase.from('produtos').update(update).eq('id',id).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}showToast('&#9989; Alteração salva!');if(field==='estoque')renderStock()});
         });
     });
 }
 
 window.uploadTblImg=function(input,id){
     var file=input.files[0];if(!file)return;
-    uploadImagesToStorage([file]).then(function(urls){
-        var url = urls[0] || null;
-        return supabase.from('produtos').update({imagem_url:url}).eq('id',id);
-    }).then(function(res){
-        if(res.error){ showToast('&#9888; '+res.error.message); return; }
-        showToast('&#128247; Imagem atualizada!');
-        renderStock();
-    }).catch(function(err){ showToast('&#9888; '+(err.message||err)); });
+    uploadImagesToStorage([file]).then(function(urls){return supabase.from('produtos').update({imagem_url:urls[0]||null}).eq('id',id)}).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}showToast('&#128247; Imagem atualizada!');renderStock()}).catch(function(err){showToast('&#9888; '+(err.message||err))});
 };
 
 window.deleteProduct=function(id){
     if(!confirm('Remover produto permanentemente?'))return;
-    supabase.from('produtos').select('imagem_url,imagens').eq('id',id).single().then(function(res){
-        if(res.data){
-            var urls = [];
-            if(res.data.imagem_url) urls.push(res.data.imagem_url);
-            if(Array.isArray(res.data.imagens)) urls = urls.concat(res.data.imagens);
-            urls.forEach(function(u){ deleteImageByUrl(u); });
-        }
-        return supabase.from('produtos').delete().eq('id',id);
-    }).then(function(res){
-        if(res.error){ showToast('&#9888; '+res.error.message); return; }
-        showToast('&#128465; Produto removido.');
-        renderStock();
-    });
+    supabase.from('produtos').delete().eq('id',id).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}showToast('&#128465; Produto removido.');renderStock()});
 };
 
 document.getElementById('btnAddProduct').addEventListener('click',function(){
-    var name=document.getElementById('prodName').value.trim();
-    var cat=document.getElementById('prodCat').value;
-    var price=document.getElementById('prodPrice').value.trim();
-    var stock=parseInt(document.getElementById('prodStock').value)||0;
-    var desc=document.getElementById('prodDesc').value.trim();
-    var longDesc=document.getElementById('prodLongDesc').value.trim();
-    var installments=parseInt(document.getElementById('prodInstallments').value)||10;
-    var msg=document.getElementById('prodAddMsg');
-    if(!name){msg.textContent='Informe o nome.';msg.style.color='var(--danger)';return}
-    if(!price){msg.textContent='Informe o preço.';msg.style.color='var(--danger)';return}
-    msg.textContent='Salvando...';msg.style.color='var(--text-muted)';
-    uploadImagesToStorage(prodImgFiles).then(function(urls){
-        var primary = urls[0] || null;
-        var rest = urls.slice(1);
-        return supabase.from('produtos').insert([{
-            nome:name,
-            categoria:cat,
-            preco:parsePrice(price),
-            estoque:stock,
-            descricao_curta:desc||name,
-            imagem_url:primary,
-            imagens: rest.length ? rest : null
-        }]);
-    }).then(function(res){
-        if(res.error){
-            msg.textContent='Erro ao salvar.';msg.style.color='var(--danger)';
-            showToast('&#9888; '+res.error.message);
-            return;
-        }
-        showToast('&#9989; "'+name+'" adicionado!');
-        renderStock();
-        ['prodName','prodPrice','prodDesc','prodLongDesc'].forEach(function(id){document.getElementById(id).value=''});
-        document.getElementById('prodImgFile').value='';
-        prodImgFiles = [];
-        renderProdImgThumbs();
-        document.getElementById('prodStock').value='10';
-        msg.textContent='Adicionado com sucesso!';msg.style.color='var(--success)';
-        setTimeout(function(){msg.textContent=''},3000);
-    }).catch(function(err){ msg.textContent='Erro ao salvar.';msg.style.color='var(--danger)'; showToast('&#9888; '+(err.message||err)); });
+    var name=document.getElementById('prodName').value.trim(),cat=document.getElementById('prodCat').value,price=document.getElementById('prodPrice').value.trim(),stock=parseInt(document.getElementById('prodStock').value)||0,desc=document.getElementById('prodDesc').value.trim(),msg=document.getElementById('prodAddMsg');
+    if(!name){msg.textContent='Informe o nome.';return}if(!price){msg.textContent='Informe o preço.';return}msg.textContent='Salvando...';
+    uploadImagesToStorage(prodImgFiles).then(function(urls){return supabase.from('produtos').insert([{nome:name,categoria:cat,preco:parsePrice(price),estoque:stock,descricao_curta:desc||name,imagem_url:urls[0]||null,imagens:urls.slice(1)}])}).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}showToast('&#9989; Produto adicionado!');renderStock()}).catch(function(err){showToast('&#9888; '+(err.message||err))});
 });
-
-/* === CATEGORIES === */
 function getCategories(){
     var cats=load(CATEGORIES_KEY,[]);
     if(!cats.length){cats=defaultCategories();save(CATEGORIES_KEY,cats)}
@@ -327,17 +261,19 @@ window.removeCat=function(i){
     showToast('&#128465; Categoria removida.');
 };
 
-/* === ANÚNCIOS === */
-var anunciosTemp=null;
-function renderAnuncios(){
+
+var anunciosTemp=[];
+async function renderAnuncios(){
     var list=document.getElementById('anunciosList'),html='';
-    if(!anunciosTemp||!anunciosTemp.length){anunciosTemp=load(ANUNCIOS_KEY,[]);if(!anunciosTemp.length){anunciosTemp=[{name:'Anúncio 1',data:''},{name:'Anúncio 2',data:''},{name:'Anúncio 3',data:''},{name:'Anúncio 4',data:''}]}}
+    if(!supabase) return;
+    var result=await supabase.from('anuncios').select('id,nome,imagem_url,tipo').eq('tipo','galeria').order('ordem',{ascending:true});
+    anunciosTemp=result.data||[];
     anunciosTemp.forEach(function(a,idx){
-        var imgTag=a.data?'<img src="'+a.data+'">':'<div style="width:100px;height:80px;background:var(--bg-input);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.7rem;">Sem imagem</div>';
+        var imgTag=a.imagem_url?'<img src="'+escAttr(a.imagem_url)+'" alt="'+escAttr(a.nome)+'">':'<div style="width:100px;height:80px;background:var(--bg-input);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.7rem;">Sem imagem</div>';
         html+='<div class="anuncio-card" data-idx="'+idx+'">'+
             imgTag+
             '<div class="info">'+
-                '<input class="tbl-input" value="'+(a.name||'')+'" placeholder="Nome do anúncio" data-idx="'+idx+'" data-field="name" style="margin-bottom:4px;">'+
+                '<input class="tbl-input" value="'+escAttr(a.nome||'')+'" placeholder="Nome do anúncio" data-idx="'+idx+'" data-field="nome" style="margin-bottom:4px;">'+
                 '<div class="actions">'+
                     '<label class="tbl-img-upload" style="cursor:pointer;"><input type="file" accept="image/*" style="display:none;" onchange="uploadAnuncioImg(this,'+idx+')">&#128247; Trocar Imagem</label>'+
                     '<button class="btn btn-outline btn-sm" onclick="removeAnuncio('+idx+')">&#128465; Remover</button>'+
@@ -346,47 +282,31 @@ function renderAnuncios(){
         '</div>';
     });
     list.innerHTML=html||'<div class="empty-state">Nenhum anúncio.</div>';
-
     list.querySelectorAll('.tbl-input').forEach(function(inp){
-        inp.addEventListener('change',function(){
-            var idx=parseInt(inp.getAttribute('data-idx'));
-            if(anunciosTemp[idx])anunciosTemp[idx].name=inp.value.trim();
-        });
+        inp.addEventListener('change',function(){var idx=parseInt(inp.getAttribute('data-idx'));if(anunciosTemp[idx])supabase.from('anuncios').update({nome:inp.value.trim()}).eq('id',anunciosTemp[idx].id)});
     });
 }
 
 window.uploadAnuncioImg=function(input,idx){
-    var file=input.files[0];if(!file)return;
-    var reader=new FileReader();
-    reader.onload=function(ev){
-        if(anunciosTemp[idx])anunciosTemp[idx].data=ev.target.result;
-        showToast('&#128247; Imagem carregada!');
-        renderAnuncios();
-    };
-    reader.readAsDataURL(file);
+    var file=input.files[0];if(!file||!anunciosTemp[idx])return;
+    var path='anuncios/'+Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
+    supabase.storage.from('anuncios').upload(path,file,{cacheControl:'3600',upsert:false}).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return Promise.reject(res.error)}var url=supabase.storage.from('anuncios').getPublicUrl(path).data.publicUrl;return supabase.from('anuncios').update({imagem_url:url}).eq('id',anunciosTemp[idx].id)}).then(function(res){if(res&&res.error)showToast('&#9888; '+res.error.message);else{showToast('&#128247; Imagem carregada!');renderAnuncios()}}).catch(function(){});
 };
 
 window.removeAnuncio=function(idx){
     if(!confirm('Remover este anúncio?'))return;
-    anunciosTemp.splice(idx,1);
-    renderAnuncios();
-    showToast('&#128465; Anúncio removido. Salve para confirmar.');
+    supabase.from('anuncios').delete().eq('id',anunciosTemp[idx].id).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}renderAnuncios();showToast('&#128465; Anúncio removido.')});
 };
 
 document.getElementById('btnAddAnuncio').addEventListener('click',function(){
-    anunciosTemp.push({name:'Novo Anúncio',data:''});
-    renderAnuncios();
-    showToast('&#10133; Novo slot adicionado.');
+    supabase.from('anuncios').insert({nome:'Novo anúncio',tipo:'galeria',ativo:true,ordem:anunciosTemp.length}).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}renderAnuncios();showToast('&#10133; Novo slot adicionado.')});
 });
 
 document.getElementById('btnSaveAnuncios').addEventListener('click',function(){
-    anunciosTemp.forEach(function(a){if(!a.name)a.name='Anúncio'});
-    save(ANUNCIOS_KEY,anunciosTemp);
-    document.getElementById('anuncioMsg').textContent='Salvos! Recarregue o site.';document.getElementById('anuncioMsg').style.color='var(--success)';
+    renderAnuncios();
+    document.getElementById('anuncioMsg').textContent='Salvos no Supabase.';document.getElementById('anuncioMsg').style.color='var(--success)';
     showToast('&#9989; Anúncios salvos!');
 });
-
-/* === BANNERS === */
 function loadBannerForm(){
     var b=load(BANNER_KEY,defaultBanner());
     ['bannerTitle','bannerSubtitle','bannerBgUrl','bannerBgColor','bannerBtnText'].forEach(function(id){document.getElementById(id).value=b[id.replace('banner','').replace(/([A-Z])/g,'-$1').toLowerCase().replace(/^-/,'')]||''});
@@ -404,7 +324,7 @@ document.getElementById('btnSaveBanner').addEventListener('click',function(){
 });
 document.getElementById('btnResetBanner').addEventListener('click',function(){save(BANNER_KEY,defaultBanner());loadBannerForm();showToast('&#8635; Restaurado ao padrão.')});
 
-/* === CONFIG === */
+
 function loadConfigForm(){
     var c=load(CONFIG_KEY,defaultConfig());
     ['cfgCompany','cfgBrand','cfgCNPJ','cfgPhone','cfgEmail','cfgHours','cfgAddress','cfgCEP','cfgCityState'].forEach(function(id){document.getElementById(id).value=''});
@@ -424,7 +344,7 @@ document.getElementById('btnSaveConfig').addEventListener('click',function(){
     showToast('&#9989; Configurações salvas!');
 });
 
-/* === USERS === */
+
 function renderUsers(){
     var users=load(USERS_KEY,[]),html='';
     users.forEach(function(u,i){
@@ -548,7 +468,7 @@ window.deleteUser=function(i){
     users.splice(i,1);save(USERS_KEY,users);renderUsers();showToast('&#9989; Removido.');
 };
 
-/* === PEDIDOS === */
+
 var pedidosFilterAtual = 'todos';
 
 function renderPedidos(){
@@ -616,7 +536,7 @@ document.querySelectorAll('.filter-pedido').forEach(function(btn){
     });
 });
 
-/* === DASHBOARD (métricas) === */
+
 function renderDashboard(){
     var pedidos = load(PEDIDOS_KEY, []);
     var users = load(USERS_KEY, []);
@@ -637,7 +557,7 @@ function renderDashboard(){
     renderPedidosPendentes();
 }
 
-/* === ÚLTIMOS PEDIDOS PENDENTES (mini-tabela) === */
+
 function renderPedidosPendentes(){
     var tbody = document.getElementById('pedidosPendentesBody');
     if(!tbody) return;
@@ -646,8 +566,6 @@ function renderPedidosPendentes(){
         .filter(function(p){ return p.status === 'pendente'; })
         .sort(function(a,b){ return (b.timestamp || 0) - (a.timestamp || 0); })
         .slice(0, 5);
-
-    // dados fictícios temporários (apenas visual) quando não há pedidos pendentes
     if(pendentes.length === 0){
         pendentes = [
             { id: 'BF-DEMO01', cliente: 'Maria Oliveira', total: 1149.00 },
@@ -667,7 +585,7 @@ function renderPedidosPendentes(){
     tbody.innerHTML = html;
 }
 
-/* === GRÁFICOS (Chart.js) === */
+
 var _vendasChart = null;
 var _statusChart = null;
 function initCharts(){
@@ -745,7 +663,7 @@ function initCharts(){
     }
 }
 
-/* === PESQUISA NAS TABELAS (filtro em tempo real) === */
+
 function bindTableSearch(inputId, tbodyId){
     var input = document.getElementById(inputId);
     var tbody = document.getElementById(tbodyId);
@@ -762,7 +680,7 @@ function bindTableSearch(inputId, tbodyId){
 bindTableSearch('searchStock', 'stockBody');
 bindTableSearch('searchPedidos', 'pedidosBody');
 
-/* === EXPORTAÇÃO CSV === */
+
 function csvCell(v){
     var s = String(v == null ? '' : v);
     if(/[";\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
@@ -820,7 +738,7 @@ function exportPedidosCSV(){
 document.getElementById('btnExportStock').addEventListener('click', exportStockCSV);
 document.getElementById('btnExportPedidos').addEventListener('click', exportPedidosCSV);
 
-/* === DETALHES DO PEDIDO (modal) === */
+
 window.verDetalhesPedido = function(id){
     var pedidos = load(PEDIDOS_KEY, []);
     var p = null;
@@ -849,8 +767,6 @@ window.verDetalhesPedido = function(id){
 
     document.getElementById('pedidoDetalhesBody').innerHTML = html;
     document.getElementById('pedidoDetalhesModal').style.display = 'flex';
-
-    // botão de WhatsApp com mensagem pré-preenchida
     var btnWpp = document.getElementById('btnWhatsPedido');
     if(btnWpp){
         var digits = (p.phone || '').replace(/\D/g, '');
@@ -876,7 +792,7 @@ document.addEventListener('keydown', function(e){
     if(e.key === 'Escape') closePedidoDetalhes();
 });
 
-/* === TOGGLE DO FORMULÁRIO DE PRODUTO === */
+
 document.getElementById('btnToggleProductForm').addEventListener('click', function(){
     var card = document.getElementById('productFormCard');
     var showing = card.style.display !== 'none';
@@ -888,14 +804,14 @@ document.getElementById('btnToggleProductForm').addEventListener('click', functi
     }
 });
 
-/* === PREVIEW === */
+
 function refreshPreview(){
     var f = document.getElementById('previewFrame');
     if(f) f.src = '/?t=' + Date.now();
 }
 document.getElementById('btnRefreshPreview').addEventListener('click', refreshPreview);
 
-/* ── JANELA FLUTUANTE: abrir/fechar, modo mobile/desktop e arrastar ── */
+
 var _previewPanel = document.getElementById('previewPanel');
 var _previewHeader = _previewPanel.querySelector('.preview-header');
 
@@ -911,7 +827,7 @@ function closePreview(){
 document.getElementById('previewFab').addEventListener('click', openPreview);
 document.getElementById('previewClose').addEventListener('click', closePreview);
 
-/* alterna Mobile (375px) / Desktop (1000px) */
+
 function setPreviewMode(mode){
     var mobile = (mode === 'mobile');
     if(_previewPanel) _previewPanel.classList.toggle('mode-mobile', mobile);
@@ -921,7 +837,7 @@ function setPreviewMode(mode){
 document.getElementById('previewMobile').addEventListener('click', function(){ setPreviewMode('mobile'); });
 document.getElementById('previewDesktop').addEventListener('click', function(){ setPreviewMode('desktop'); });
 
-/* arrastar a janela pelo cabeçalho */
+
 var _drag = null;
 _previewHeader.addEventListener('mousedown', function(e){
     if(e.target.closest('button')) return;
@@ -947,7 +863,7 @@ _saveIds.forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.addEventListener('click', function(){ setTimeout(refreshPreview, 300); });
 });
-/* updateStock with refresh */
+
 window.updateStock = function(el){
     var id = el.getAttribute('data-id');
     var val = parseInt(el.value) || 0;

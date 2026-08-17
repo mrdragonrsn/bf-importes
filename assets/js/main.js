@@ -5,12 +5,13 @@ function openLightbox(src){
 }
 
 (function(){
-    /* ── SUPABASE CLIENT ───────────── */
+
     var SUPABASE_URL = 'https://trirxmcalxktampbujyr.supabase.co';
     var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaXJ4bWNhbHhrdGFtcGJ1anlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjU3MzEsImV4cCI6MjEwMjIwMTczMX0.sr6dx1qSK8cqV4e1g6-jMz99T2WTw9Q0jX1iHb-Vwy4';
     var supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    window.bfSupabase = supabase;
 
-    /* ── DADOS DOS PRODUTOS (fonte: Supabase) ── */
+
     var productData = {};
 
     var PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23e2e8f0'/%3E%3Cg transform='translate(188,138)' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E";
@@ -18,8 +19,7 @@ function openLightbox(src){
 
     function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    /* Normaliza as imagens de um produto em array de URLs.
-       Compatível com: `imagens` (array), `imagem_url` (string), `image`/`imagem` (string legada). */
+
     function getImages(p){
         if(!p) return [];
         var arr = [];
@@ -85,8 +85,6 @@ function openLightbox(src){
         }
 
         grid.innerHTML = '<div class="empty-state">Carregando produtos...</div>';
-
-        // lê ?busca= da URL
         var params = new URLSearchParams(window.location.search);
         var termo = (params.get('busca') || '').trim();
 
@@ -96,7 +94,6 @@ function openLightbox(src){
 
             var res = await supabase.rpc('buscar_produtos_inteligente', { termo_busca: termo });
             if(res.error){
-                // fallback: função RPC ainda não criada — usa ilike direto
                 res = await supabase.from('produtos').select('*').ilike('nome', '%'+termo+'%').order('nome',{ascending:true});
             }
             if(res.error){
@@ -134,7 +131,7 @@ function openLightbox(src){
     }
     renderProducts();
 
-    /* ── CARROSSEL DE DESTAQUES DA HOME (dinâmico do Supabase) ── */
+
     async function renderHomeFeatured(){
         var track = document.getElementById('featuredTrack');
         if(!track || !supabase) return;
@@ -143,7 +140,6 @@ function openLightbox(src){
         if(res.error || !res.data || !res.data.length) return;
 
         var rows = res.data;
-        // popula productData para stock-info e modal funcionarem na home
         rows.forEach(function(p){
             productData[p.nome] = {
                 images: getImages(p),
@@ -169,7 +165,7 @@ function openLightbox(src){
     }
     renderHomeFeatured();
 
-    /* ── RENDER ESTOQUE ──────────────── */
+
     function renderStock() {
         document.querySelectorAll('.stock-info').forEach(function(el){
             var name = el.getAttribute('data-product');
@@ -185,7 +181,7 @@ function openLightbox(src){
     }
     renderStock();
 
-    /* ── IMAGENS DOS PRODUTOS (placeholder + img do admin) ── */
+
     function renderProductImages(){
         document.querySelectorAll('.product-card').forEach(function(card){
             var si = card.querySelector('.stock-info');
@@ -204,7 +200,7 @@ function openLightbox(src){
     }
     renderProductImages();
 
-    /* ── CARRINHO ────────────────────── */
+
     var CART_KEY = 'bf_cart';
     function loadCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
     function saveCart(arr){ localStorage.setItem(CART_KEY, JSON.stringify(arr)); }
@@ -307,7 +303,7 @@ function openLightbox(src){
     var btnCartH = document.getElementById('btnCartHeader');
     if (btnCartH) btnCartH.addEventListener('click', openCart);
 
-    /* ── CHECKOUT ────────────────────── */
+
     var checkoutOverlay = document.getElementById('checkoutOverlay');
     var checkoutSummary = document.getElementById('checkoutSummary');
 
@@ -402,7 +398,7 @@ function openLightbox(src){
             });
         }
 
-    /* ── SYNC CATEGORIAS DO ADMIN ────── */
+
     (function(){
         var filterBar = document.getElementById('filterBar');
         if(!filterBar) return;
@@ -492,7 +488,7 @@ function openLightbox(src){
                 document.getElementById('checkoutSuccess').style.display = 'block';
                 document.getElementById('btnConfirmOrder').style.display = 'none';
 
-                /* ── SALVAR PEDIDO NO localStorage ── */
+
                 try {
                     var orders = JSON.parse(localStorage.getItem('bf_orders')||'[]');
                     orders.push({
@@ -532,7 +528,7 @@ function openLightbox(src){
         });
     }
 
-    /* ── MÁSCARAS DE INPUT ──────────── */
+
     (function(){
         function applyMask(input, fn){
             if(!input) return;
@@ -594,7 +590,7 @@ function openLightbox(src){
         }
     })();
 
-    /* ── CEP AUTOCOMPLETE ───────────── */
+
     (function(){
         var cepInput = document.getElementById('coCEP');
         if(!cepInput) return;
@@ -623,7 +619,7 @@ function openLightbox(src){
         });
     })();
 
-    /* ── HASH (SHA-256 via Web Crypto) ── */
+
     function sha256(text){
         try {
             var enc = new TextEncoder();
@@ -636,7 +632,7 @@ function openLightbox(src){
         }
     }
 
-    /* ── AUTH ─────────────────────────── */
+
     var USERS_KEY = 'bf_users';
     var SESSION_KEY = 'bf_session';
     function loadUsers(){ try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; } catch(e){ return []; } }
@@ -764,7 +760,7 @@ function openLightbox(src){
             });
         });
 
-        /* ── FORGOT PASSWORD ───────────── */
+
         var boxReset = document.getElementById('authBoxReset');
         var RESET_KEY = 'bf_reset';
 
@@ -889,7 +885,7 @@ function openLightbox(src){
         });
     }
 
-    /* ── TOAST ────────────────────────── */
+
     function showToast(msg){
         var container = document.getElementById('toastContainer');
         if (!container) return;
@@ -900,7 +896,7 @@ function openLightbox(src){
         setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 2500);
     }
 
-    /* ── CONTATO INTERATIVO ───────────── */
+
     var phoneEl = document.getElementById('contactPhone');
     if (phoneEl) {
         phoneEl.addEventListener('click', function(){
@@ -922,7 +918,7 @@ function openLightbox(src){
         });
     }
 
-    /* ── PRODUTOS: add-to-cart + modal + filtro ── */
+
     var productGrid = document.querySelector('.product-grid');
     if (productGrid) {
         productGrid.addEventListener('click', function(e){
@@ -965,7 +961,7 @@ function openLightbox(src){
         }
     }
 
-    /* ── MODAL DE PRODUTO ────────────── */
+
     var overlay = document.getElementById('productModal');
     if (overlay) {
         var modalClose = document.getElementById('modalClose');
@@ -1060,8 +1056,6 @@ function openLightbox(src){
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-
-        // expõe a abertura do modal para reuso (ex.: carrossel da home)
         window.openProductModal = openModal;
 
         if (modalAddCart) modalAddCart.addEventListener('click', function(){
@@ -1122,7 +1116,7 @@ function openLightbox(src){
         });
     }
 
-    /* ── KEYDOWN ESCAPE ──────────────── */
+
     document.addEventListener('keydown', function(e){
         if (e.key === 'Escape') {
             if (overlay && overlay.classList.contains('active')) {
@@ -1138,7 +1132,7 @@ function openLightbox(src){
         }
     });
 
-    /* ── CHAT WIDGET ────────────────── */
+
     var panel = document.getElementById('chatPanel');
     if (panel) {
         var toggle = document.getElementById('chatToggle');
@@ -1207,7 +1201,7 @@ function openLightbox(src){
     renderCart();
     updateBadge();
 
-    /* ── PENDING CHECKOUT ──────────────── */
+
     try {
         if (currentUser && localStorage.getItem('bf_pending_checkout')) {
             localStorage.removeItem('bf_pending_checkout');
@@ -1216,7 +1210,7 @@ function openLightbox(src){
         }
     } catch(e) {}
 
-    /* ── BUSCA INTELIGENTE (Autocomplete + Histórico) ── */
+
     (function(){
         var wrap = document.getElementById('headerSearchWrap');
         if(!wrap) return;
@@ -1341,7 +1335,6 @@ function openLightbox(src){
             }
             var res = await supabase.rpc('buscar_produtos_inteligente', { termo_busca: term });
             if(res.error){
-                // fallback: função RPC ainda não criada — usa ilike direto na tabela
                 res = await supabase.from('produtos').select('*').ilike('nome', '%'+term+'%').limit(10);
             }
             if(res.error){ renderResults([], term); return; }
@@ -1399,7 +1392,7 @@ function openLightbox(src){
         });
     })();
 
-    /* ── MEUS PEDIDOS ────────────────── */
+
     (function(){
         function openMeusPedidos(){
             var overlay = document.getElementById('pedidosOverlay');
@@ -1458,7 +1451,7 @@ function openLightbox(src){
         });
     })();
 
-    /* ── PERFIL DO USUÁRIO ────────────── */
+
     (function(){
         var PERFIL_KEY = 'bf_profiles';
 
@@ -1698,7 +1691,7 @@ function openLightbox(src){
         if(cartaoNumero) cartaoNumero.addEventListener('input', function(){ this.value = maskCardPerfil(this.value); });
         if(cartaoValidade) cartaoValidade.addEventListener('input', function(){ this.value = maskExpiryPerfil(this.value); });
 
-        /* ── Auto-fill checkout from profile ── */
+
         var origOpenCheckout = openCheckout;
         openCheckout = function(){
             origOpenCheckout();
@@ -1727,7 +1720,7 @@ function openLightbox(src){
         };
     })();
 
-    /* ── FRETE DINÂMICO ─────────────── */
+
     (function(){
         renderCheckoutSummary = (function(original){
             return function(){
@@ -1768,7 +1761,7 @@ function openLightbox(src){
         window.calcFrete = calcFrete;
     })();
 
-    /* ── WHATSAPP NOTIFICAÇÃO ─────────── */
+
     (function(){
         var btnWpp = document.getElementById('btnWppShare');
         if(!btnWpp) return;
@@ -1802,7 +1795,7 @@ function openLightbox(src){
         }
     } catch(e) {}
 
-    /* ── SYNC: BANNER ─────────────── */
+
     try {
         var banner = JSON.parse(localStorage.getItem('bf_banner')||'{}');
         if(banner.title){
@@ -1827,31 +1820,23 @@ function openLightbox(src){
         }
     } catch(e) {}
 
-    /* ── SYNC: ANÚNCIOS ────────────── */
-    try {
-        var anun = JSON.parse(localStorage.getItem('bf_anuncios')||'[]');
-        if(anun && anun.length > 0){
-            var grid = document.getElementById('anunciosGrid');
-            if(grid){
-                var html = '';
-                anun.forEach(function(a){
-                    if(a.data){
-                        html += '<img src="'+a.data+'" alt="'+(a.name||'Anúncio')+'" class="ad-img" loading="lazy">';
-                    }
-                });
-                if(html) grid.innerHTML = html;
-            }
-        }
-    } catch(e) {}
+
+     var grid = document.getElementById('anunciosGrid');
+     if(grid && window.bfSupabase){
+         window.bfSupabase.from('anuncios').select('nome,imagem_url').eq('tipo','galeria').eq('ativo',true).order('ordem',{ascending:true}).then(function(res){
+             if(res.error || !res.data) return;
+             grid.innerHTML = res.data.filter(function(a){ return a.imagem_url; }).map(function(a){
+                 return '<img src="'+esc(a.imagem_url)+'" alt="'+esc(a.nome)+'" class="ad-img" loading="lazy">';
+             }).join('');
+         });
+     }
 })();
 
-/* ══════════════════════════════════════════════════════════════════
-   MELHORIAS DE UX / ANIMAÇÕES / ACESSIBILIDADE (aditivo)
-══════════════════════════════════════════════════════════════════ */
+
 (function(){
     'use strict';
 
-    /* ── LIGHTBOX (delegação de eventos) ─────────────────────────── */
+
     (function(){
         var lb = document.getElementById('lightbox');
         if (!lb) return;
@@ -1864,26 +1849,25 @@ function openLightbox(src){
             lb.classList.add('active');
         }
 
-        /* abre ao clicar em qualquer imagem com a classe .ad-img */
+
         document.addEventListener('click', function(e){
             var ad = e.target.closest ? e.target.closest('.ad-img') : null;
             if (ad) { openLightbox(ad.src, ad.alt || ad.getAttribute('alt') || ''); }
         });
 
-        /* fecha ao clicar no overlay (fora da imagem) ou no botão */
+
         lb.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
         if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
         document.addEventListener('keydown', function(e){
             if (e.key === 'Escape' && lb.classList.contains('active')) closeLightbox();
         });
 
-        /* mantém compatibilidade com chamadas antigas */
+
         window.openLightbox = openLightbox;
     })();
 
-    /* ── SCROLL REVEAL / FADE-UP (IntersectionObserver) ───────────── */
+
     (function(){
-        // Aplica a classe .fade-up nos elementos-chave e um delay em cascata
         function applyFadeUp(){
             var groups = [
                 '.section-title',
@@ -1903,8 +1887,6 @@ function openLightbox(src){
                 });
             });
         }
-
-        // Observa todos os .fade-up e revela quando entram na viewport
         function observeFadeUp(){
             var els = document.querySelectorAll('.fade-up');
             if (!('IntersectionObserver' in window)) {
@@ -1915,7 +1897,6 @@ function openLightbox(src){
                 entries.forEach(function(entry){
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        // limpa o delay após a entrada para não atrasar os hovers
                         entry.target.addEventListener('transitionend', function onEnd(){
                             entry.target.style.transitionDelay = '';
                             entry.target.removeEventListener('transitionend', onEnd);
@@ -1926,9 +1907,6 @@ function openLightbox(src){
             }, { threshold: 0.15 });
             els.forEach(function(el){ observer.observe(el); });
         }
-
-        // Revela o hero imediatamente após o carregamento, sem depender do
-        // IntersectionObserver (que pode não disparar a tempo para o topo)
         function revealHero(){
             var hero = document.getElementById('heroSection');
             if (!hero || !hero.classList.contains('fade-up')) return;
@@ -1951,7 +1929,7 @@ function openLightbox(src){
         }
     })();
 
-    /* ── CARROSSEL DE DESTAQUES (autoplay + responsivo) ───────────── */
+
     (function(){
         var track = document.getElementById('featuredTrack');
         if (!track) return;
@@ -2038,18 +2016,12 @@ function openLightbox(src){
             update();
             startAutoplay();
         }
-
-        // expõe re-inicialização após renderização dinâmica
         window.initFeaturedCarousel = init;
 
         if (nextBtn) nextBtn.addEventListener('click', function(){ goNext(); restartAutoplay(); });
         if (prevBtn) prevBtn.addEventListener('click', function(){ goPrev(); restartAutoplay(); });
-
-        // pausa o autoplay ao passar o mouse
         viewport.addEventListener('mouseenter', stopAutoplay);
         viewport.addEventListener('mouseleave', startAutoplay);
-
-        // suporte a toque (swipe) no mobile
         var startX = null;
         viewport.addEventListener('touchstart', function(e){
             startX = e.touches[0].clientX;
@@ -2063,8 +2035,6 @@ function openLightbox(src){
                 restartAutoplay();
             }
         }, { passive: true });
-
-        // recalcula ao redimensionar
         var resizeTimer;
         window.addEventListener('resize', function(){
             clearTimeout(resizeTimer);
@@ -2074,8 +2044,6 @@ function openLightbox(src){
                 update();
             }, 150);
         });
-
-        // abre o modal do produto ao clicar em um card (sem redirecionar)
         track.addEventListener('click', function(e){
             var card = e.target.closest('.product-card');
             if (!card) return;
@@ -2083,8 +2051,6 @@ function openLightbox(src){
                 window.openProductModal(card);
             }
         });
-
-        // suporte a teclado (Enter/Espaço) para acessibilidade
         track.addEventListener('keydown', function(e){
             if (e.key !== 'Enter' && e.key !== ' ') return;
             var card = e.target.closest('.product-card');
@@ -2099,24 +2065,11 @@ function openLightbox(src){
     })();
 })();
 
-/* ══════════════════════════════════════════════════════════════════
-   ANÚNCIOS DINÂMICOS (Rotação aleatória de promos do Facebook)
-══════════════════════════════════════════════════════════════════ */
+
 (function(){
     'use strict';
 
-    var PROMOS = [
-        { img: '/assets/images/promos/promo1.jpg', tag: 'Locação Comercial', title: 'Economize com Locação de Impressoras', text: 'Solução ideal para empresas imprimirem sem custos extras com compra de equipamentos.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid024EgBApiJszkqFSrxEWeMCvrf1scVPa3Z6WkNntgf3teMqEwQEXuLB8v2yX95d6nFl' },
-        { img: '/assets/images/promos/promo2.jpg', tag: 'Suprimentos', title: 'Sua Impressora Pronta para a Semana', text: 'Inicie a semana com estoque de tintas e cartuchos renovados.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid036BVL8xTLTJTzrUiErTCPvLgspjmxd2NfmG3xTPKFDwLp8oZRSHAjvbHf7a7dRy2Ml' },
-        { img: '/assets/images/promos/promo3.svg', tag: 'Assistência Técnica', title: 'Luz Vermelha Piscando?', text: 'Se a sua impressora apresentou falha ou luz de alerta, chame nossa assistência especializada.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid0TU7QFKtihHe6ApZBB9X11xAEgP8d2EwFjL7EdsQNiNQ61vtZY5rEVwE8sTgDcbBMl' },
-        { img: '/assets/images/promos/promo4.jpg', tag: 'Planos Corporativos', title: 'Planos de Locação sem Custo Inicial', text: 'Equipamentos modernos com manutenção inclusa e flexibilidade para o seu negócio.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid036SfnM8N1Vj8vm71FpriZt4SNRDjctN8uLrnMV3prwgZ7jqJtRgAmnkXHhheJ12QFl' },
-        { img: '/assets/images/promos/promo5.jpg', tag: 'Loja Física', title: 'Recarga Rápida de Cartuchos', text: 'Traga seu cartucho até nossa loja física para recarga rápida com valor especial.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid02UmnxVnfUTnjaLLRqmXDuPvcMEHoMVTEpp2xdLpiAgVkhUiLwMgRacgv4Q8Z7ELeul' },
-        { img: '/assets/images/promos/promo6.jpg', tag: 'Solução Rápida', title: 'Papel em Branco? A Gente Resolve', text: 'Quando a folha sai em branco ou falhada, conte com a nossa assistência para voltar a imprimir.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid02tdA6Uytg81ssnQ1nUkh2Lw4wBX4dhrGfUHerEtw9PZprCa65WqJfbXN6AXCxGPQCl' },
-        { img: '/assets/images/promos/promo7.jpg', tag: 'Atendimento', title: 'Produtos com a Melhor Qualidade', text: 'Oferecemos a melhor qualidade e atendimento para nossos clientes. Vem pra B&F!', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid02ZzrKnC44gqEBc4DWccRSB9zSNmCQa5BhSNT3P7GYfDd1i5g5uV7wPeFxmVXgj3eVl' },
-        { img: '/assets/images/promos/promo8.jpg', tag: 'Rotina', title: 'Hora de Voltar aos Trabalhos', text: 'Garanta todos os suprimentos necessários para manter a produtividade em dia.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid0ERirNtEkeYAp1fpCbiXc8bFSYP5ZAK3HB14eHFEsSe6wnXADK4j5csFKx1vtcV2yl' },
-        { img: '/assets/images/promos/promo9.jpg', tag: 'Referência', title: 'Referência em Impressoras e Cartuchos', text: 'Conheça nossos produtos e serviços e descubra por que somos referência na região.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid0Ej5zF7EvFv6UDExkAfwvQKsgvpWCpokjwbpDDicLvAEp5qUFJELjQHsJrAnFCFonl' },
-        { img: '/assets/images/promos/promo10.jpg', tag: 'Guia de Compra', title: 'Pensando em Comprar uma Impressora Nova?', text: 'Confira as dicas que podem ajudar na hora da decisão de compra.', link: 'https://www.facebook.com/bfjaboticabal/posts/pfbid02kSXipBp9ReXvxua6W6jTkjv8AYrPvE6nQpC5bEiSzyqxR5a6ZZqYzLL1SQiXHUthl' }
-    ];
+    var PROMOS = [];
 
     function shuffle(arr){
         var a = arr.slice();
@@ -2135,7 +2088,6 @@ function openLightbox(src){
 
         function applySelection(){
             var selection = shuffle(PROMOS).slice(0, slots.length);
-            // evita repetir o mesmo anúncio no mesmo slot entre ciclos consecutivos
             slots.forEach(function(slot, idx){
                 if(selection[idx] && lastSelection[idx] && selection[idx].img === lastSelection[idx].img){
                     var alt = PROMOS.find(function(p){ return p.img !== selection[idx].img && selection.indexOf(p) === -1; });
@@ -2165,13 +2117,22 @@ function openLightbox(src){
             });
         }
 
-        applySelection();
-        setInterval(applySelection, 7000);
+         applySelection();
+         setInterval(applySelection, 15000);
+     }
+
+    function loadPromos(){
+        var client = window.bfSupabase;
+        if(!client) return;
+        client.from('anuncios').select('imagem_url,nome,tag,titulo,descricao,link').eq('tipo','promo').eq('ativo',true).order('ordem',{ascending:true}).then(function(res){
+            if(res.error || !res.data) return;
+            PROMOS = res.data.map(function(a){
+                return {img:a.imagem_url,tag:a.tag,title:a.titulo,text:a.descricao,link:a.link};
+            });
+            initPromos();
+        });
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPromos);
-    } else {
-        initPromos();
-    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadPromos);
+    else loadPromos();
 })();

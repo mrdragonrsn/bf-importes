@@ -30,7 +30,7 @@
 
     <main class="main-content">
 
-        <!-- ========== DASHBOARD (VISÃO GERAL) ========== -->
+
         <div class="tab-panel active" id="tab-dashboard">
             <h1 class="page-title">&#128200; Dashboard</h1>
             <p class="page-sub">Visão geral do desempenho da loja</p>
@@ -90,17 +90,17 @@
             </div>
         </div>
 
-        <!-- ========== ESTOQUE (UNIFICADO) ========== -->
+
         <div class="tab-panel" id="tab-estoque">
             <h1 class="page-title">&#128230; Estoque &amp; Produtos</h1>
             <p class="page-sub">Adicione produtos e gerencie tudo em tempo real</p>
 
-            <!-- Botão para alternar o formulário -->
+
             <div class="flex-row" style="justify-content:space-between;margin-bottom:12px;">
                 <button class="btn btn-primary" id="btnToggleProductForm">&#10133; Novo Produto</button>
             </div>
 
-            <!-- Add Product Form (oculto por padrão) -->
+
             <div class="card" id="productFormCard" style="display:none;">
                 <h3>&#10133; Adicionar Produto</h3>
                 <div class="form-row">
@@ -131,7 +131,7 @@
                 </div>
             </div>
 
-            <!-- Categories management -->
+
             <div class="card">
                 <h3>&#128220; Gerenciar Categorias</h3>
                 <div class="form-row">
@@ -141,7 +141,7 @@
                 <div id="catList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
             </div>
 
-            <!-- Stock Table (Fully Editable) -->
+
             <div class="card">
                 <h3>&#128202; Produtos Cadastrados</h3>
                 <div class="flex-row" style="justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;">
@@ -157,7 +157,7 @@
             </div>
         </div>
 
-        <!-- ========== BANNERS ========== -->
+
         <div class="tab-panel" id="tab-banners">
             <h1 class="page-title">&#127912; Gerenciar Banners</h1>
             <p class="page-sub">Altere o banner principal do site</p>
@@ -180,7 +180,7 @@
             </div>
         </div>
 
-        <!-- ========== ANÚNCIOS ========== -->
+
         <div class="tab-panel" id="tab-anuncios">
             <h1 class="page-title">&#128444; Gerenciar Anúncios</h1>
             <p class="page-sub">Adicione, remova ou altere as imagens de anúncio do site</p>
@@ -197,7 +197,7 @@
             </div>
         </div>
 
-        <!-- ========== CONFIGURAÇÕES ========== -->
+
         <div class="tab-panel" id="tab-config">
             <h1 class="page-title">&#9881; Configurações do Site</h1>
             <p class="page-sub">Dados da empresa, contato e endereço</p>
@@ -225,7 +225,7 @@
             </div>
         </div>
 
-        <!-- ========== PEDIDOS ========== -->
+
         <div class="tab-panel" id="tab-pedidos">
             <h1 class="page-title">&#128230; Pedidos</h1>
             <p class="page-sub">Visualize e gerencie os pedidos realizados no site</p>
@@ -250,7 +250,7 @@
             </div>
         </div>
 
-        <!-- ========== USUÁRIOS ========== -->
+
         <div class="tab-panel" id="tab-usuarios">
             <h1 class="page-title">&#128101; Gerenciar Usuários</h1>
             <p class="page-sub">Adicione, edite, redefina senhas e configure permissões</p>
@@ -259,7 +259,7 @@
                     <h3 style="margin:0;">Usuários Cadastrados</h3>
                     <button class="btn btn-primary btn-sm" id="btnShowAddUser">&#10133; Novo Usuário</button>
                 </div>
-                <!-- Add/Edit User Form -->
+
                 <div id="userFormCard" class="card" style="display:none;background:var(--bg-input);margin-bottom:14px;">
                     <h3 id="userFormTitle">&#10133; Adicionar Usuário</h3>
                     <div class="form-row">
@@ -274,7 +274,7 @@
                         <input type="hidden" id="userFormIdx" value="-1">
                     </div>
                 </div>
-                <!-- Reset Password Modal inline -->
+
                 <div id="resetPassCard" class="card" style="display:none;background:var(--bg-input);margin-bottom:14px;">
                     <h3>&#128274; Redefinir Senha: <span id="resetPassUser"></span></h3>
                     <div class="form-row">
@@ -287,7 +287,7 @@
                         <input type="hidden" id="resetPassIdx" value="-1">
                     </div>
                 </div>
-                <!-- Users Table -->
+
                 <table>
                     <thead><tr><th>Nome</th><th>E-mail</th><th>Permissão</th><th style="width:130px;">Ações</th></tr></thead>
                     <tbody id="usersBody"><tr><td colspan="4" class="empty-state">Nenhum usuário.</td></tr></tbody>
@@ -297,10 +297,10 @@
 
     </main>
 
-    <!-- ── FAB PRÉ-VISUALIZAÇÃO ───────── -->
+
     <button class="preview-fab" id="previewFab" aria-label="Abrir pré-visualização" title="Pré-visualização">&#128065;</button>
 
-    <!-- ── OFFCANVAS PRÉ-VISUALIZAÇÃO ──── -->
+
     <aside class="preview-panel" id="previewPanel">
         <div class="preview-header">
             <span>&#128065; Pré-visualização</span>
@@ -320,7 +320,7 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ── MODAL DETALHES DO PEDIDO ── -->
+
 <div class="modal-overlay-admin" id="pedidoDetalhesModal" style="display:none;">
     <div class="modal-card-admin">
         <div class="modal-head-admin">
