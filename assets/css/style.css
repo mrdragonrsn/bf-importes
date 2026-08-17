@@ -659,6 +659,25 @@
         .contact-section .section-title,
         .contact-section .section-subtitle { color: var(--branco); }
         .contact-section .divide { background: var(--azul-brilho); }
+        .contact-form-section { padding: 0 0 72px; background: var(--branco); }
+        .contact-form-layout { display: grid; grid-template-columns: minmax(0, .85fr) minmax(360px, 1.15fr); gap: clamp(36px, 7vw, 92px); align-items: center; }
+        .contact-form-copy { max-width: 390px; }
+        .contact-form-copy > span { display: inline-flex; margin-bottom: 16px; color: var(--azul-padrao); font-size: .72rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+        .contact-form-copy h2 { margin: 0 0 16px; color: var(--azul-escuro); font-size: clamp(2rem, 3.6vw, 3rem); letter-spacing: -.045em; line-height: 1.05; }
+        .contact-form-copy p { margin: 0; color: #53657a; line-height: 1.7; }
+        .contact-form-card { display: grid; gap: 15px; padding: 28px; background: #fff; border: 1px solid #dbe5f0; border-radius: 20px; box-shadow: 0 18px 50px rgba(10,31,63,.08); }
+        .contact-form-field { display: grid; gap: 7px; }
+        .contact-form-field label { color: var(--azul-escuro); font-size: .78rem; font-weight: 800; }
+        .contact-form-field input, .contact-form-field textarea { width: 100%; padding: 12px 13px; border: 1px solid #cbd5e1; border-radius: 10px; color: var(--azul-escuro); font: inherit; outline: none; resize: vertical; transition: border-color 180ms ease, box-shadow 180ms ease; }
+        .contact-form-field input:focus, .contact-form-field textarea:focus { border-color: var(--azul-padrao); box-shadow: 0 0 0 4px rgba(26,86,184,.12); }
+        .contact-form-submit { padding: 13px 18px; border: 0; border-radius: 10px; background: var(--azul-padrao); color: #fff; cursor: pointer; font: inherit; font-weight: 800; transition: background-color 180ms ease, transform 140ms ease; }
+        .contact-form-submit:hover { background: var(--azul-medio); }
+        .contact-form-submit:active { transform: scale(.98); }
+        .contact-form-submit:disabled { cursor: wait; opacity: .7; }
+        .contact-form-status { min-height: 20px; margin: 0; color: #53657a; font-size: .84rem; }
+        .contact-form-status.success { color: #15803d; }
+        .contact-form-status.error { color: #b91c1c; }
+        @media (max-width: 760px) { .contact-form-layout { grid-template-columns: 1fr; gap: 30px; } .contact-form-copy { max-width: 540px; } }
         .contact-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

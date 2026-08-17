@@ -679,7 +679,12 @@ function openLightbox(src){
         function doLogin(){
             var login = document.getElementById('loginEmail').value.trim();
             var pass = document.getElementById('loginPass').value;
-            supabase.auth.signInWithPassword({email:login,password:pass}).then(function(res){
+            var lookup=login.indexOf('@')>=0?Promise.resolve({data:{email:login}}):supabase.from('profiles').select('email').ilike('nome',login).maybeSingle();
+            lookup.then(function(profile){
+                var email=profile.data&&profile.data.email;
+                if(!email)throw new Error('Usuário não encontrado');
+                return supabase.auth.signInWithPassword({email:email,password:pass});
+            }).then(function(res){
                 if(res.error){
                     var le = document.getElementById('loginError'); if (le) le.textContent = 'Usuário ou senha inválidos.';
                     return;
@@ -687,7 +692,7 @@ function openLightbox(src){
                 authOverlay.classList.remove('active');
                  showToast('Bem-vindo!');
                 setTimeout(function(){ location.reload(); }, 600);
-            });
+            }).catch(function(){var le=document.getElementById('loginError');if(le)le.textContent='Usuário ou senha inválidos.'});
         }
 
         function fazerLogin(e){
@@ -717,6 +722,7 @@ function openLightbox(src){
             if (pass.length < 4) { var re = document.getElementById('regError'); if (re) re.textContent = 'Senha deve ter ao menos 4 caracteres.'; return; }
             supabase.auth.signUp({email:email,password:pass,options:{data:{nome:name}}}).then(function(res){
                 if(res.error){ var re = document.getElementById('regError'); if (re) re.textContent = res.error.message; return; }
+                if(res.data.user && !res.data.session){ var re = document.getElementById('regError'); if (re) re.textContent = 'Conta criada. Verifique seu e-mail para confirmar o cadastro.'; return; }
                 authOverlay.classList.remove('active');
                 showToast('&#127881; Conta criada com sucesso!');
                 setTimeout(function(){ location.reload(); }, 600);
@@ -868,6 +874,21 @@ function openLightbox(src){
         emailEl.addEventListener('click', function(){
             var em = emailEl.getAttribute('data-email');
             window.location.href = 'mailto:' + em;
+        });
+    }
+
+    var contactForm = document.getElementById('contactForm');
+    if(contactForm){
+        contactForm.addEventListener('submit',function(e){
+            e.preventDefault();
+            var button=document.getElementById('contactSubmit');
+            var status=document.getElementById('contactStatus');
+            var data={name:document.getElementById('contactName').value.trim(),email:document.getElementById('contactEmailInput').value.trim(),message:document.getElementById('contactMessage').value.trim()};
+            button.disabled=true;
+            button.textContent='Enviando...';
+            status.className='contact-form-status';
+            status.textContent='';
+            fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(res){return res.json().then(function(body){if(!res.ok)throw new Error(body.error||'Não foi possível enviar');return body})}).then(function(){status.className='contact-form-status success';status.textContent='Mensagem enviada com sucesso.';contactForm.reset();button.textContent='Enviado!';setTimeout(function(){button.textContent='Enviar mensagem';button.disabled=false},2500)}).catch(function(error){status.className='contact-form-status error';status.textContent=error.message;button.textContent='Tentar novamente';button.disabled=false});
         });
     }
 
