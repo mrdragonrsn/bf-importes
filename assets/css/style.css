@@ -1336,6 +1336,7 @@
             background: rgba(0,0,0,0.5);
             z-index: 1100;
             display: none;
+            animation: fadeOverlay 240ms ease both;
         }
         .cart-overlay.active { display: block; }
         .cart-sidebar {
@@ -1350,7 +1351,7 @@
             box-shadow: -4px 0 24px rgba(0,0,0,0.18);
             display: flex;
             flex-direction: column;
-            transition: right 0.3s ease;
+            transition: right 300ms cubic-bezier(0.32, 0.72, 0, 1), box-shadow 300ms ease;
         }
         .cart-sidebar.active { right: 0; }
         .cart-header-bar {
@@ -1360,9 +1361,11 @@
             padding: 18px 22px;
             border-bottom: 1px solid #e2e8f0;
         }
-        .cart-header-bar h3 { font-size: 1.12rem; font-weight: 700; color: var(--azul-escuro); }
-        .cart-close {
-            background: none;
+         .cart-header-bar h3 { display: flex; align-items: center; gap: 8px; font-size: 1.12rem; font-weight: 700; color: var(--azul-escuro); }
+         .cart-close {
+             display: grid;
+             place-items: center;
+             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
@@ -1460,8 +1463,11 @@
             transition: all 0.25s;
         }
         .btn-checkout:hover { background: var(--azul-medio); transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 22px rgba(26, 86, 184, 0.4); }
-        .btn-clear-cart {
-            background: none;
+         .btn-clear-cart {
+             display: flex;
+             align-items: center;
+             gap: 6px;
+             background: none;
             border: 1px solid #e2e8f0;
             color: #94a3b8;
             padding: 4px 10px;
@@ -1497,6 +1503,8 @@
             box-shadow: 0 12px 48px rgba(0,0,0,0.25);
             animation: slideUp 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
         }
+        .auth-box[style*="display: block"] { animation: authPanelSwap 260ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+        @keyframes authPanelSwap { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .auth-box h3 { display: flex; align-items: center; justify-content: center; gap: 9px; font-size: 1.3rem; font-weight: 800; color: var(--azul-escuro); margin-bottom: 24px; text-align: center; }
         .auth-title-icon { color: var(--azul-padrao); }
         .auth-field {
@@ -2233,6 +2241,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            animation: fadeOverlay 300ms ease both;
         }
         .pedidos-overlay.active { display: flex; }
         .pedidos-modal {
@@ -2255,8 +2264,10 @@
             border-bottom: 1px solid #e2e8f0;
             background: #f8fafc;
         }
-        .pedidos-modal-header h3 { font-size: 1.15rem; font-weight: 800; color: var(--azul-escuro); }
+        .pedidos-modal-header h3 { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; font-weight: 800; color: var(--azul-escuro); }
         .pedidos-modal-close {
+            display: grid;
+            place-items: center;
             background: none;
             border: none;
             font-size: 1.6rem;
@@ -2347,6 +2358,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            animation: fadeOverlay 300ms ease both;
         }
         .perfil-overlay.active { display: flex; }
         .perfil-modal {
@@ -2374,7 +2386,7 @@
         .perfil-close:hover { color: #1e293b; }
         .perfil-tabs { display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 20px; background: #f8fafc; gap: 4px; }
         .perfil-tab {
-            padding: 12px 16px; border: none; background: none; cursor: pointer; font-weight: 600; font-size: 0.82rem;
+            display: inline-flex; align-items: center; gap: 7px; padding: 12px 16px; border: none; background: none; cursor: pointer; font-weight: 600; font-size: 0.82rem;
             color: #94a3b8; border-bottom: 3px solid transparent; transition: all 0.2s; font-family: inherit; margin-bottom: -1px;
         }
         .perfil-tab:hover { color: var(--azul-padrao); }
@@ -2388,8 +2400,9 @@
             display: flex; align-items: center; justify-content: center; font-size: 2.4rem; margin-bottom: 10px;
             overflow: hidden; border: 3px solid var(--azul-padrao);
         }
+        .perfil-foto svg { color: var(--azul-padrao); }
         .btn-perfil-foto {
-            font-size: 0.78rem; color: var(--azul-padrao); cursor: pointer; font-weight: 600; padding: 4px 12px; border: 1px solid var(--azul-padrao); border-radius: 14px; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--azul-padrao); cursor: pointer; font-weight: 600; padding: 6px 12px; border: 1px solid var(--azul-padrao); border-radius: 14px; transition: all 0.2s;
         }
         .btn-perfil-foto:hover { background: #eff6ff; }
         .perfil-field { margin-bottom: 12px; }
@@ -2401,7 +2414,7 @@
         .perfil-field input:read-only { background: #f1f5f9; color: #64748b; }
         .perfil-row { display: flex; gap: 10px; }
         .btn-perfil-salvar {
-            display: block; width: 100%; background: var(--azul-padrao); color: #fff; padding: 11px 0;
+            display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: var(--azul-padrao); color: #fff; padding: 11px 0;
             border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.86rem;
             font-family: inherit; margin-top: 6px; transition: all 0.25s;
         }
@@ -2413,7 +2426,7 @@
         }
         .btn-perfil-cancel:hover { background: var(--cinza-claro); }
         .btn-add-cartao {
-            display: block; width: 100%; background: none; color: var(--azul-padrao); padding: 10px 0;
+            display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: none; color: var(--azul-padrao); padding: 10px 0;
             border: 2px dashed var(--azul-padrao); border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.84rem;
             font-family: inherit; margin: 10px 0; transition: all 0.2s;
         }

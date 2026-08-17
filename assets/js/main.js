@@ -250,7 +250,7 @@ function openLightbox(src){
             var h = '';
             cart.forEach(function(item, idx){
                 var pd = productData[item.title];
-                var thumb = (pd && pd.images && pd.images[0]) ? '<img src="'+pd.images[0]+'" alt="" style="width:100%;height:100%;object-fit:cover;">' : '&#128424;';
+                var thumb = (pd && pd.images && pd.images[0]) ? '<img src="'+pd.images[0]+'" alt="" style="width:100%;height:100%;object-fit:cover;">' : '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12v20H6z"/><path d="M9 6h6M9 10h6M9 14h6M9 18h3"/></svg>';
                 h += '<div class="cart-item">' +
                     '<div class="cart-item-img">' + thumb + '</div>' +
                     '<div class="cart-item-info">' +
@@ -305,7 +305,7 @@ function openLightbox(src){
             cart = [];
             renderCart();
             saveCart(cart);
-            showToast('&#128465; Carrinho limpo.');
+            showToast('Carrinho limpo.');
         }
     });
     if (cartOverlay) cartOverlay.addEventListener('click', function(e){ if (e.target === cartOverlay) closeCart(); });
@@ -318,10 +318,10 @@ function openLightbox(src){
 
     if (checkoutOverlay && checkoutSummary) {
         function renderCheckoutSummary(){
-            var h = '<h4>&#128722; Resumo do Pedido</h4>';
+            var h = '<h4>Resumo do Pedido</h4>';
             cart.forEach(function(item){
                 var pd = productData[item.title];
-                var thumb = (pd && pd.images && pd.images[0]) ? '<img src="'+pd.images[0]+'" alt="" style="width:100%;height:100%;object-fit:cover;">' : '&#128424;';
+                var thumb = (pd && pd.images && pd.images[0]) ? '<img src="'+pd.images[0]+'" alt="" style="width:100%;height:100%;object-fit:cover;">' : '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12v20H6z"/><path d="M9 6h6M9 10h6M9 14h6M9 18h3"/></svg>';
                 h += '<div class="checkout-item-mini">' +
                     '<div class="checkout-item-img">' + thumb + '</div>' +
                     '<div class="info"><strong>' + item.title + '</strong><span>' + item.qty + 'x ' + item.price + '</span></div>' +
@@ -401,7 +401,7 @@ function openLightbox(src){
             pixKeyEl.addEventListener('click', function(){
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(pixKeyEl.textContent).then(function(){
-                        showToast('&#128247; Chave PIX copiada!');
+                        showToast('Chave PIX copiada!');
                     });
                 }
             });
@@ -636,7 +636,7 @@ function openLightbox(src){
                 var packageIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M3 12l9 5 9-5"/><path d="M3 16l9 5 9-5"/></svg>';
                 var logoutIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>';
                 var adminBtn = currentProfile && currentProfile.role === 'admin' ? '<a href="/admin" class="user-menu-link">'+adminIcon+'<span>Painel Admin</span></a>' : '';
-                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">'+userIcon+'<span>' + (currentProfile ? currentProfile.nome : currentUser.email) + '</span></button><div class="user-menu" id="userMenu"><a href="/perfil" class="user-menu-link">'+userIcon+'<span>Perfil</span></a><a href="/pedidos" class="user-menu-link">'+packageIcon+'<span>Meus Pedidos</span></a>'+adminBtn+'<button id="btnLogout">'+logoutIcon+'<span>Sair</span></button></div></div>';
+                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">'+userIcon+'<span>' + (currentProfile ? currentProfile.nome : currentUser.email) + '</span></button><div class="user-menu" id="userMenu"><a href="/perfil" id="btnPerfil" class="user-menu-link">'+userIcon+'<span>Perfil</span></a><a href="/pedidos" id="btnMeusPedidos" class="user-menu-link">'+packageIcon+'<span>Meus Pedidos</span></a>'+adminBtn+'<button id="btnLogout">'+logoutIcon+'<span>Sair</span></button></div></div>';
                 var unameBtn = document.getElementById('userNameBtn');
                 if (unameBtn) unameBtn.addEventListener('click', function(e){ e.stopPropagation(); var m = document.getElementById('userMenu'); if (m) m.classList.toggle('open'); });
                 var logoutBtn = document.getElementById('btnLogout');
@@ -685,7 +685,7 @@ function openLightbox(src){
                     return;
                 }
                 authOverlay.classList.remove('active');
-                showToast('&#128100; Bem-vindo!');
+                 showToast('Bem-vindo!');
                 setTimeout(function(){ location.reload(); }, 600);
             });
         }
@@ -1373,6 +1373,15 @@ function openLightbox(src){
             if(overlay){ overlay.classList.remove('active'); document.body.style.overflow = ''; }
         }
 
+        document.addEventListener('click', function(e){
+            var ordersLink=e.target.closest ? e.target.closest('#btnMeusPedidos') : null;
+            if(!ordersLink)return;
+            e.preventDefault();
+            var menu=document.getElementById('userMenu');
+            if(menu)menu.classList.remove('open');
+            openMeusPedidos();
+        });
+
         var closePedidosBtn = document.getElementById('pedidosClose');
         if(closePedidosBtn) closePedidosBtn.addEventListener('click', closeMeusPedidos);
 
@@ -1407,7 +1416,7 @@ function openLightbox(src){
             if(perfil.foto_url || perfil.foto){
                 document.getElementById('perfilFoto').innerHTML = '<img src="'+(perfil.foto_url || perfil.foto)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
             } else {
-                document.getElementById('perfilFoto').innerHTML = '&#128100;';
+                document.getElementById('perfilFoto').innerHTML = '<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>';
             }
 
             if(perfil.endereco){
@@ -1454,7 +1463,7 @@ function openLightbox(src){
                         '<div class="cartao-3d" onclick="this.classList.toggle(\'flipped\')">' +
                             '<div class="cartao-3d-face cartao-3d-front '+bandeiraCls+'">' +
                                 '<button class="cartao-3d-remove" onclick="event.stopPropagation();window.removeCartao('+i+')" title="Remover">&times;</button>' +
-                                '<div class="cartao-3d-top"><span class="cartao-3d-band">'+c.bandeira.toUpperCase()+'</span><span class="cartao-3d-chip">💳</span></div>' +
+                                 '<div class="cartao-3d-top"><span class="cartao-3d-band">'+c.bandeira.toUpperCase()+'</span><span class="cartao-3d-chip"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg></span></div>' +
                                 '<div class="cartao-3d-numero">•••• •••• •••• '+ultimos4+'</div>' +
                                 '<div class="cartao-3d-bottom">' +
                                     '<div><span class="cartao-3d-nome">'+c.nome+'</span></div>' +
@@ -1479,7 +1488,7 @@ function openLightbox(src){
             var perfil = loadPerfil() || {};
             if(perfil.cartoes) perfil.cartoes.splice(idx,1);
             savePerfil({cartoes: perfil.cartoes || []}).then(function(){ renderCartoes(currentProfile); });
-            showToast('&#128465; Cartão removido.');
+             showToast('Cartão removido.');
         };
 
         var fotoInput = document.getElementById('perfilFotoInput');
@@ -1502,7 +1511,7 @@ function openLightbox(src){
                                 var url=supabase.storage.from('perfis').getPublicUrl(path).data.publicUrl;
                                 document.getElementById('perfilFoto').innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
                                 savePerfil({foto_url:url});
-                                showToast('&#128247; Foto atualizada!');
+                                showToast('Foto atualizada!');
                             });
                         },'image/webp',0.82);
                     };
@@ -1521,7 +1530,7 @@ function openLightbox(src){
                 currentUser.user_metadata.nome = nome;
             });
             var btn = document.getElementById('userNameBtn');
-            if(btn) btn.innerHTML = '&#128100; ' + nome;
+            if(btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>' + nome + '</span>';
             showToast('&#9989; Dados salvos!');
         });
 
@@ -1710,14 +1719,14 @@ function openLightbox(src){
             supabase.from('pedidos').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(1).maybeSingle().then(function(res){
             if(res.error || !res.data) return;
             var o = res.data;
-            var msg = '🔹 *Pedido Confirmado* - B&F Importes\n\n';
-            msg += '📦 *Pedido:* ' + o.codigo + '\n';
-            msg += '📅 *Data:* ' + new Date(o.created_at).toLocaleString('pt-BR') + '\n';
-            msg += '💳 *Pagamento:* ' + (o.pagamento === 'card' ? 'Cartão' : o.pagamento === 'pix' ? 'PIX' : 'Boleto') + '\n';
-            msg += '💰 *Total:* R$ ' + parseFloat(o.total).toFixed(2).replace('.',',') + '\n\n';
-            msg += '👤 *Cliente:* ' + (o.cliente.nome || '') + '\n';
-            msg += '📧 *E-mail:* ' + (o.cliente.email || '') + '\n\n';
-            msg += '📋 *Itens:*\n';
+            var msg = '*Pedido Confirmado* - B&F Importes\n\n';
+            msg += '*Pedido:* ' + o.codigo + '\n';
+            msg += '*Data:* ' + new Date(o.created_at).toLocaleString('pt-BR') + '\n';
+            msg += '*Pagamento:* ' + (o.pagamento === 'card' ? 'Cartão' : o.pagamento === 'pix' ? 'PIX' : 'Boleto') + '\n';
+            msg += '*Total:* R$ ' + parseFloat(o.total).toFixed(2).replace('.',',') + '\n\n';
+            msg += '*Cliente:* ' + (o.cliente.nome || '') + '\n';
+            msg += '*E-mail:* ' + (o.cliente.email || '') + '\n\n';
+            msg += '*Itens:*\n';
             o.itens.forEach(function(item, i){
                 msg += '  ' + (i+1) + '. ' + item.titulo + ' (' + item.qtd + 'x ' + item.preco + ')\n';
             });
