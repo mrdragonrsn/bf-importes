@@ -18,14 +18,15 @@ create unique index if not exists anuncios_tipo_ordem_idx on public.anuncios (ti
 
 drop policy if exists "anuncios public read" on public.anuncios;
 drop policy if exists "anuncios authenticated write" on public.anuncios;
+drop policy if exists "anuncios admin write" on public.anuncios;
 
 create policy "anuncios public read"
   on public.anuncios for select
   using (ativo = true);
 
-create policy "anuncios authenticated write"
+create policy "anuncios admin write"
   on public.anuncios for all to authenticated
-  using (true) with check (true);
+  using (public.is_admin()) with check (public.is_admin());
 
 insert into public.anuncios (tipo, nome, tag, titulo, descricao, link, imagem_url, ordem)
 values
@@ -58,11 +59,12 @@ on conflict (id) do update set public = true;
 
 drop policy if exists "anuncios storage public read" on storage.objects;
 drop policy if exists "anuncios storage authenticated write" on storage.objects;
+drop policy if exists "anuncios storage admin write" on storage.objects;
 
 create policy "anuncios storage public read"
   on storage.objects for select
   using (bucket_id = 'anuncios');
 
-create policy "anuncios storage authenticated write"
+create policy "anuncios storage admin write"
   on storage.objects for all to authenticated
-  using (bucket_id = 'anuncios') with check (bucket_id = 'anuncios');
+  using (bucket_id = 'anuncios' and public.is_admin()) with check (bucket_id = 'anuncios' and public.is_admin());

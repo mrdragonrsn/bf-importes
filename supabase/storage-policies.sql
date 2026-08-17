@@ -1,7 +1,6 @@
 -- Políticas RLS do Storage para o bucket "produtos"
 -- Execute este script no SQL Editor do Supabase (Dashboard > SQL Editor > New query > Run)
--- O bucket "produtos" já foi criado como público. Este script libera upload/remoção
--- via anon key (necessário porque o painel admin atual não usa Supabase Auth).
+-- O bucket "produtos" é público apenas para leitura. Escrita exige usuário admin.
 
 begin;
 
@@ -10,25 +9,29 @@ drop policy if exists "produtos public read" on storage.objects;
 drop policy if exists "produtos anon insert" on storage.objects;
 drop policy if exists "produtos anon update" on storage.objects;
 drop policy if exists "produtos anon delete" on storage.objects;
+drop policy if exists "produtos admin insert" on storage.objects;
+drop policy if exists "produtos admin update" on storage.objects;
+drop policy if exists "produtos admin delete" on storage.objects;
 
 -- Leitura pública dos objetos do bucket (redundante em bucket público, mas explícito)
 create policy "produtos public read"
   on storage.objects for select
   using (bucket_id = 'produtos');
 
--- Upload anônimo no bucket produtos (caminho deve começar com "produtos/")
-create policy "produtos anon insert"
+create policy "produtos admin insert"
   on storage.objects for insert
-  with check (bucket_id = 'produtos');
+  to authenticated
+  with check (bucket_id = 'produtos' and public.is_admin());
 
--- Atualização anônima (troca de imagem via upsert)
-create policy "produtos anon update"
+create policy "produtos admin update"
   on storage.objects for update
-  using (bucket_id = 'produtos');
+  to authenticated
+  using (bucket_id = 'produtos' and public.is_admin())
+  with check (bucket_id = 'produtos' and public.is_admin());
 
--- Remoção anônima (apagar imagem ao excluir produto)
-create policy "produtos anon delete"
+create policy "produtos admin delete"
   on storage.objects for delete
-  using (bucket_id = 'produtos');
+  to authenticated
+  using (bucket_id = 'produtos' and public.is_admin());
 
 commit;
