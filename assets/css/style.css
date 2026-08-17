@@ -1485,28 +1485,34 @@
         .auth-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(5, 19, 39, 0.72);
             z-index: 1200;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
             animation: fadeOverlay 300ms ease both;
         }
         .auth-overlay.active { display: flex; }
         .auth-box {
+            position: relative;
+            overflow: hidden;
             background: var(--branco);
-            border-radius: 14px;
-            width: 380px;
+            border: 1px solid rgba(255,255,255,.65);
+            border-radius: 20px;
+            width: 420px;
             max-width: 100%;
-            padding: 36px 30px 30px;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+            padding: 42px 36px 34px;
+            box-shadow: 0 28px 80px rgba(3, 17, 38, 0.34), 0 4px 14px rgba(3, 17, 38, 0.12);
             animation: slideUp 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
         }
+        .auth-box::before { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--azul-padrao), var(--azul-claro)); content: ''; }
         .auth-box[style*="display: block"] { animation: authPanelSwap 260ms cubic-bezier(0.23, 1, 0.32, 1) both; }
         @keyframes authPanelSwap { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .auth-box h3 { display: flex; align-items: center; justify-content: center; gap: 9px; font-size: 1.3rem; font-weight: 800; color: var(--azul-escuro); margin-bottom: 24px; text-align: center; }
-        .auth-title-icon { color: var(--azul-padrao); }
+        .auth-title-icon { width: 40px; height: 40px; padding: 9px; color: var(--azul-padrao); background: #eff6ff; border: 1px solid #dbeafe; border-radius: 12px; }
         .auth-field {
             margin-bottom: 16px;
         }
@@ -2235,34 +2241,37 @@
         .pedidos-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(5, 19, 39, 0.72);
             z-index: 1300;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
             animation: fadeOverlay 300ms ease both;
         }
         .pedidos-overlay.active { display: flex; }
         .pedidos-modal {
             background: var(--branco);
-            border-radius: 14px;
-            width: 800px;
+            border: 1px solid rgba(255,255,255,.65);
+            border-radius: 20px;
+            width: 880px;
             max-width: 100%;
             max-height: 85vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.25);
-            animation: slideUp 0.3s ease;
+            box-shadow: 0 28px 80px rgba(3, 17, 38, 0.34), 0 4px 14px rgba(3, 17, 38, 0.12);
+            animation: slideUp 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
             overflow: hidden;
         }
         .pedidos-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 22px;
+            padding: 21px 26px;
             border-bottom: 1px solid #e2e8f0;
-            background: #f8fafc;
+            background: #ffffff;
         }
         .pedidos-modal-header h3 { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; font-weight: 800; color: var(--azul-escuro); }
         .pedidos-modal-close {
@@ -2278,7 +2287,7 @@
         }
         .pedidos-modal-close:hover { color: #1e293b; }
         .pedidos-modal-body {
-            padding: 20px;
+            padding: 24px 26px 28px;
             overflow-y: auto;
             flex: 1;
         }
@@ -2352,46 +2361,49 @@
         .perfil-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(5, 19, 39, 0.72);
             z-index: 1350;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
             animation: fadeOverlay 300ms ease both;
         }
         .perfil-overlay.active { display: flex; }
         .perfil-modal {
             background: var(--branco);
-            border-radius: 14px;
-            width: 520px;
+            border: 1px solid rgba(255,255,255,.65);
+            border-radius: 20px;
+            width: 560px;
             max-width: 100%;
             max-height: 85vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.25);
-            animation: slideUp 0.3s ease;
+            box-shadow: 0 28px 80px rgba(3, 17, 38, 0.34), 0 4px 14px rgba(3, 17, 38, 0.12);
+            animation: slideUp 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
             overflow: hidden;
         }
         .perfil-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 22px;
+            padding: 21px 26px;
             border-bottom: 1px solid #e2e8f0;
-            background: #f8fafc;
+            background: #ffffff;
         }
         .perfil-header h3 { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; font-weight: 800; color: var(--azul-escuro); }
         .perfil-close { display: grid; place-items: center; background: none; border: none; cursor: pointer; color: #64748b; padding: 4px; line-height: 1; }
         .perfil-close:hover { color: #1e293b; }
-        .perfil-tabs { display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 20px; background: #f8fafc; gap: 4px; }
+        .perfil-tabs { display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 24px; background: #ffffff; gap: 4px; }
         .perfil-tab {
             display: inline-flex; align-items: center; gap: 7px; padding: 12px 16px; border: none; background: none; cursor: pointer; font-weight: 600; font-size: 0.82rem;
             color: #94a3b8; border-bottom: 3px solid transparent; transition: all 0.2s; font-family: inherit; margin-bottom: -1px;
         }
         .perfil-tab:hover { color: var(--azul-padrao); }
         .perfil-tab.active { color: var(--azul-padrao); border-bottom-color: var(--azul-padrao); }
-        .perfil-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .perfil-body { padding: 24px 26px 28px; overflow-y: auto; flex: 1; }
         .perfil-panel { display: none; }
         .perfil-panel.active { display: block; }
         .perfil-foto-area { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
