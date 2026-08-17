@@ -100,6 +100,7 @@ document.querySelectorAll('#sideNav a').forEach(function(a){
         if(tabName === 'anuncios') renderAnuncios();
         if(tabName === 'banners') loadBannerForm();
         if(tabName === 'dashboard'){ renderDashboard(); initCharts(); }
+        if(tabName === 'mensagens') renderMensagens();
     });
 });
 
@@ -905,5 +906,125 @@ window.updateStock = function(el){
         setTimeout(refreshPreview, 500);
     });
 };
+
+function renderMensagens(){
+    var container = document.getElementById('mensagensLista');
+    if(!container) return;
+    container.innerHTML = '<div class="empty-state">Carregando...</div>';
+    supabase.from('contato_mensagens').select('*').order('created_at',{ascending:false}).then(function(res){
+        if(res.error){
+            container.innerHTML = '<div class="empty-state">Erro ao carregar mensagens.</div>';
+            return;
+        }
+        var msgs = res.data || [];
+        if(!msgs.length){
+            container.innerHTML = '<div class="empty-state">Nenhuma mensagem recebida.</div>';
+            return;
+        }
+        container.innerHTML = '<table><thead><tr><th>Data</th><th>Nome</th><th>E-mail</th><th>Mensagem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="mensagensBody"></tbody></table>';
+        var tbody = document.getElementById('mensagensBody');
+        msgs.forEach(function(m){
+            var date = new Date(m.created_at);
+            var dateStr = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+            var statusBadge = m.respondida ? '<span class="badge badge-green">Respondida</span>' : m.lida ? '<span class="badge badge-yellow">Lida</span>' : '<span class="badge badge-red">Nova</span>';
+            tbody.innerHTML += '<tr>' +
+                '<td style="white-space:nowrap;font-size:.8rem;color:#64748b;">'+escHtml(dateStr)+'</td>' +
+                '<td><strong>'+escHtml(m.nome)+'</strong></td>' +
+                '<td><a href="mailto:'+escAttr(m.email)+'" style="color:var(--azul-padrao);">'+escHtml(m.email)+'</a></td>' +
+                '<td style="max-width:280px;font-size:.82rem;color:#475569;">'+escHtml(m.mensagem.substring(0,100))+(m.mensagem.length > 100 ? '...' : '')+'</td>' +
+                '<td>'+statusBadge+'</td>' +
+                '<td>' +
+                    '<button class="btn btn-outline btn-sm" onclick="verMensagem(\''+m.id+'\')" title="Ver e responder">Ver</button> ' +
+                    '<a class="btn btn-outline btn-sm" href="mailto:'+escAttr(m.email)+'?subject=Re: Contato B%26F" title="Enviar e-mail">Email</a>' +
+                '</td>' +
+            '</tr>';
+        });
+    });
+}
+
+window.verMensagens = verMensagem;
+
+function verMensagem(id){
+    supabase.from('contato_mensagens').select('*').eq('id',id).single().then(function(res){
+        if(res.error || !res.data){ showToast('Erro ao carregar mensagem'); return; }
+        var m = res.data;
+        var date = new Date(m.created_at);
+        var dateStr = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+        var respondedHtml = '';
+        if(m.respondida && m.resposta){
+            respondedHtml = '<div style="margin-top:16px;padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0;">' +
+                '<strong style="color:#166534;">Resposta enviada:</strong>' +
+                '<p style="margin:6px 0 0;font-size:.88rem;color:#15803d;">'+escHtml(m.resposta)+'</p></div>';
+        }
+        var html = '<div style="padding:8px;">' +
+            '<div style="margin-bottom:12px;">' +
+                '<strong>De:</strong> '+escHtml(m.nome)+' &lt;'+escHtml(m.email)+'&gt;<br>' +
+                '<strong>Data:</strong> '+escHtml(dateStr)+'<br>' +
+                '<strong>Mensagem:</strong>' +
+            '</div>' +
+            '<div style="background:var(--bg-input);padding:12px;border-radius:8px;margin-bottom:12px;white-space:pre-wrap;font-size:.88rem;line-height:1.6;">'+escHtml(m.mensagem)+'</div>' +
+            respondedHtml +
+            '<div style="margin-top:16px;">' +
+                '<label style="display:block;font-weight:600;margin-bottom:6px;">Enviar resposta por e-mail:</label>' +
+                '<textarea id="respostaTexto" rows="4" placeholder="Digite sua resposta..." style="width:100%;padding:10px;border-radius:8px;border:1px solid #cbd5e1;font-family:inherit;font-size:.88rem;resize:vertical;margin-bottom:8px;"></textarea>' +
+                '<div style="display:flex;gap:8px;">' +
+                    '<button class="btn btn-primary" onclick="enviarResposta(\''+m.id+'\')">Enviar resposta</button>' +
+                    '<button class="btn btn-outline" onclick="marcarLida(\''+m.id+'\')">Marcar como lida</button>' +
+                    '<a class="btn btn-outline" href="mailto:'+escAttr(m.email)+'?subject=Re: Contato B%26F" style="display:inline-flex;align-items:center;">Abrir no e-mail</a>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+        var modal = document.getElementById('pedidoDetalhesModal') || createModal();
+        document.getElementById('pedidoDetalhesBody').innerHTML = html;
+        document.getElementById('btnWhatsPedido').style.display = 'none';
+        modal.style.display = 'flex';
+    });
+}
+
+function createModal(){
+    var m = document.createElement('div');
+    m.className = 'modal-overlay-admin';
+    m.id = 'pedidoDetalhesModal';
+    m.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;';
+    m.innerHTML = '<div class="modal-card-admin" style="background:#fff;border-radius:12px;max-width:560px;width:95%;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
+        '<div class="modal-head-admin" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;">' +
+            '<h3 id="modalMsgTitle">Mensagem</h3>' +
+            '<button class="btn-icon" onclick="this.closest(\'.modal-overlay-admin\').style.display=\'none\'" aria-label="Fechar"></button>' +
+        '</div>' +
+        '<div class="modal-body-admin" id="pedidoDetalhesBody"></div>' +
+    '</div>';
+    document.body.appendChild(m);
+    m.addEventListener('click', function(e){ if(e.target === m) m.style.display = 'none'; });
+    return m;
+}
+
+window.enviarResposta = enviarResposta;
+window.marcarLida = marcarLida;
+
+function enviarResposta(id){
+    var texto = document.getElementById('respostaTexto').value.trim();
+    if(!texto){ showToast('Digite uma resposta'); return; }
+    supabase.from('contato_mensagens').update({
+        resposta: texto,
+        respondida: true,
+        lida: true
+    }).eq('id', id).then(function(res){
+        if(res.error){ showToast('Erro: '+res.error.message); return; }
+        showToast('Resposta salva!');
+        document.getElementById('pedidoDetalhesModal').style.display = 'none';
+        renderMensagens();
+    });
+}
+
+function marcarLida(id){
+    supabase.from('contato_mensagens').update({lida: true}).eq('id', id).then(function(res){
+        if(res.error){ showToast('Erro: '+res.error.message); return; }
+        showToast('Marcada como lida');
+        document.getElementById('pedidoDetalhesModal').style.display = 'none';
+        renderMensagens();
+    });
+}
+
+document.getElementById('btnRefreshMensagens') && document.getElementById('btnRefreshMensagens').addEventListener('click', renderMensagens);
 
 })();

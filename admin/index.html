@@ -22,6 +22,7 @@
             <a data-tab="config"><span></span> Configurações</a>
             <a data-tab="usuarios"><span></span> Usuários</a>
             <a data-tab="pedidos"><span></span> Pedidos</a>
+            <a data-tab="mensagens"><span></span> Mensagens</a>
         </nav>
         <div class="sidebar-footer">
             <button class="btn-logout" id="btnAdminLogout">Sair</button>
@@ -291,6 +292,18 @@
                     <thead><tr><th>Nome</th><th>Usuário</th><th>E-mail</th><th>Permissão</th><th style="width:130px;">Ações</th></tr></thead>
                     <tbody id="usersBody"><tr><td colspan="4" class="empty-state">Nenhum usuário.</td></tr></tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="tab-mensagens">
+            <h1 class="page-title">Mensagens</h1>
+            <p class="page-sub">Mensagens enviadas pelo formulário de contato</p>
+            <div class="card">
+                <div class="flex-row" style="justify-content:space-between;margin-bottom:12px;">
+                    <h3 style="margin:0;">Caixa de Entrada</h3>
+                    <button class="btn btn-outline btn-sm" id="btnRefreshMensagens">Atualizar</button>
+                </div>
+                <div id="mensagensLista"></div>
             </div>
         </div>
 

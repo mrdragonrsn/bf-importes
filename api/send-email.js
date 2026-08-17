@@ -1,5 +1,29 @@
 var requestLog = new Map();
 
+var SUPABASE_URL = 'https://trirxmcalxktampbujyr.supabase.co';
+var SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+async function supabaseAdmin(table, method, body) {
+    var url = SUPABASE_URL + '/rest/v1/' + table;
+    var opts = {
+        method: method,
+        headers: {
+            'apikey': SUPABASE_SERVICE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+        }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    var res = await fetch(url, opts);
+    if (!res.ok) {
+        var err = await res.text();
+        throw new Error(err);
+    }
+    if (method === 'POST' || method === 'PATCH' || method === 'PUT') return res.json();
+    return res.status === 204 ? null : res.json();
+}
+
 module.exports = async function handler(request, response) {
     response.setHeader('Cache-Control', 'no-store');
     if (request.method !== 'POST') {
@@ -21,5 +45,18 @@ module.exports = async function handler(request, response) {
     if (now - previous < 60000) return response.status(429).json({error:'Aguarde um minuto antes de enviar outra mensagem.'});
     requestLog.set(rateKey, now);
     for (var entry of requestLog) if (now - entry[1] > 3600000) requestLog.delete(entry[0]);
+
+    if (SUPABASE_SERVICE_KEY) {
+        try {
+            await supabaseAdmin('contato_mensagens', 'POST', {
+                nome: name,
+                email: email,
+                mensagem: message
+            });
+        } catch (err) {
+            console.error('Failed to save message to DB:', err.message);
+        }
+    }
+
     return response.status(200).json({ok:true, info:'Mensagem recebida. Entraremos em contato em breve.'});
 };
