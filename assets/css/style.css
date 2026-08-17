@@ -95,8 +95,13 @@
             padding: 6px 0;
             border-bottom: 2px solid transparent;
             transition: border-color 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+        .nav-links a svg { opacity: 0.85; }
         .nav-links a:hover { border-color: var(--azul-brilho); }
+        .nav-links a:hover svg { opacity: 1; }
         .btn-contato {
             background: var(--branco);
             color: var(--azul-padrao);
@@ -684,8 +689,15 @@
             text-align: center;
         }
         .contact-item .icon-ctt {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 12px;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--azul-padrao);
         }
         .contact-item h4 {
             font-size: 1rem;
