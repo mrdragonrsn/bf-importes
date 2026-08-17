@@ -158,16 +158,41 @@
     </section>
 
 
-    <section style="background:var(--branco);padding:72px 0;">
+    <section class="about-section">
+        <div class="about-section__bg" aria-hidden="true">
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="340" cy="60" r="120" stroke="#1a56b8" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.18"/>
+                <circle cx="340" cy="60" r="160" stroke="#1a56b8" stroke-width="1" stroke-dasharray="4 6" opacity="0.1"/>
+                <circle cx="60" cy="340" r="80" stroke="#0a1f3f" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.12"/>
+                <circle cx="60" cy="340" r="110" stroke="#0a1f3f" stroke-width="1" stroke-dasharray="3 7" opacity="0.08"/>
+                <rect x="280" y="280" width="40" height="40" rx="8" stroke="#3b82f6" stroke-width="1.5" opacity="0.15" transform="rotate(15 300 300)"/>
+                <rect x="320" y="200" width="24" height="24" rx="4" stroke="#60a5fa" stroke-width="1" opacity="0.12" transform="rotate(30 332 212)"/>
+            </svg>
+        </div>
         <div class="container">
-            <div style="text-align:center;max-width:600px;margin:0 auto 48px;">
-                <h2 class="section-title">Sobre a B&amp;F</h2>
+            <div style="text-align:center;max-width:600px;margin:0 auto 52px;">
+                <span class="about-label">Sobre nós</span>
+                <h2 class="section-title">Conheça a B&amp;F</h2>
                 <p class="section-subtitle">Soluções completas em impressão para quem não pode esperar</p>
                 <div class="divide"></div>
             </div>
 
-            <div class="about-grid" style="max-width:1040px;margin:0 auto;">
+            <div class="about-grid" style="max-width:1080px;margin:0 auto;">
                 <div style="display:flex;flex-direction:column;gap:24px;">
+                    <div class="about-stat-row">
+                        <div class="about-stat">
+                            <span class="about-stat__number">15+</span>
+                            <span class="about-stat__label">Anos de mercado</span>
+                        </div>
+                        <div class="about-stat">
+                            <span class="about-stat__number">2 mil+</span>
+                            <span class="about-stat__label">Clientes atendidos</span>
+                        </div>
+                        <div class="about-stat">
+                            <span class="about-stat__number">5</span>
+                            <span class="about-stat__label">Marcas parceiras</span>
+                        </div>
+                    </div>
                     <p style="font-size:1rem; color:#334155; line-height:1.8;">
                         Desde 2010 no mercado, a <strong style="color:var(--azul-escuro);">B&amp;F Importes</strong>
                         é referência em soluções de impressão para empresas de todos os portes.
@@ -180,11 +205,11 @@
                         Nossa missão é simples: manter sua operação funcionando sem interrupções.
                     </p>
                     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-                        <a href="/produtos" style="display:inline-flex;align-items:center;gap:8px;background:var(--azul-padrao);color:#fff;padding:12px 24px;border-radius:8px;font-weight:600;text-decoration:none;font-size:0.9rem;transition:background 0.2s;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
+                        <a href="/produtos" class="btn-about-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
                             Ver Produtos
                         </a>
-                        <a href="/contato" style="display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--azul-padrao);padding:12px 24px;border-radius:8px;font-weight:600;text-decoration:none;font-size:0.9rem;border:1.5px solid var(--azul-padrao);transition:all 0.2s;">
+                        <a href="/contato" class="btn-about-secondary">
                             Fale Conosco
                         </a>
                     </div>
@@ -193,7 +218,7 @@
                 <div class="about-values">
                     <div class="about-value-card">
                         <div class="about-value-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
                         </div>
                         <div>
                             <strong>Garantia Estendida</strong>
@@ -202,7 +227,7 @@
                     </div>
                     <div class="about-value-card">
                         <div class="about-value-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
                         </div>
                         <div>
                             <strong>Entrega Rápida</strong>
@@ -211,7 +236,7 @@
                     </div>
                     <div class="about-value-card">
                         <div class="about-value-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                         </div>
                         <div>
                             <strong>Suporte Técnico</strong>
@@ -220,7 +245,7 @@
                     </div>
                     <div class="about-value-card">
                         <div class="about-value-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
                         </div>
                         <div>
                             <strong>CNPJ e Locação</strong>

@@ -1780,9 +1780,9 @@ function openLightbox(src){
      if(grid && window.bfSupabase){
          window.bfSupabase.from('anuncios').select('nome,imagem_url').eq('tipo','galeria').eq('ativo',true).order('ordem',{ascending:true}).then(function(res){
              if(res.error || !res.data) return;
-             grid.innerHTML = res.data.filter(function(a){ return a.imagem_url; }).map(function(a){
-                 return '<img src="'+esc(a.imagem_url)+'" alt="'+esc(a.nome)+'" class="ad-img" loading="lazy">';
-             }).join('');
+              grid.innerHTML = res.data.filter(function(a){ return a.imagem_url; }).map(function(a){
+                  return '<div class="ad-card"><img src="'+esc(a.imagem_url)+'" alt="'+esc(a.nome)+'" class="ad-img" loading="lazy"></div>';
+              }).join('');
          });
      }
 })();
@@ -1806,8 +1806,8 @@ function openLightbox(src){
 
 
         document.addEventListener('click', function(e){
-            var ad = e.target.closest ? e.target.closest('.ad-img') : null;
-            if (ad) { openLightbox(ad.src, ad.alt || ad.getAttribute('alt') || ''); }
+            var ad = e.target.closest ? e.target.closest('.ad-card') : null;
+            if (ad) { var img = ad.querySelector('img'); if (img) openLightbox(img.src, img.alt || ''); }
         });
 
 

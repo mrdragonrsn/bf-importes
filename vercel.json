@@ -1,4 +1,5 @@
 {
+  "project": "bf-imp",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
