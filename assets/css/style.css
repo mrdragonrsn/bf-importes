@@ -1204,6 +1204,48 @@
             grid-template-columns: 1fr 1fr;
             gap: 14px;
         }
+        .about-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .about-value-card {
+            background: var(--branco);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .about-value-card:hover {
+            box-shadow: 0 4px 16px rgba(10,31,63,0.1);
+            border-color: var(--azul-brilho);
+        }
+        .about-value-icon {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            background: #eff6ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--azul-padrao);
+        }
+        .about-value-card strong {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 3px;
+        }
+        .about-value-card p {
+            font-size: 0.78rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
         .about-photo {
             background: linear-gradient(135deg, #e0edff 0%, var(--cinza-claro) 100%);
             border-radius: 12px;
@@ -1236,6 +1278,7 @@
             .about-grid { grid-template-columns: 1fr; gap: 24px; }
             .about-photos { grid-template-columns: 1fr 1fr; }
             .about-photo { height: 100px; font-size: 2rem; }
+            .about-values { grid-template-columns: 1fr; }
             .diferenciais-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
             .diferencial-card { padding: 18px 12px; }
         }
