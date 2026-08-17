@@ -1490,9 +1490,24 @@ function openLightbox(src){
                 if(!file) return;
                 var reader = new FileReader();
                 reader.onload = function(e){
-                    document.getElementById('perfilFoto').innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-                    savePerfil({foto_url: e.target.result});
-                    showToast('&#128247; Foto atualizada!');
+                    var img=new Image();
+                    img.onload=function(){
+                        var canvas=document.createElement('canvas');
+                        canvas.width=img.naturalWidth;
+                        canvas.height=img.naturalHeight;
+                        canvas.getContext('2d').drawImage(img,0,0);
+                        canvas.toBlob(function(blob){
+                            var path=currentUser.id+'/'+Date.now()+'.webp';
+                            supabase.storage.from('perfis').upload(path,blob,{cacheControl:'31536000',upsert:true,contentType:'image/webp'}).then(function(res){
+                                if(res.error){showToast('&#9888; '+res.error.message);return;}
+                                var url=supabase.storage.from('perfis').getPublicUrl(path).data.publicUrl;
+                                document.getElementById('perfilFoto').innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                                savePerfil({foto_url:url});
+                                showToast('&#128247; Foto atualizada!');
+                            });
+                        },'image/webp',0.82);
+                    };
+                    img.src=e.target.result;
                 };
                 reader.readAsDataURL(file);
             });

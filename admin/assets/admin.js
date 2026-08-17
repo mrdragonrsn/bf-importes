@@ -149,17 +149,36 @@ document.getElementById('prodImgFile').addEventListener('change', function(e){
     renderProdImgThumbs();
 });
 
+function toWebp(file){
+    return new Promise(function(resolve,reject){
+        var reader=new FileReader();
+        reader.onload=function(){
+            var img=new Image();
+            img.onload=function(){
+                var canvas=document.createElement('canvas');
+                canvas.width=img.naturalWidth;
+                canvas.height=img.naturalHeight;
+                canvas.getContext('2d').drawImage(img,0,0);
+                canvas.toBlob(function(blob){blob?resolve(blob):reject(new Error('Falha ao converter imagem'))},'image/webp',0.82);
+            };
+            img.onerror=reject;
+            img.src=reader.result;
+        };
+        reader.onerror=reject;
+        reader.readAsDataURL(file);
+    });
+}
+
 function uploadImagesToStorage(files){
     if(!files || !files.length) return Promise.resolve([]);
     return Promise.all(files.map(function(file){
-        return new Promise(function(resolve, reject){
-            var ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
-            var path='produtos/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
-            supabase.storage.from('produtos').upload(path,file,{cacheControl:'3600',upsert:false}).then(function(res){
-                if(res.error){ reject(res.error); return; }
-                var url=supabase.storage.from('produtos').getPublicUrl(res.data.path);
-                resolve(url.data.publicUrl);
-            });
+        return toWebp(file).then(function(blob){
+            var path='produtos/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.webp';
+            return supabase.storage.from('produtos').upload(path,blob,{cacheControl:'31536000',upsert:false,contentType:'image/webp'});
+        }).then(function(res){
+            if(res.error) return Promise.reject(res.error);
+            var url=supabase.storage.from('produtos').getPublicUrl(res.data.path);
+            return url.data.publicUrl;
         });
     }));
 }
@@ -323,8 +342,16 @@ async function renderAnuncios(){
 
 window.uploadAnuncioImg=function(input,idx){
     var file=input.files[0];if(!file||!anunciosTemp[idx])return;
-    var path='anuncios/'+Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
-    supabase.storage.from('anuncios').upload(path,file,{cacheControl:'3600',upsert:false}).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return Promise.reject(res.error)}var url=supabase.storage.from('anuncios').getPublicUrl(path).data.publicUrl;return supabase.from('anuncios').update({imagem_url:url}).eq('id',anunciosTemp[idx].id)}).then(function(res){if(res&&res.error)showToast('&#9888; '+res.error.message);else{showToast('&#128247; Imagem carregada!');renderAnuncios()}}).catch(function(){});
+    toWebp(file).then(function(blob){
+        var path='anuncios/'+Date.now()+'.webp';
+        return supabase.storage.from('anuncios').upload(path,blob,{cacheControl:'31536000',upsert:false,contentType:'image/webp'});
+    }).then(function(res){
+        if(res.error)return Promise.reject(res.error);
+        var url=supabase.storage.from('anuncios').getPublicUrl(res.data.path).data.publicUrl;
+        return supabase.from('anuncios').update({imagem_url:url}).eq('id',anunciosTemp[idx].id);
+    }).then(function(res){
+        if(res&&res.error)showToast('&#9888; '+res.error.message);else{showToast('&#128247; Imagem carregada!');renderAnuncios()}
+    }).catch(function(err){showToast('&#9888; '+err.message)});
 };
 
 window.removeAnuncio=function(idx){
