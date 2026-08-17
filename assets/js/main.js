@@ -1509,7 +1509,7 @@ function openLightbox(src){
                         canvas.toBlob(function(blob){
                             var path=currentUser.id+'/'+Date.now()+'.webp';
                             supabase.storage.from('perfis').upload(path,blob,{cacheControl:'31536000',upsert:true,contentType:'image/webp'}).then(function(res){
-                                if(res.error){showToast('+res.error.message);return;}
+                                if(res.error){showToast(res.error.message);return;}
                                 var url=supabase.storage.from('perfis').getPublicUrl(path).data.publicUrl;
                                 document.getElementById('perfilFoto').innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
                                 savePerfil({foto_url:url});
