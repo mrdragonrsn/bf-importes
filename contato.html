@@ -7,7 +7,7 @@
     <meta name="description" content="Fale com a B&amp;F Importes - WhatsApp, telefone, e-mail e endereço em Jaboticabal-SP.">
     <meta property="og:title" content="Contato - B&amp;F Importes">
     <meta property="og:description" content="Entre em contato com a B&amp;F Importes pelo WhatsApp, telefone ou e-mail.">
-    <meta property="og:url" content="https://mrdragonrsn.github.io/bf-importes/contato.html">
+    <meta property="og:url" content="https://bf-imp.vercel.app/contato">
     <link rel="icon" href="https://trirxmcalxktampbujyr.supabase.co/storage/v1/object/public/anuncios/logo.webp" type="image/webp">
     <link rel="stylesheet" href="/assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,9 +16,9 @@
 
     <div class="top-bar">
         <div class="container">
-            <span>&#128222; (16) 98138-6747</span>
-            <span>&#128231; atendimento@biancoeferreira.com.br</span>
-            <span>&#128339; Seg–Sex 8h às 18h | Sáb 8h às 13h</span>
+            <span>(16) 98138-6747</span>
+            <span>atendimento@biancoeferreira.com.br</span>
+            <span>Seg–Sex 8h às 18h | Sáb 8h às 13h</span>
         </div>
     </div>
 
@@ -33,15 +33,15 @@
             </div>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="/">&#127968; Início</a></li>
-                    <li><a href="/produtos">&#128722; Produtos</a></li>
-                    <li><a href="/servicos">&#128295; Serviços</a></li>
-                    <li><a href="/contato" style="border-bottom-color:var(--azul-brilho);">&#128222; Contato</a></li>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/produtos">Produtos</a></li>
+                    <li><a href="/servicos">Serviços</a></li>
+                    <li><a href="/contato" style="border-bottom-color:var(--azul-brilho);">Contato</a></li>
                 </ul>
             </nav>
             <div class="header-search-wrap" id="headerSearchWrap">
                 <input type="text" class="header-search" id="headerSearch" placeholder="Buscar produtos..." autocomplete="off" aria-autocomplete="list" aria-controls="searchDropdown">
-                <button class="header-search-btn" id="headerSearchBtn">&#128269;</button>
+                <button class="header-search-btn" id="headerSearchBtn"></button>
                 <div class="search-dropdown" id="searchDropdown" role="listbox" aria-label="Sugestões de busca"></div>
             </div>
             <div class="header-actions">
@@ -62,22 +62,22 @@
 
             <div class="contact-grid">
                 <div class="contact-item">
-                    <div class="icon-ctt">&#128222;</div>
+                    <div class="icon-ctt"></div>
                     <h4>Telefone / WhatsApp</h4>
                     <p class="contact-clickable" id="contactPhone" data-copy="16981386747">(16) 98138-6747</p>
                 </div>
                 <div class="contact-item">
-                    <div class="icon-ctt">&#128231;</div>
+                    <div class="icon-ctt"></div>
                     <h4>E-mail</h4>
                     <p class="contact-clickable" id="contactEmail" data-email="atendimento@biancoeferreira.com.br">atendimento@biancoeferreira.com.br</p>
                 </div>
                 <div class="contact-item">
-                    <div class="icon-ctt">&#128205;</div>
+                    <div class="icon-ctt"></div>
                     <h4>Endereço</h4>
                     <p><a href="https://maps.google.com/?q=R.+Rui+Barbosa,+363,+Centro,+Jaboticabal,+SP,+14870-090" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">R. Rui Barbosa, 363 — Centro<br>Jaboticabal — SP, 14870-090</a></p>
                 </div>
                 <div class="contact-item">
-                    <div class="icon-ctt">&#128339;</div>
+                    <div class="icon-ctt"></div>
                     <h4>Horário de Atendimento</h4>
                     <p>Seg a Sex: 8h às 18h<br>Sáb: 8h às 13h</p>
                 </div>
@@ -89,10 +89,11 @@
         <div class="container contact-form-layout">
             <div class="contact-form-copy"><span>Fale com a B&amp;F</span><h2>Vamos encontrar a solução certa para sua operação.</h2><p>Envie sua mensagem e nossa equipe retornará com orientação e orçamento.</p></div>
             <form class="contact-form-card" id="contactForm">
-                <div class="contact-form-field"><label for="contactName">Nome</label><input id="contactName" name="name" type="text" autocomplete="name" required></div>
-                <div class="contact-form-field"><label for="contactEmailInput">E-mail</label><input id="contactEmailInput" name="email" type="email" autocomplete="email" required></div>
-                <div class="contact-form-field"><label for="contactMessage">Mensagem</label><textarea id="contactMessage" name="message" rows="5" required></textarea></div>
-                <button class="contact-form-submit" id="contactSubmit" type="submit">Enviar mensagem</button>
+                 <div class="contact-form-field"><label for="contactName">Nome</label><input id="contactName" name="name" type="text" autocomplete="name" required></div>
+                 <div class="contact-form-field"><label for="contactEmailInput">E-mail</label><input id="contactEmailInput" name="email" type="email" autocomplete="email" required></div>
+                 <div class="contact-form-field"><label for="contactMessage">Mensagem</label><textarea id="contactMessage" name="message" rows="5" required></textarea></div>
+                 <div class="contact-honeypot" aria-hidden="true"><label for="contactWebsite">Website</label><input id="contactWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+                 <button class="contact-form-submit" id="contactSubmit" type="submit">Enviar mensagem</button>
                 <p class="contact-form-status" id="contactStatus" aria-live="polite"></p>
             </form>
         </div>
@@ -103,7 +104,7 @@
             <h2 class="section-title">Onde Estamos</h2>
             <div class="divide"></div>
             <div style="border-radius:14px;overflow:hidden;max-width:700px;margin:0 auto;box-shadow:var(--sombra);">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3719.123456789!2d-48.3220!3d-21.2560!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94b8c0c0c0c0c0c1%3A0x1234567890abcdef!2sR.+Rui+Barbosa%2C+363+-+Centro%2C+Jaboticabal+-+SP!5e0!3m2!1spt-BR!2sbr!4v1690000000000"
+                <iframe title="Mapa da loja B&F Importes em Jaboticabal" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3719.123456789!2d-48.3220!3d-21.2560!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94b8c0c0c0c0c0c1%3A0x1234567890abcdef!2sR.+Rui+Barbosa%2C+363+-+Centro%2C+Jaboticabal+-+SP!5e0!3m2!1spt-BR!2sbr!4v1690000000000"
                     width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
                 </iframe>
             </div>
@@ -116,7 +117,7 @@
         <div class="container">
             <article class="fb-highlight" data-promo-slot>
                 <div class="fb-highlight__media">
-                    <img data-promo-img width="526" height="296" alt="" loading="lazy">
+                     <img data-promo-img src="https://trirxmcalxktampbujyr.supabase.co/storage/v1/object/public/anuncios/anuncio-principal.webp" width="526" height="296" alt="Destaque B&amp;F Importes" loading="lazy">
                 </div>
                 <div class="fb-highlight__body">
                     <span class="fb-highlight__tag" data-promo-tag></span>
@@ -142,8 +143,8 @@
         <div class="modal-container">
             <button class="modal-close" id="modalClose">&times;</button>
             <div class="modal-tabs">
-                <button class="modal-tab active" data-tab="galeria">&#128247; Imagens</button>
-                <button class="modal-tab" data-tab="descricao">&#128196; Descrição</button>
+                <button class="modal-tab active" data-tab="galeria">Imagens</button>
+                <button class="modal-tab" data-tab="descricao">Descrição</button>
             </div>
             <div class="modal-tab-panel active" id="tabGaleria">
                 <div class="modal-main-img" id="modalMainImg"></div>
@@ -161,9 +162,9 @@
                     <div class="modal-installment" id="modalInstallment"></div>
                 </div>
                     <div class="modal-footer-actions">
-                        <button class="btn-modal-cart" id="modalAddCart">&#128722; Adicionar</button>
-                        <button class="btn-modal-buy" id="modalBuyNow">&#128179; Comprar</button>
-                        <a href="#" class="btn-modal-quote" id="modalBtn">&#128172; Orçamento</a>
+                        <button class="btn-modal-cart" id="modalAddCart">Adicionar</button>
+                        <button class="btn-modal-buy" id="modalBuyNow">Comprar</button>
+                        <a href="#" class="btn-modal-quote" id="modalBtn">Orçamento</a>
                     </div>
             </div>
         </div>
@@ -173,19 +174,19 @@
     <div class="checkout-overlay" id="checkoutOverlay">
         <div class="checkout-panel" id="checkoutPanel">
             <div class="checkout-header">
-                <h3>&#128179; Finalizar Compra</h3>
+                <h3>Finalizar Compra</h3>
                 <button class="checkout-close" id="checkoutClose">&times;</button>
             </div>
             <div class="checkout-summary" id="checkoutSummary"></div>
             <div class="checkout-form" id="checkoutForm">
                 <div id="checkoutLoginGate" class="login-gate" style="display:none;">
-                    <h3>&#128274; Faça login para finalizar</h3>
+                    <h3>Faça login para finalizar</h3>
                     <p>Você precisa estar logado para realizar o pagamento.</p>
                     <button class="btn-auth-gate" onclick="var o=document.getElementById('checkoutOverlay');if(o)o.classList.remove('active');document.body.style.overflow='';var a=document.getElementById('authOverlay');if(a)a.classList.add('active');" type="button"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Fazer Login</button>
                     <button class="btn-auth-gate outline" onclick="var o=document.getElementById('checkoutOverlay');if(o)o.classList.remove('active');document.body.style.overflow='';var a=document.getElementById('authOverlay');if(a)a.classList.add('active');var r=document.getElementById('switchToRegister');if(r)r.click();" type="button"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Criar Conta</button>
                 </div>
                 <div id="checkoutFormFields">
-                    <h4>&#128666; Dados de Entrega</h4>
+                    <h4>Dados de Entrega</h4>
                     <div class="checkout-field"><label>Nome completo</label><input type="text" id="coName" placeholder="Seu nome completo"></div>
                     <div class="checkout-row">
                         <div class="checkout-field"><label>CPF</label><input type="text" id="coCPF" placeholder="000.000.000-00"></div>
@@ -205,35 +206,16 @@
                         <div class="checkout-field" style="flex:1;"><label>Nº</label><input type="text" id="coNumber" placeholder="123"></div>
                     </div>
                     <div class="checkout-field"><label>Complemento</label><input type="text" id="coComplement" placeholder="Apto, bloco, etc. (opcional)"></div>
-                    <h4 style="margin-top:8px;">&#128179; Forma de Pagamento</h4>
-                    <div class="payment-tabs">
-                        <button class="payment-tab active" data-pay="card"><span class="icon">&#128179;</span> Cartão</button>
-                        <button class="payment-tab" data-pay="pix"><span class="icon"><svg width="22" height="22" viewBox="0 0 512 512" style="vertical-align:middle"><circle cx="256" cy="256" r="240" fill="#32BCAD"/><text x="256" y="336" font-size="290" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">P</text></svg></span> PIX</button>
-                        <button class="payment-tab" data-pay="boleto"><span class="icon">&#128196;</span> Boleto</button>
-                    </div>
-                    <div class="payment-body active" id="payCard">
-                        <div class="checkout-field"><label>Número do cartão</label><input type="text" id="cardNumber" placeholder="0000 0000 0000 0000"></div>
-                        <div class="checkout-field"><label>Nome no cartão</label><input type="text" id="cardName" placeholder="Nome impresso no cartão"></div>
-                        <div class="checkout-row">
-                            <div class="checkout-field"><label>Validade</label><input type="text" id="cardExpiry" placeholder="MM/AA"></div>
-                            <div class="checkout-field"><label>CVV</label><input type="text" id="cardCVV" placeholder="123"></div>
-                        </div>
-                        <div class="checkout-field"><label>Parcelas</label><select id="cardInstallments"></select></div>
-                    </div>
-                    <div class="payment-body" id="payPix">
-                        <div class="pix-qrcode" id="pixQrCode"><img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&format=webp&data=bf-pagamento-550e8400-e29b-41d4-a716-446655440000" alt="QR Code PIX" style="width:180px;height:180px;"></div>
-                        <div class="pix-key" id="pixKey" title="Clique para copiar">bf-pagamento-550e8400-e29b-41d4-a716-446655440000</div>
-                        <p style="font-size:0.76rem;color:#64748b;text-align:center;">Clique na chave PIX acima para copiar</p>
-                    </div>
-                    <div class="payment-body" id="payBoleto">
-                        <div class="boleto-info">&#128196; O boleto será gerado e enviado para o seu e-mail após a confirmação do pedido. Vencimento em 3 dias úteis.</div>
-                    </div>
+                     <h4 style="margin-top:8px;">Como deseja continuar?</h4>
+                     <div class="payment-body active" id="payQuote">
+                         <div class="boleto-info">Sua solicitação será registrada e nossa equipe confirmará disponibilidade, frete e forma de pagamento pelo WhatsApp ou e-mail. Não informe dados de cartão neste formulário.</div>
+                     </div>
                 </div>
                 <div id="checkoutSuccess" style="display:none;">
                     <div class="nf-container">
                         <div class="nf-header">
                             <div class="nf-company"><h4>B&amp;F Ltda</h4><p>CNPJ: 03.108.169/0001-58</p><p>R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090</p></div>
-                            <div class="nf-title"><h5>DANFE</h5><div class="nf-num" id="nfOrderNum"></div><span style="font-size:0.72rem;color:#64748b;" id="nfDate"></span></div>
+                            <div class="nf-title"><h5>Resumo do pedido</h5><div class="nf-num" id="nfOrderNum"></div><span style="font-size:0.72rem;color:#64748b;" id="nfDate"></span></div>
                         </div>
                         <div class="nf-body">
                             <div class="nf-section-title">Dados do Cliente</div>
@@ -246,10 +228,10 @@
                         </div>
                         <div class="nf-footer">Agradecemos a preferência! | B&amp;F<br>atendimento@biancoeferreira.com.br | (16) 98138-6747</div>
                     </div>
-                    <button class="btn-print-nf" id="btnPrintNF">&#128424; Imprimir Nota Fiscal</button>
-                    <button class="btn-wpp-share" id="btnWppShare">&#128172; Compartilhar pedido no WhatsApp</button>
+                    <button class="btn-print-nf" id="btnPrintNF">Imprimir resumo</button>
+                    <button class="btn-wpp-share" id="btnWppShare">Compartilhar pedido no WhatsApp</button>
                 </div>
-                <button class="btn-confirm" id="btnConfirmOrder">Confirmar Pedido</button>
+                <button class="btn-confirm" id="btnConfirmOrder">Enviar solicitação</button>
                 <button class="btn-back-cart" id="btnBackToCart">&#8592; Voltar ao carrinho</button>
             </div>
         </div>
@@ -289,28 +271,13 @@
         <div class="auth-box" id="authBoxReset" style="display:none;">
             <h3><svg class="auth-title-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/></svg>Recuperar Senha</h3>
             <div id="resetStep1" class="reset-steps active">
-                <p style="font-size:0.84rem;color:#475569;margin-bottom:14px;text-align:center;">Informe seu e-mail cadastrado para receber o código de recuperação.</p>
+                 <p style="font-size:0.84rem;color:#475569;margin-bottom:14px;text-align:center;">Informe seu e-mail cadastrado para receber um link seguro de recuperação.</p>
                 <div class="auth-field"><label>E-mail</label><input type="text" id="resetEmail" placeholder="seu@email.com"></div>
                 <div class="auth-error" id="resetError"></div>
-                <button class="btn-auth" id="btnSendReset">Enviar Código</button>
-            </div>
-            <div id="resetStep2" class="reset-steps">
-                <p style="font-size:0.84rem;color:#475569;margin-bottom:14px;text-align:center;">Enviamos um código de 6 dígitos para <strong id="resetEmailDisplay"></strong>.</p>
-                <label style="display:block;text-align:center;font-size:0.78rem;font-weight:600;color:#475569;margin-bottom:6px;">Código de verificação</label>
-                <div class="reset-code-box" id="resetCodeInputs">
-                    <input type="text" maxlength="1" pattern="[0-9]">
-                    <input type="text" maxlength="1" pattern="[0-9]">
-                    <input type="text" maxlength="1" pattern="[0-9]">
-                    <input type="text" maxlength="1" pattern="[0-9]">
-                    <input type="text" maxlength="1" pattern="[0-9]">
-                    <input type="text" maxlength="1" pattern="[0-9]">
-                </div>
-                <div class="auth-error" id="resetCodeError"></div>
-                <button class="btn-auth" id="btnVerifyCode">Verificar Código</button>
-                <button class="btn-resend" id="btnResendCode">Reenviar código</button>
-            </div>
-            <div id="resetStep3" class="reset-steps">
-                <p style="font-size:0.84rem;color:#475569;margin-bottom:14px;text-align:center;">Código verificado! Defina sua nova senha.</p>
+                 <button class="btn-auth" id="btnSendReset">Enviar link</button>
+             </div>
+             <div id="resetStep3" class="reset-steps">
+                 <p style="font-size:0.84rem;color:#475569;margin-bottom:14px;text-align:center;">Defina uma nova senha para sua conta.</p>
                 <div class="auth-field"><label>Nova senha</label><input type="password" id="resetNewPass" placeholder="Mínimo 4 caracteres"></div>
                 <div class="auth-field"><label>Confirmar nova senha</label><input type="password" id="resetNewPass2" placeholder="Repita a senha"></div>
                 <div class="auth-error" id="resetPassError"></div>
@@ -321,6 +288,7 @@
         <div class="auth-box" id="authBoxRegister" style="display:none;">
             <h3><svg class="auth-title-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Criar Conta</h3>
             <div class="auth-field"><label>Nome</label><input type="text" id="regName" placeholder="Seu nome"></div>
+            <div class="auth-field"><label>Usuário</label><input type="text" id="regUsername" placeholder="Como você quer ser chamado" autocomplete="username"></div>
             <div class="auth-field"><label>E-mail</label><input type="text" id="regEmail" placeholder="seu@email.com"></div>
             <div class="auth-field"><label>Senha</label><input type="password" id="regPass" placeholder="Mínimo 4 caracteres"></div>
             <div class="auth-error" id="regError"></div>
@@ -335,15 +303,15 @@
         <div class="chat-panel" id="chatPanel">
             <div class="chat-header"><div class="avatar">B&amp;F</div><div class="info"><div class="name">B&amp;F</div><div class="status">Online agora</div></div><button class="close-chat" id="closeChat">&times;</button></div>
             <div class="chat-body" id="chatBody"><div class="chat-msg bot">Ol&aacute;! Somos a B&amp;F. Como posso ajudar?</div></div>
-            <div class="chat-footer"><input type="text" id="chatInput" placeholder="Digite sua mensagem..." maxlength="300"><button id="chatSend">&#10148;</button></div>
+            <div class="chat-footer"><input type="text" id="chatInput" placeholder="Digite sua mensagem..." maxlength="300"><button id="chatSend"></button></div>
         </div>
-        <button class="chat-toggle" id="chatToggle">&#128172;</button>
+        <button class="chat-toggle" id="chatToggle"></button>
     </div>
 
 
     <div class="lightbox-overlay" id="lightbox" onclick="this.classList.remove('active')">
-        <button class="lightbox-close">&times;</button>
-        <img id="lightboxImg" src="" alt="">
+        <button class="lightbox-close" aria-label="Fechar imagem">&times;</button>
+        <img id="lightboxImg" src="https://trirxmcalxktampbujyr.supabase.co/storage/v1/object/public/anuncios/anuncio-principal.webp" alt="Imagem ampliada">
     </div>
 
 
@@ -381,12 +349,13 @@
                         <label class="btn-perfil-foto"><input type="file" accept="image/*" id="perfilFotoInput" style="display:none;"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>Alterar foto</label>
                     </div>
                     <div class="perfil-field"><label>Nome</label><input type="text" id="perfilNome" placeholder="Seu nome"></div>
+                    <div class="perfil-field"><label>Usuário</label><input type="text" id="perfilUsuario" readonly></div>
                     <div class="perfil-field"><label>E-mail</label><input type="text" id="perfilEmail" placeholder="seu@email.com" readonly></div>
                     <div class="perfil-field"><label>Telefone</label><input type="text" id="perfilPhone" placeholder="(00) 00000-0000"></div>
                     <div class="perfil-field"><label>Nível de acesso</label><input type="text" id="perfilNivel" readonly></div>
                     <button class="btn-perfil-salvar" id="btnSalvarDados"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Salvar Dados</button>
                     <div id="perfilAdminLink" style="display:none;margin-top:14px;text-align:center;">
-                        <a href="/admin" class="btn-perfil-salvar" style="background:#0f172a;display:inline-block;width:auto;padding:10px 24px;text-decoration:none;">&#128736; Painel Admin</a>
+                        <a href="/admin" class="btn-perfil-salvar" style="background:#0f172a;display:inline-block;width:auto;padding:10px 24px;text-decoration:none;">Painel Admin</a>
                     </div>
                 </div>
                 <div class="perfil-panel" id="perfil-endereco">
@@ -426,7 +395,7 @@
 
 <div id="pageLoader" style="position:fixed;inset:0;background:#0a1f3f;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s;">
     <div style="text-align:center;color:#fff;">
-        <div style="font-size:3rem;animation:pulseLoad 0.6s ease-in-out infinite alternate;">🖨️</div>
+        <div style="font-size:3rem;animation:pulseLoad 0.6s ease-in-out infinite alternate;">Carregando...</div>
         <div style="margin-top:10px;font-size:0.85rem;color:#94a3b8;">Carregando...</div>
     </div>
 </div>

@@ -51,7 +51,7 @@
             animation:blink 0.8s step-end infinite;
         }
         @keyframes blink{50%{opacity:0;}}
-        h1{font-size:5rem;font-weight:800;margin:10px 0;background:linear-gradient(90deg,#60a5fa,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+        h1{font-size:5rem;font-weight:800;margin:10px 0;color:#60a5fa;}
         .sub{font-size:1.1rem;color:#94a3b8;margin-bottom:6px;}
         .desc{font-size:0.88rem;color:#64748b;margin-bottom:30px;line-height:1.6;}
         .btn-home{
@@ -63,7 +63,7 @@
             font-weight:700;
             font-size:0.95rem;
             text-decoration:none;
-            transition:all 0.3s;
+             transition:transform 180ms ease-out, background-color 180ms ease, box-shadow 180ms ease;
             box-shadow:0 4px 14px rgba(59,130,246,0.4);
         }
         .btn-home:hover{background:#2563eb;transform:translateY(-2px);box-shadow:0 6px 20px rgba(59,130,246,0.6);}
@@ -106,16 +106,16 @@
     <div class="particles" id="particles"></div>
     <div class="container">
         <div class="printer">
-            🖨️
-            <div class="paper">📄</div>
+            Impressora
+            <div class="paper">Pagina</div>
         </div>
-        <div class="dots">⚠️ ⚠️ ⚠️</div>
+        <div class="dots">Alerta Alerta Alerta</div>
         <h1>404</h1>
         <p class="sub">Página não encontrada</p>
         <p class="desc">Parece que o papel <strong>entalou</strong>!<br>A página que você procura não está aqui.<br>Que tal voltar ao início e tentar de novo?</p>
-        <a href="/" class="btn-home">&#127968; Voltar ao Início</a>
+        <a href="/" class="btn-home">Voltar ao Início</a>
         <br>
-        <button class="repair-link" onclick="document.querySelector('.printer').style.animation='none';setTimeout(function(){document.querySelector('.printer').style.animation=''},100);this.textContent='🔧 Desentalando...';setTimeout(function(){document.querySelector('.printer .paper').style.display='none';document.querySelector('.printer').textContent='🖨️✅';document.querySelector('.dots').textContent='✅ Recuperado!';document.querySelector('.printer .paper').remove();document.querySelector('.repair-link').textContent='✔️ Impressora recuperada!';},1500);">🔧 Desentalar impressora</button>
+        <button class="repair-link" onclick="document.querySelector('.printer').style.animation='none';setTimeout(function(){document.querySelector('.printer').style.animation=''},100);this.textContent='Reparando...';setTimeout(function(){var paper=document.querySelector('.printer .paper');if(paper)paper.remove();document.querySelector('.printer').textContent='OK';document.querySelector('.dots').textContent='Recuperado!';document.querySelector('.repair-link').textContent='Impressora recuperada!';},1500);">Reparar impressora</button>
         <p class="smoke">Se o problema persistir, chame o suporte técnico.</p>
     </div>
 

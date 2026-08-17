@@ -145,8 +145,7 @@
 
         #produtos {
             background-color: #f8fafc;
-            background-image: radial-gradient(circle, rgba(13, 47, 94, 0.09) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-image: none;
             padding: 60px 0;
         }
 
@@ -154,9 +153,9 @@
         .hero {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(160deg, #0a1f3f 0%, #0d2f5e 30%, #1a56b8 50%, #0e7490 75%, #0a1f3f 100%);
-            background-size: 400% 400%;
-            animation: heroAurora 18s ease infinite;
+            background: linear-gradient(135deg, #081c38 0%, #0d3768 58%, #1a56b8 100%);
+            background-size: auto;
+            animation: none;
             color: var(--branco);
             text-align: center;
             padding: 90px 0 100px;
@@ -1527,7 +1526,7 @@
         .auth-overlay.active { display: flex; }
         .auth-box {
             position: relative;
-            overflow: hidden;
+            overflow: auto;
             background: var(--branco);
             border: 1px solid rgba(255,255,255,.65);
             border-radius: 20px;
@@ -1537,7 +1536,7 @@
             box-shadow: 0 28px 80px rgba(3, 17, 38, 0.34), 0 4px 14px rgba(3, 17, 38, 0.12);
             animation: slideUp 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
         }
-        .auth-box::before { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--azul-padrao), var(--azul-claro)); content: ''; }
+        .auth-box::before { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--azul-padrao); content: ''; }
         .auth-box[style*="display: block"] { animation: authPanelSwap 260ms cubic-bezier(0.23, 1, 0.32, 1) both; }
         @keyframes authPanelSwap { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .auth-box h3 { display: flex; align-items: center; justify-content: center; gap: 9px; font-size: 1.3rem; font-weight: 800; color: var(--azul-escuro); margin-bottom: 24px; text-align: center; }
@@ -1590,6 +1589,8 @@
         .auth-switch a:hover { color: var(--azul-medio); text-decoration: underline; text-underline-offset: 3px; }
         .auth-error { color: #ef4444; font-size: 0.78rem; text-align: center; margin-top: 8px; }
         .auth-error.success { color: #16a34a; }
+        .btn-auth:disabled,
+        .contact-form-submit:disabled { opacity: .62; cursor: wait; transform: none; box-shadow: none; }
         .forgot-link { display: block; text-align: right; font-size: 0.78rem; color: var(--azul-padrao); font-weight: 700; cursor: pointer; margin-top: 8px; margin-bottom: 6px; transition: color 180ms ease; }
         .auth-switch + .forgot-link { margin-top: 18px; text-align: center; }
         .forgot-link:hover { color: var(--azul-medio); text-decoration: underline; text-underline-offset: 3px; }
@@ -1621,20 +1622,6 @@
             font-family: inherit;
         }
         .reset-code-box input:focus { border-color: var(--azul-padrao); }
-        .btn-resend {
-            background: none;
-            border: none;
-            color: var(--azul-padrao);
-            cursor: pointer;
-            font-size: 0.78rem;
-            font-weight: 600;
-            margin-top: 6px;
-            font-family: inherit;
-        }
-        .btn-resend:hover { text-decoration: underline; }
-        .btn-resend:disabled { color: #94a3b8; cursor: not-allowed; }
-
-
         .toast-container {
             position: fixed;
             top: 20px;
@@ -2702,18 +2689,19 @@ textarea:focus-visible {
     margin-top: 22px;
 }
 .carousel__dot {
-    width: 10px;
+    width: 26px;
     height: 10px;
     border-radius: 20px;
     border: none;
     background: var(--cinza-medio);
     cursor: pointer;
     padding: 0;
-    transition: background 0.25s ease, width 0.25s ease;
+    transform: scaleX(.38);
+    transition: background-color 180ms ease, transform 180ms ease;
 }
 .carousel__dot.active {
     background: var(--azul-padrao);
-    width: 26px;
+    transform: scaleX(1);
 }
 
 
@@ -2895,4 +2883,55 @@ textarea:focus-visible {
     .anuncios-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Final interaction and responsive pass. */
+.contact-honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.product-card {
+    transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 180ms ease, border-color 180ms ease;
+}
+.product-card:focus-visible {
+    outline: 3px solid var(--azul-brilho);
+    outline-offset: 3px;
+}
+.btn-card-add:active,
+.btn-cta:active,
+.btn-contato:active,
+.btn-login:active,
+.btn-cart-header:active,
+.contact-form-submit:active,
+.btn-checkout:active {
+    transform: scale(.98);
+}
+.pedidos-modal-body { overflow-x: auto; }
+
+@media (max-width: 680px) {
+    .auth-overlay,
+    .checkout-overlay,
+    .pedidos-overlay { align-items: flex-start; padding: 12px; }
+    .auth-box { margin-top: 4vh; padding: 30px 22px 24px; max-height: 92dvh; }
+    .checkout-panel { max-height: 94dvh; overflow-y: auto; }
+    .pedidos-modal { max-height: 92dvh; }
+    .pedidos-modal-header { padding: 17px 18px; }
+    .pedidos-modal-body { padding: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .product-card,
+    .btn-card-add,
+    .btn-cta,
+    .btn-contato,
+    .btn-login,
+    .btn-cart-header,
+    .contact-form-submit,
+    .btn-checkout { transition: none; }
 }

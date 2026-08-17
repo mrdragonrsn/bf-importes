@@ -41,7 +41,7 @@ function openLightbox(src){
         var priceStr = 'R$ ' + preco.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
         var inst = preco / 10;
         var photoBadge = imgs.length > 1 ? '<span class="thumb-photo-count">'+imgs.length+' fotos</span>' : '';
-        return '<div class="product-card" data-category="'+esc(p.categoria||'impressoras')+'" data-name="'+name+'">' +
+        return '<div class="product-card" role="button" tabindex="0" data-category="'+esc(p.categoria||'impressoras')+'" data-name="'+name+'">' +
             '<div class="thumb">'+photoBadge+'<img src="'+esc(img)+'" alt="'+name+'" loading="lazy"></div>' +
             '<div class="body">' +
                 '<span class="cat">'+esc(cat)+'</span>' +
@@ -66,7 +66,7 @@ function openLightbox(src){
             productData[p.nome] = {
                 images: getImages(p),
                 stock: parseInt(p.estoque)||0,
-                longDesc: p.descricao_curta || '',
+                longDesc: p.descricao_longa || p.descricao_curta || '',
                 img: getImages(p)[0] || '',
                 preco: parseFloat(p.preco)||0
             };
@@ -107,7 +107,7 @@ function openLightbox(src){
             if(found.length === 0){
                 grid.innerHTML =
                     '<div class="empty-state" style="text-align:center;padding:70px 20px;">' +
-                        '<div style="font-size:3rem;margin-bottom:12px;">&#128269;</div>' +
+                        '<div style="font-size:3rem;margin-bottom:12px;"></div>' +
                         '<p style="font-size:1.05rem;font-weight:700;color:#334155;margin-bottom:6px;">Nenhum produto encontrado para "'+esc(termo)+'"</p>' +
                         '<p style="font-size:.9rem;color:#64748b;margin-bottom:22px;">Verifique a ortografia ou tente termos mais gerais.</p>' +
                         '<a href="/produtos" class="btn-cta" style="display:inline-block;">Ver catálogo completo</a>' +
@@ -146,7 +146,7 @@ function openLightbox(src){
             productData[p.nome] = {
                 images: getImages(p),
                 stock: parseInt(p.estoque)||0,
-                longDesc: p.descricao_curta || '',
+                longDesc: p.descricao_longa || p.descricao_curta || '',
                 img: getImages(p)[0] || '',
                 preco: parseFloat(p.preco)||0
             };
@@ -291,7 +291,7 @@ function openLightbox(src){
         if (exist) { exist.qty++; }
         else { cart.push({title: title, price: price, qty: 1}); }
         renderCart();
-        showToast('&#9989; ' + title + ' adicionado ao carrinho!');
+        showToast(title + ' adicionado ao carrinho!');
     }
 
     function openCart(){ if(cartOverlay){cartOverlay.classList.add('active');} if(cartSidebar){cartSidebar.classList.add('active');} document.body.style.overflow = 'hidden'; }
@@ -328,7 +328,8 @@ function openLightbox(src){
                 '</div>';
             });
             var subtotal = cartTotal();
-            var shipping = subtotal > 500 ? 0 : 29.90;
+            var state = document.getElementById('coState');
+            var shipping = window.calcFrete && state && state.value ? window.calcFrete(state.value, subtotal) : (subtotal > 500 ? 0 : 29.90);
             var total = subtotal + shipping;
             h += '<div class="checkout-totals">' +
                 '<div class="row"><span>Subtotal</span><span>' + fmtReal(subtotal) + '</span></div>' +
@@ -438,13 +439,12 @@ function openLightbox(src){
                 var state = document.getElementById('coState').value;
 
                 if (!name || !email || !phone || !address || !number || !city || !state) {
-                    showToast('&#9888; Preencha todos os campos obrigatórios.');
+                    showToast('Preencha todos os campos obrigatórios.');
                     return;
                 }
 
-                var activePayTab = document.querySelector('.payment-tab.active');
-                var payMethod = activePayTab ? activePayTab.getAttribute('data-pay') : 'card';
-                var payLabel = payMethod === 'card' ? 'Cartão de Crédito' : payMethod === 'pix' ? 'PIX' : 'Boleto';
+                var payMethod = 'quote';
+                var payLabel = 'Solicitação de orçamento';
 
                 var orderId = 'BF-' + Date.now().toString(36).toUpperCase();
                 var now = new Date();
@@ -456,16 +456,18 @@ function openLightbox(src){
                 if (nfDate) nfDate.textContent = dateStr;
 
                 var cpf = document.getElementById('coCPF').value.trim() || '---';
+                var cep = (document.getElementById('coCEP') || {}).value || '';
+                var neighborhood = (document.getElementById('coNeighborhood') || {}).value || '';
                 var addrFull = address + ', ' + number;
                 var coComp = document.getElementById('coComplement');
                 if (coComp && coComp.value.trim()) addrFull += ' — ' + coComp.value.trim();
-                addrFull += ' — ' + city + '/' + state;
+                addrFull += ' — ' + neighborhood + ' — ' + city + '/' + state + (cep ? ' — CEP ' + cep : '');
 
-                var custHtml = '<div><span class="lbl">Nome</span><span class="val">'+name+'</span></div>';
-                custHtml += '<div><span class="lbl">CPF</span><span class="val">'+cpf+'</span></div>';
-                custHtml += '<div><span class="lbl">E-mail</span><span class="val">'+email+'</span></div>';
-                custHtml += '<div><span class="lbl">Telefone</span><span class="val">'+phone+'</span></div>';
-                custHtml += '<div style="grid-column:1/-1;"><span class="lbl">Endereço</span><span class="val">'+addrFull+'</span></div>';
+                var custHtml = '<div><span class="lbl">Nome</span><span class="val">'+esc(name)+'</span></div>';
+                custHtml += '<div><span class="lbl">CPF</span><span class="val">'+esc(cpf)+'</span></div>';
+                custHtml += '<div><span class="lbl">E-mail</span><span class="val">'+esc(email)+'</span></div>';
+                custHtml += '<div><span class="lbl">Telefone</span><span class="val">'+esc(phone)+'</span></div>';
+                custHtml += '<div style="grid-column:1/-1;"><span class="lbl">Endereço</span><span class="val">'+esc(addrFull)+'</span></div>';
                 var nfCust = document.getElementById('nfCustomerInfo');
                 if (nfCust) nfCust.innerHTML = custHtml;
 
@@ -475,7 +477,7 @@ function openLightbox(src){
                     var pu = cartPrice(item.price);
                     var tot = pu * item.qty;
                     subtotal += tot;
-                    itemsHtml += '<tr><td>'+item.title+'</td><td class="num">'+item.qty+'</td><td class="num">'+item.price+'</td><td class="num">'+fmtReal(tot)+'</td></tr>';
+                    itemsHtml += '<tr><td>'+esc(item.title)+'</td><td class="num">'+item.qty+'</td><td class="num">'+esc(item.price)+'</td><td class="num">'+fmtReal(tot)+'</td></tr>';
                 });
                 var nfItems = document.getElementById('nfItemsBody');
                 if (nfItems) nfItems.innerHTML = itemsHtml;
@@ -483,8 +485,7 @@ function openLightbox(src){
                 var shipping = subtotal > 500 ? 0 : 29.90;
                 var uf = state;
                 if (window.calcFrete && uf) { shipping = window.calcFrete(uf, subtotal); }
-                var totalCheckoutEl = document.getElementById('checkoutTotalValue');
-                var total = totalCheckoutEl ? (parseFloat(totalCheckoutEl.getAttribute('data-total')) || (subtotal + shipping)) : (subtotal + shipping);
+                var total = subtotal + shipping;
                 var totalsHtml = '<div class="nf-row"><span>Subtotal</span><span>'+fmtReal(subtotal)+'</span></div>';
                 totalsHtml += '<div class="nf-row"><span>Frete</span><span>'+ (shipping === 0 ? 'Grátis' : fmtReal(shipping)) +'</span></div>';
                 totalsHtml += '<div class="nf-row total"><span>TOTAL</span><span>'+fmtReal(total)+'</span></div>';
@@ -494,11 +495,8 @@ function openLightbox(src){
                 var nfPay = document.getElementById('nfPayment');
                 if (nfPay) nfPay.innerHTML = '<strong>Forma de pagamento:</strong> ' + payLabel;
 
-                document.getElementById('checkoutFormFields').style.display = 'none';
-                document.getElementById('checkoutSuccess').style.display = 'block';
-                document.getElementById('btnConfirmOrder').style.display = 'none';
-
-
+                btnConfirm.disabled = true;
+                btnConfirm.textContent = 'Registrando pedido...';
                 supabase.from('pedidos').insert({
                     codigo: orderId,
                     user_id: currentUser.id,
@@ -511,8 +509,16 @@ function openLightbox(src){
                     status: 'pendente',
                     data_entrega: ''
                 }).then(function(res){
-                    if(res.error){ showToast('&#9888; Não foi possível registrar o pedido.'); return; }
-                    showToast('&#9989; Pedido ' + orderId + ' confirmado! (' + payLabel + ')');
+                    if(res.error){
+                        showToast('Não foi possível registrar o pedido. Tente novamente.');
+                        btnConfirm.disabled = false;
+                        btnConfirm.textContent = 'Confirmar pedido';
+                        return;
+                    }
+                    document.getElementById('checkoutFormFields').style.display = 'none';
+                    document.getElementById('checkoutSuccess').style.display = 'block';
+                    document.getElementById('btnConfirmOrder').style.display = 'none';
+                        showToast('Solicitação ' + orderId + ' enviada!');
                     cart = [];
                     renderCart();
                 });
@@ -524,7 +530,7 @@ function openLightbox(src){
 
         var btnChk = document.getElementById('btnCheckout');
         if (btnChk) btnChk.addEventListener('click', function(){
-            if (cart.length === 0) { showToast('&#9888; Carrinho vazio.'); return; }
+            if (cart.length === 0) { showToast('Carrinho vazio.'); return; }
             openCheckout();
         });
     }
@@ -550,45 +556,9 @@ function openLightbox(src){
             v = v.replace(/\D/g,'').slice(0,8);
             return v.replace(/(\d{5})(\d{3})/,'$1-$2').replace(/(\d{5})/,'$1');
         }
-        function maskCard(v){
-            v = v.replace(/\D/g,'').slice(0,16);
-            return v.replace(/(\d{4})(\d{4})(\d{4})(\d{4})/,'$1 $2 $3 $4').replace(/(\d{4})(\d{4})(\d{4})/,'$1 $2 $3').replace(/(\d{4})(\d{4})/,'$1 $2').replace(/(\d{4})/,'$1');
-        }
-        function maskExpiry(v){
-            v = v.replace(/\D/g,'').slice(0,4);
-            if(v.length>=3) return v.replace(/(\d{2})(\d{2})/,'$1/$2');
-            return v;
-        }
-        function validateExpiry(v){
-            v = v.replace(/\D/g,'');
-            if(v.length<4) return true;
-            var m = parseInt(v.slice(0,2)), y = parseInt('20'+v.slice(2,4));
-            if(m<1||m>12) return false;
-            var now = new Date();
-            if(y < now.getFullYear()) return false;
-            if(y === now.getFullYear() && m < (now.getMonth()+1)) return false;
-            return true;
-        }
-
         applyMask(document.getElementById('coCPF'), maskCPF);
         applyMask(document.getElementById('coPhone'), maskPhone);
         applyMask(document.getElementById('coCEP'), maskCEP);
-        applyMask(document.getElementById('cardNumber'), maskCard);
-        applyMask(document.getElementById('cardExpiry'), maskExpiry);
-
-        var cvvEl = document.getElementById('cardCVV');
-        if(cvvEl){ cvvEl.setAttribute('maxlength','3'); cvvEl.addEventListener('input',function(){ this.value=this.value.replace(/\D/g,'').slice(0,3); }); }
-
-        var expiryEl = document.getElementById('cardExpiry');
-        if(expiryEl){
-            expiryEl.addEventListener('blur',function(){
-                if(this.value.replace(/\D/g,'').length===4 && !validateExpiry(this.value)){
-                    showToast('&#9888; Data de validade do cartão inválida ou expirada.');
-                    this.style.borderColor = '#ef4444';
-                } else { this.style.borderColor = ''; }
-            });
-            expiryEl.addEventListener('input',function(){ this.style.borderColor = ''; });
-        }
     })();
 
 
@@ -606,16 +576,16 @@ function openLightbox(src){
             fetch('https://viacep.com.br/ws/'+raw+'/json/')
                 .then(function(r){ return r.json(); })
                 .then(function(data){
-                    if(data.erro){ showToast('&#9888; CEP não encontrado.'); if(cityEl) cityEl.placeholder = 'Sua cidade'; return; }
+                    if(data.erro){ showToast('CEP não encontrado.'); if(cityEl) cityEl.placeholder = 'Sua cidade'; return; }
                     if(cityEl){ cityEl.value = data.localidade||''; cityEl.placeholder = 'Sua cidade'; }
                     if(stateEl && data.uf){ stateEl.value = data.uf; }
                     if(addrEl) addrEl.value = data.logradouro||'';
                     if(bairroEl) bairroEl.value = data.bairro||'';
-                    showToast('&#128205; Endereço preenchido: '+(data.localidade||'')+'/'+(data.uf||''));
+                    showToast('Endereço preenchido: '+(data.localidade||'')+'/'+(data.uf||''));
                     if(typeof renderCheckoutSummary === 'function') renderCheckoutSummary();
                 }).catch(function(){
                     if(cityEl) cityEl.placeholder = 'Sua cidade';
-                    showToast('&#9888; Erro ao consultar CEP.');
+                    showToast('Erro ao consultar CEP.');
                 });
         });
     })();
@@ -679,7 +649,9 @@ function openLightbox(src){
         function doLogin(){
             var login = document.getElementById('loginEmail').value.trim();
             var pass = document.getElementById('loginPass').value;
-            var lookup=login.indexOf('@')>=0?Promise.resolve({data:{email:login}}):supabase.from('profiles').select('email').ilike('nome',login).maybeSingle();
+            var lookup=login.indexOf('@')>=0?Promise.resolve({data:{email:login}}):supabase.rpc('get_login_email',{identifier:login.toLowerCase()}).then(function(result){
+                return {data:{email:result.data}};
+            });
             lookup.then(function(profile){
                 var email=profile.data&&profile.data.email;
                 if(!email)throw new Error('Usuário não encontrado');
@@ -716,16 +688,40 @@ function openLightbox(src){
         var btnR = document.getElementById('btnRegister');
         if (btnR) btnR.addEventListener('click', function(){
             var name = document.getElementById('regName').value.trim();
+            var username = document.getElementById('regUsername').value.trim().toLowerCase();
             var email = document.getElementById('regEmail').value.trim();
             var pass = document.getElementById('regPass').value;
-            if (!name || !email || !pass) { var re = document.getElementById('regError'); if (re) re.textContent = 'Preencha todos os campos.'; return; }
+            if (!name || !username || !email || !pass) { var re = document.getElementById('regError'); if (re) re.textContent = 'Preencha todos os campos.'; return; }
+            if (!/^[a-z0-9._-]{3,30}$/.test(username)) { var re = document.getElementById('regError'); if (re) re.textContent = 'Usuário: use 3 a 30 caracteres (letras, números, ponto, _ ou -).'; return; }
             if (pass.length < 4) { var re = document.getElementById('regError'); if (re) re.textContent = 'Senha deve ter ao menos 4 caracteres.'; return; }
-            supabase.auth.signUp({email:email,password:pass,options:{data:{nome:name}}}).then(function(res){
-                if(res.error){ var re = document.getElementById('regError'); if (re) re.textContent = res.error.message; return; }
+            var cooldownKey = 'bf_signup_cooldown_' + email.toLowerCase();
+            var cooldownUntil = parseInt(localStorage.getItem(cooldownKey) || '0', 10);
+            if(cooldownUntil > Date.now()){
+                var wait = Math.ceil((cooldownUntil - Date.now()) / 1000);
+                var re = document.getElementById('regError'); if (re) re.textContent = 'Aguarde ' + wait + 's antes de tentar novamente.';
+                return;
+            }
+            btnR.disabled = true;
+            btnR.textContent = 'Criando...';
+            supabase.auth.signUp({email:email,password:pass,options:{data:{nome:name,usuario:username}}}).then(function(res){
+                if(res.error){
+                    var message = res.error.message || 'Não foi possível criar a conta.';
+                    if(/rate limit|email send/i.test(message)) message = 'O serviço de confirmação atingiu o limite temporário de e-mails. Aguarde alguns minutos e tente novamente.';
+                    if(/already registered|already exists/i.test(message)) message = 'Este e-mail já está cadastrado.';
+                    if(/duplicate|unique|profiles_usuario/i.test(message)) message = 'Este usuário já está em uso. Escolha outro.';
+                    var re = document.getElementById('regError'); if (re) re.textContent = message;
+                    return;
+                }
                 if(res.data.user && !res.data.session){ var re = document.getElementById('regError'); if (re) re.textContent = 'Conta criada. Verifique seu e-mail para confirmar o cadastro.'; return; }
                 authOverlay.classList.remove('active');
-                showToast('&#127881; Conta criada com sucesso!');
+                showToast('Conta criada com sucesso!');
                 setTimeout(function(){ location.reload(); }, 600);
+            }).catch(function(){
+                var re = document.getElementById('regError'); if (re) re.textContent = 'Não foi possível criar a conta agora. Tente novamente mais tarde.';
+            }).finally(function(){
+                localStorage.setItem(cooldownKey, String(Date.now() + 60000));
+                btnR.disabled = false;
+                btnR.textContent = 'Cadastrar';
             });
         });
 
@@ -760,44 +756,25 @@ function openLightbox(src){
             var email = (document.getElementById('resetEmail')||{}).value.trim();
             var err = document.getElementById('resetError');
             if (!email) { if(err) err.textContent = 'Informe o e-mail.'; return; }
+            var resetKey = 'bf_reset_cooldown_' + email.toLowerCase();
+            if(parseInt(localStorage.getItem(resetKey) || '0', 10) > Date.now()){
+                if(err) err.textContent = 'Aguarde antes de solicitar outro link.';
+                return;
+            }
+            var resetButton = document.getElementById('btnSendReset');
+            if(resetButton) resetButton.disabled = true;
             supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin + window.location.pathname}).then(function(res){
-                if(res.error){ if(err) err.textContent = res.error.message; return; }
+                if(res.error){
+                    if(err) err.textContent = /rate limit|email send/i.test(res.error.message || '') ? 'O limite temporário de e-mails foi atingido. Aguarde antes de tentar novamente.' : res.error.message;
+                    return;
+                }
                 if(err) err.textContent = '';
-                showToast('&#128231; Link de recuperação enviado para ' + email + '.');
+                showToast('Link de recuperação enviado para ' + email + '.');
                 boxLogin.style.display = 'block';
                 if(boxReset) boxReset.style.display = 'none';
-            });
-        });
-
-        var resetCodeInputs = document.getElementById('resetCodeInputs');
-        if(resetCodeInputs) {
-            resetCodeInputs.addEventListener('input', function(e){
-                var inp = e.target;
-                if(inp.value && inp.nextElementSibling) inp.nextElementSibling.focus();
-            });
-            resetCodeInputs.addEventListener('keydown', function(e){
-                if(e.key === 'Backspace' && !e.target.value && e.target.previousElementSibling) {
-                    e.target.previousElementSibling.focus();
-                }
-                if(e.key === 'Enter') {
-                    var btnV = document.getElementById('btnVerifyCode');
-                    if(btnV) btnV.click();
-                }
-            });
-        }
-
-        var btnVerify = document.getElementById('btnVerifyCode');
-        if(btnVerify) btnVerify.addEventListener('click', function(){
-            var email = document.getElementById('resetEmailDisplay').textContent.trim();
-            var err = document.getElementById('resetCodeError');
-            if(err) err.textContent = 'Use o link enviado por e-mail para definir uma nova senha.';
-        });
-
-        var btnResend = document.getElementById('btnResendCode');
-        if(btnResend) btnResend.addEventListener('click', function(){
-            var email = document.getElementById('resetEmail').value.trim();
-            supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin + window.location.pathname}).then(function(res){
-                showToast(res.error ? '&#9888; ' + res.error.message : '&#128231; Novo link enviado.');
+            }).finally(function(){
+                localStorage.setItem(resetKey, String(Date.now() + 60000));
+                if(resetButton) resetButton.disabled = false;
             });
         });
 
@@ -813,13 +790,18 @@ function openLightbox(src){
                 if(res.error){ if(err) err.textContent = res.error.message; return; }
                 authOverlay.classList.remove('active');
                 if(boxReset) boxReset.style.display = 'none';
-                showToast('&#9989; Senha redefinida com sucesso!');
+                showToast('Senha redefinida com sucesso!');
                 var le = document.getElementById('loginError'); if(le) le.textContent = '';
             });
         });
     }
 
-    supabase.auth.getSession().then(function(res){
+    if(!supabase){
+        currentUser = null;
+        currentProfile = null;
+        updateAuthUI();
+        renderCart();
+    } else supabase.auth.getSession().then(function(res){
         currentUser = res.data && res.data.session ? res.data.session.user : null;
         if(currentUser){
             return supabase.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
@@ -833,7 +815,7 @@ function openLightbox(src){
         cart = items || [];
         renderCart();
     });
-    supabase.auth.onAuthStateChange(function(event, session){
+    if(supabase) supabase.auth.onAuthStateChange(function(event, session){
         currentUser = session ? session.user : null;
         if(event === 'PASSWORD_RECOVERY' && authOverlay && boxReset){
             authOverlay.classList.add('active');
@@ -864,7 +846,7 @@ function openLightbox(src){
                 navigator.clipboard.writeText(num).then(function(){
                     phoneEl.classList.add('copied');
                     setTimeout(function(){ phoneEl.classList.remove('copied'); }, 1800);
-                    showToast('&#128222; Número copiado: (16) 98138-6747');
+                    showToast('Número copiado: (16) 98138-6747');
                 });
             }
         });
@@ -883,7 +865,7 @@ function openLightbox(src){
             e.preventDefault();
             var button=document.getElementById('contactSubmit');
             var status=document.getElementById('contactStatus');
-            var data={name:document.getElementById('contactName').value.trim(),email:document.getElementById('contactEmailInput').value.trim(),message:document.getElementById('contactMessage').value.trim()};
+            var data={name:document.getElementById('contactName').value.trim(),email:document.getElementById('contactEmailInput').value.trim(),message:document.getElementById('contactMessage').value.trim(),website:(document.getElementById('contactWebsite')||{}).value||''};
             button.disabled=true;
             button.textContent='Enviando...';
             status.className='contact-form-status';
@@ -900,7 +882,7 @@ function openLightbox(src){
             if (addBtn) {
                 e.stopPropagation();
                 if (!currentUser) {
-                    showToast('&#128274; Faça login para adicionar ao carrinho.');
+                    showToast('Faça login para adicionar ao carrinho.');
                     if (authOverlay) authOverlay.classList.add('active');
                     return;
                 }
@@ -984,7 +966,7 @@ function openLightbox(src){
                     if (gallery.length) {
                         mainImg.innerHTML = '<img src="'+gallery[0]+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">';
                     } else {
-                        mainImg.innerHTML = '&#128424;';
+                        mainImg.innerHTML = '';
                     }
                 }
 
@@ -1015,7 +997,7 @@ function openLightbox(src){
                 }
             } else {
                 if (modalDesc) modalDesc.textContent = desc;
-                if (mainImg) mainImg.innerHTML = '&#128424;';
+                if (mainImg) mainImg.innerHTML = '';
                 if (thumbs) thumbs.innerHTML = '';
                 if (modalStock) modalStock.innerHTML = '';
             }
@@ -1034,7 +1016,7 @@ function openLightbox(src){
 
         if (modalAddCart) modalAddCart.addEventListener('click', function(){
             if (!currentUser) {
-                showToast('&#128274; Faça login para adicionar ao carrinho.');
+                showToast('Faça login para adicionar ao carrinho.');
                 if (authOverlay) authOverlay.classList.add('active');
                 return;
             }
@@ -1063,7 +1045,7 @@ function openLightbox(src){
                 if (price) addToCart(currentModalProduct, price);
                 closeModal();
                 if (!currentUser) {
-                    showToast('&#128274; Faça login para finalizar a compra.');
+                    showToast('Faça login para finalizar a compra.');
                     if (authOverlay) authOverlay.classList.add('active');
                 } else {
                     setTimeout(openCheckout, 300);
@@ -1217,7 +1199,7 @@ function openLightbox(src){
             var html = '<div class="sd-header"><span>Buscas recentes</span><button type="button" class="sd-clear" id="sdClearRecent">Limpar</button></div>';
             recent.forEach(function(term){
                 html += '<div class="search-recent-item" data-term="'+esc(term)+'" role="option">' +
-                    '<span class="sr-icon">&#128269;</span><span>'+esc(term)+'</span></div>';
+                    '<span class="sr-icon"></span><span>'+esc(term)+'</span></div>';
             });
             dropdown.innerHTML = html;
             dropdown.classList.add('open');
@@ -1253,7 +1235,7 @@ function openLightbox(src){
                 var firstImg = getImages(p)[0];
                 var img = firstImg
                     ? '<img class="si-img" src="'+esc(firstImg)+'" alt="">'
-                    : '<span class="si-img">&#128424;</span>';
+                    : '<span class="si-img"></span>';
                 html += '<div class="search-item" data-term="'+esc(p.nome)+'" role="option">' +
                     img +
                     '<div class="si-info">' +
@@ -1372,7 +1354,7 @@ function openLightbox(src){
                 myOrders.forEach(function(p){
                     var statusClass = p.status === 'entregue' ? 'badge-verde' : p.status === 'cancelado' ? 'badge-vermelho' : 'badge-amarelo';
                     var statusText = p.status.charAt(0).toUpperCase() + p.status.slice(1);
-                    var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
+                var pagLabel = p.pagamento === 'quote' ? 'Orçamento' : p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
                     var entrega = p.data_entrega || '—';
                     html += '<tr>' +
                         '<td><strong>' + p.codigo + '</strong></td>' +
@@ -1430,6 +1412,7 @@ function openLightbox(src){
             currentProfile = perfil;
 
             document.getElementById('perfilNome').value = perfil.nome || currentUser.user_metadata && currentUser.user_metadata.nome || '';
+            document.getElementById('perfilUsuario').value = perfil.usuario || currentUser.user_metadata && currentUser.user_metadata.usuario || '';
             document.getElementById('perfilEmail').value = currentUser.email || '';
             document.getElementById('perfilPhone').value = perfil.telefone || perfil.phone || '';
             document.getElementById('perfilNivel').value = perfil.role === 'admin' ? 'Administrador' : 'Usuário';
@@ -1475,10 +1458,8 @@ function openLightbox(src){
             } else {
                 var html = '';
                 cartoes.forEach(function(c, i){
-                    var num = c.numero.replace(/\D/g,'');
-                    var numFormatado = num.replace(/(\d{4})/g,'$1 ').trim();
+                    var num = String(c.ultimos4 || c.numero || '').replace(/\D/g,'');
                     var ultimos4 = num.slice(-4);
-                    var cvv = c.cvv || '***';
                     var bandeiraCls = c.bandeira || 'outro';
                     html += '<div class="cartao-3d-wrap">' +
                         '<div class="cartao-3d" onclick="this.classList.toggle(\'flipped\')">' +
@@ -1492,9 +1473,9 @@ function openLightbox(src){
                                 '</div>' +
                                 '<div class="cartao-3d-hint">Clique para ver CVV</div>' +
                             '</div>' +
-                            '<div class="cartao-3d-face cartao-3d-back">' +
-                                '<div class="cartao-3d-tarja"></div>' +
-                                '<div class="cartao-3d-cvv-area"><span class="cartao-3d-cvv-label">CVV</span><span class="cartao-3d-cvv">'+cvv+'</span></div>' +
+                                '<div class="cartao-3d-face cartao-3d-back">' +
+                                 '<div class="cartao-3d-tarja"></div>' +
+                                 '<div class="cartao-3d-cvv-area"><span class="cartao-3d-cvv-label">Dados protegidos</span><span class="cartao-3d-cvv">••••</span></div>' +
                                 '<div class="cartao-3d-hint" style="margin-top:16px;">Clique para voltar</div>' +
                             '</div>' +
                         '</div>' +
@@ -1528,7 +1509,7 @@ function openLightbox(src){
                         canvas.toBlob(function(blob){
                             var path=currentUser.id+'/'+Date.now()+'.webp';
                             supabase.storage.from('perfis').upload(path,blob,{cacheControl:'31536000',upsert:true,contentType:'image/webp'}).then(function(res){
-                                if(res.error){showToast('&#9888; '+res.error.message);return;}
+                                if(res.error){showToast('+res.error.message);return;}
                                 var url=supabase.storage.from('perfis').getPublicUrl(path).data.publicUrl;
                                 document.getElementById('perfilFoto').innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
                                 savePerfil({foto_url:url});
@@ -1552,7 +1533,7 @@ function openLightbox(src){
             });
             var btn = document.getElementById('userNameBtn');
             if(btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>' + nome + '</span>';
-            showToast('&#9989; Dados salvos!');
+            showToast('Dados salvos!');
         });
 
         var adminLink = document.getElementById('perfilAdminLink');
@@ -1575,7 +1556,7 @@ function openLightbox(src){
                 return;
             }
             savePerfil({endereco: endereco});
-            showToast('&#9989; Endereço salvo! Este endereço será usado no checkout.');
+            showToast('Endereço salvo! Este endereço será usado no checkout.');
         });
 
         document.getElementById('btnAddCartao').addEventListener('click', function(){
@@ -1598,11 +1579,11 @@ function openLightbox(src){
             if(!numero || !nome || !validade){ showToast('&#9888; Preencha todos os campos do cartão.'); return; }
             var perfil = loadPerfil() || {};
             if(!perfil.cartoes) perfil.cartoes = [];
-            perfil.cartoes.push({numero: numero, nome: nome, validade: validade, bandeira: bandeira, cvv: cvv});
+            perfil.cartoes.push({ultimos4: numero.replace(/\D/g,'').slice(-4), nome: nome, validade: validade, bandeira: bandeira});
             savePerfil({cartoes: perfil.cartoes}).then(function(){ renderCartoes(currentProfile); });
             document.getElementById('cartaoForm').style.display = 'none';
             document.getElementById('btnAddCartao').style.display = 'block';
-            showToast('&#9989; Cartão salvo!');
+            showToast('Cartão salvo sem dados sensíveis.');
         });
 
         var perfilCloseBtn = document.getElementById('perfilClose');
@@ -1679,7 +1660,7 @@ function openLightbox(src){
             var coState = document.getElementById('coState');
             var coComplement = document.getElementById('coComplement');
             if(coName && !coName.value) coName.value = perfil.nome || currentUser.user_metadata && currentUser.user_metadata.nome || '';
-            if(coPhone && !coPhone.value) coPhone.value = perfil.phone || '';
+            if(coPhone && !coPhone.value) coPhone.value = perfil.telefone || perfil.phone || '';
             if(end.cep && coCEP && !coCEP.value) coCEP.value = end.cep;
             if(end.rua && coAddress && !coAddress.value) coAddress.value = end.rua;
             if(end.numero && coNumber && !coNumber.value) coNumber.value = end.numero;
@@ -1729,6 +1710,8 @@ function openLightbox(src){
             return 29.90;
         }
         window.calcFrete = calcFrete;
+        var checkoutState = document.getElementById('coState');
+        if(checkoutState) checkoutState.addEventListener('change', renderCheckoutSummary);
     })();
 
 
@@ -1743,7 +1726,7 @@ function openLightbox(src){
             var msg = '*Pedido Confirmado* - B&F Importes\n\n';
             msg += '*Pedido:* ' + o.codigo + '\n';
             msg += '*Data:* ' + new Date(o.created_at).toLocaleString('pt-BR') + '\n';
-            msg += '*Pagamento:* ' + (o.pagamento === 'card' ? 'Cartão' : o.pagamento === 'pix' ? 'PIX' : 'Boleto') + '\n';
+            msg += '*Pagamento:* ' + (o.pagamento === 'quote' ? 'Orçamento' : o.pagamento === 'card' ? 'Cartão' : o.pagamento === 'pix' ? 'PIX' : 'Boleto') + '\n';
             msg += '*Total:* R$ ' + parseFloat(o.total).toFixed(2).replace('.',',') + '\n\n';
             msg += '*Cliente:* ' + (o.cliente.nome || '') + '\n';
             msg += '*E-mail:* ' + (o.cliente.email || '') + '\n\n';
@@ -1751,7 +1734,7 @@ function openLightbox(src){
             o.itens.forEach(function(item, i){
                 msg += '  ' + (i+1) + '. ' + item.titulo + ' (' + item.qtd + 'x ' + item.preco + ')\n';
             });
-            msg += '\nAcompanhe seus pedidos em: https://mrdragonrsn.github.io/bf-importes/';
+            msg += '\nAcompanhe seus pedidos em: https://bf-imp.vercel.app/pedidos';
             window.open('https://wa.me/5516981386747?text=' + encodeURIComponent(msg), '_blank');
             });
         });
@@ -2019,6 +2002,17 @@ function openLightbox(src){
         track.addEventListener('click', function(e){
             var card = e.target.closest('.product-card');
             if (!card) return;
+            var addBtn = e.target.closest('.btn-card-add, .add-to-cart');
+            if(addBtn){
+                e.stopPropagation();
+                if(!currentUser){
+                    showToast('Faça login para adicionar ao carrinho.');
+                    if(authOverlay) authOverlay.classList.add('active');
+                    return;
+                }
+                addToCart(card.querySelector('h3').textContent.trim(), card.querySelector('.price').textContent.trim());
+                return;
+            }
             if (typeof window.openProductModal === 'function') {
                 window.openProductModal(card);
             }
@@ -2028,6 +2022,7 @@ function openLightbox(src){
             var card = e.target.closest('.product-card');
             if (!card) return;
             e.preventDefault();
+            if(e.target.closest('.btn-card-add, .add-to-cart')) return;
             if (typeof window.openProductModal === 'function') {
                 window.openProductModal(card);
             }

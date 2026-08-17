@@ -1,32 +1,25 @@
-function escapeHtml(value) {
-    return String(value || '').replace(/[&<>"']/g, function(character) {
-        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character];
-    });
-}
+var requestLog = new Map();
 
 module.exports = async function handler(request, response) {
+    response.setHeader('Cache-Control', 'no-store');
     if (request.method !== 'POST') {
         response.setHeader('Allow', 'POST');
         return response.status(405).json({error:'Método não permitido'});
     }
-    if (!process.env.RESEND_API_KEY) return response.status(500).json({error:'Serviço de e-mail não configurado'});
     var body = request.body || {};
     var name = String(body.name || '').trim();
     var email = String(body.email || '').trim();
     var message = String(body.message || '').trim();
+    var website = String(body.website || '').trim();
+    if (website) return response.status(204).end();
     if (!name || !email || !message || name.length > 120 || email.length > 254 || message.length > 4000) return response.status(400).json({error:'Dados inválidos'});
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return response.status(400).json({error:'E-mail inválido'});
-    var resend = await fetch('https://api.resend.com/emails', {
-        method:'POST',
-        headers:{Authorization:'Bearer '+process.env.RESEND_API_KEY,'Content-Type':'application/json'},
-        body:JSON.stringify({
-            from:process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
-            to:[process.env.RESEND_TO_EMAIL || 'atendimento@biancoeferreira.com.br'],
-            reply_to:email,
-            subject:'Novo contato pelo site: '+name,
-            html:'<h2>Novo contato pelo site</h2><p><strong>Nome:</strong> '+escapeHtml(name)+'</p><p><strong>E-mail:</strong> '+escapeHtml(email)+'</p><p><strong>Mensagem:</strong></p><p>'+escapeHtml(message).replace(/\n/g,'<br>')+'</p>'
-        })
-    });
-    if (!resend.ok) return response.status(502).json({error:'Falha ao enviar e-mail'});
-    return response.status(200).json({ok:true});
+    var ip = String(request.headers['x-forwarded-for'] || request.headers['x-real-ip'] || 'unknown').split(',')[0].trim();
+    var rateKey = ip + ':' + email.toLowerCase();
+    var now = Date.now();
+    var previous = requestLog.get(rateKey) || 0;
+    if (now - previous < 60000) return response.status(429).json({error:'Aguarde um minuto antes de enviar outra mensagem.'});
+    requestLog.set(rateKey, now);
+    for (var entry of requestLog) if (now - entry[1] > 3600000) requestLog.delete(entry[0]);
+    return response.status(200).json({ok:true, info:'Mensagem recebida. Entraremos em contato em breve.'});
 };

@@ -7,9 +7,10 @@
         if(result.error||!result.data.user){window.location.replace('/');return}
         var user=result.data.user;
         if(page==='profile'){
-            return client.from('profiles').select('nome,telefone').eq('id',user.id).maybeSingle().then(function(profile){
+            return client.from('profiles').select('nome,usuario,telefone').eq('id',user.id).maybeSingle().then(function(profile){
                 var data=profile.data||{};
                 document.getElementById('profileName').value=data.nome||user.user_metadata&&user.user_metadata.nome||'';
+                document.getElementById('profileUsername').value=data.usuario||user.user_metadata&&user.user_metadata.usuario||'';
                 document.getElementById('profileEmail').value=user.email||'';
                 document.getElementById('profilePhone').value=data.telefone||'';
                 document.getElementById('profileForm').addEventListener('submit',function(event){

@@ -20,7 +20,8 @@ function save(key,obj){
     return Promise.resolve();
 }
 
-function escAttr(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function escAttr(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function formatPrice(n){n=parseFloat(n)||0;return n.toFixed(2).replace('.',',');}
 function parsePrice(s){return parseFloat(String(s==null?'':s).replace(/[^\d.,-]/g,'').replace(/\./g,'').replace(',','.'))||0;}
 
@@ -66,7 +67,7 @@ async function loadData(){
         supabase.from('categorias').select('*').order('ordem',{ascending:true}),
         supabase.from('pedidos').select('*').order('created_at',{ascending:false})
     ]);
-    dataCache.profiles=(results[0].data||[]).map(function(row){return {id:row.id,name:row.nome,email:row.email||'',role:row.role,profile:row}});
+    dataCache.profiles=(results[0].data||[]).map(function(row){return {id:row.id,name:row.nome,username:row.usuario||'',email:row.email||'',role:row.role,profile:row}});
     (results[1].data||[]).forEach(function(row){dataCache[row.chave]=row.valor||{}});
     dataCache.categorias=(results[2].data||[]).filter(function(row){return row.ativo}).map(function(row){return row.nome});
     dataCache.pedidos=(results[3].data||[]).map(function(row){
@@ -197,7 +198,7 @@ function renderStock(){
     var tbody=document.getElementById('stockBody');
     tbody.innerHTML='<tr><td colspan="7" class="empty-state">Carregando produtos...</td></tr>';
     supabase.from('produtos').select('*').order('nome',{ascending:true}).then(function(res){
-        if(res.error){ tbody.innerHTML='<tr><td colspan="7" class="empty-state">Erro ao carregar produtos.</td></tr>'; showToast('&#9888; '+res.error.message); return; }
+        if(res.error){ tbody.innerHTML='<tr><td colspan="7" class="empty-state">Erro ao carregar produtos.</td></tr>'; showToast(''+res.error.message); return; }
         var produtos=res.data||[];
         var html='';
         produtos.forEach(function(p){
@@ -212,9 +213,9 @@ function renderStock(){
                 '</select></td>'+
                 '<td><input class="tbl-input" value="'+formatPrice(p.preco)+'" data-field="preco" style="width:90px;"></td>'+
                 '<td><input class="tbl-input" type="number" value="'+stock+'" data-field="estoque" min="0" style="width:65px;"></td>'+
-                '<td><div class="flex-row" style="gap:6px;">'+imgHtml+'<label class="tbl-img-upload" title="Alterar imagem"><input type="file" accept="image/*" style="display:none;" onchange="uploadTblImg(this,\''+p.id+'\')">&#128247;</label></div></td>'+
+                '<td><div class="flex-row" style="gap:6px;">'+imgHtml+'<label class="tbl-img-upload" title="Alterar imagem"><input type="file" accept="image/*" style="display:none;" onchange="uploadTblImg(this,\''+p.id+'\')"></label></div></td>'+
                 '<td><span class="badge '+statusBadge+'">'+statusText+'</span></td>'+
-                '<td><button class="btn-icon danger" onclick="deleteProduct(\''+p.id+'\')" title="Remover">&#128465;</button></td>'+
+                '<td><button class="btn-icon danger" onclick="deleteProduct(\''+p.id+'\')" title="Remover"></button></td>'+
             '</tr>';
         });
         tbody.innerHTML=html||'<tr><td colspan="7" class="empty-state">Nenhum produto cadastrado.</td></tr>';
@@ -230,25 +231,26 @@ function bindStockEdits(tbody){
             if(!id)return;
             var update={};
             if(field==='nome'){if(!val)return;update.nome=val}else if(field==='categoria')update.categoria=val;else if(field==='preco')update.preco=parsePrice(val);else if(field==='estoque')update.estoque=parseInt(val)||0;else return;
-            supabase.from('produtos').update(update).eq('id',id).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}showToast('&#9989; Alteração salva!');if(field==='estoque')renderStock()});
+            supabase.from('produtos').update(update).eq('id',id).then(function(res){if(res.error){showToast(''+res.error.message);return}showToast('Alteração salva!');if(field==='estoque')renderStock()});
         });
     });
 }
 
 window.uploadTblImg=function(input,id){
     var file=input.files[0];if(!file)return;
-    uploadImagesToStorage([file]).then(function(urls){return supabase.from('produtos').update({imagem_url:urls[0]||null}).eq('id',id)}).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}showToast('&#128247; Imagem atualizada!');renderStock()}).catch(function(err){showToast('&#9888; '+(err.message||err))});
+    uploadImagesToStorage([file]).then(function(urls){return supabase.from('produtos').update({imagem_url:urls[0]||null}).eq('id',id)}).then(function(res){if(res.error){showToast(''+res.error.message);return}showToast('Imagem atualizada!');renderStock()}).catch(function(err){showToast(''+(err.message||err))});
 };
 
 window.deleteProduct=function(id){
     if(!confirm('Remover produto permanentemente?'))return;
-    supabase.from('produtos').delete().eq('id',id).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}showToast('&#128465; Produto removido.');renderStock()});
+    supabase.from('produtos').delete().eq('id',id).then(function(res){if(res.error){showToast(''+res.error.message);return}showToast('Produto removido.');renderStock()});
 };
 
 document.getElementById('btnAddProduct').addEventListener('click',function(){
     var name=document.getElementById('prodName').value.trim(),cat=document.getElementById('prodCat').value,price=document.getElementById('prodPrice').value.trim(),stock=parseInt(document.getElementById('prodStock').value)||0,desc=document.getElementById('prodDesc').value.trim(),msg=document.getElementById('prodAddMsg');
     if(!name){msg.textContent='Informe o nome.';return}if(!price){msg.textContent='Informe o preço.';return}msg.textContent='Salvando...';
-    uploadImagesToStorage(prodImgFiles).then(function(urls){return supabase.from('produtos').insert([{nome:name,categoria:cat,preco:parsePrice(price),estoque:stock,descricao_curta:desc||name,imagem_url:urls[0]||null,imagens:urls.slice(1)}])}).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}showToast('&#9989; Produto adicionado!');renderStock()}).catch(function(err){showToast('&#9888; '+(err.message||err))});
+    var longDesc=document.getElementById('prodLongDesc').value.trim();
+    uploadImagesToStorage(prodImgFiles).then(function(urls){return supabase.from('produtos').insert([{nome:name,categoria:cat,preco:parsePrice(price),estoque:stock,descricao_curta:desc||name,descricao_longa:longDesc||desc||name,imagem_url:urls[0]||null,imagens:urls.slice(1)}])}).then(function(res){if(res.error){showToast(''+res.error.message);return}showToast('Produto adicionado!');renderStock()}).catch(function(err){showToast(''+(err.message||err))});
 });
 function getCategories(){
     var cats=load(CATEGORIES_KEY,[]);
@@ -270,7 +272,7 @@ function renderCategories(){
     cats.forEach(function(c,i){
         html+='<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:8px;">'+
             '<input class="tbl-input" value="'+c+'" data-idx="'+i+'" data-cat-orig="'+c+'" style="font-size:.8rem;width:140px;padding:3px 6px;" onchange="editCat(this)">'+
-            '<button class="btn-icon danger" onclick="removeCat('+i+')" title="Remover" style="font-size:.8rem;">&#128465;</button>'+
+            '<button class="btn-icon danger" onclick="removeCat('+i+')" title="Remover" style="font-size:.8rem;"></button>'+
         '</div>';
     });
     document.getElementById('catList').innerHTML=html||'<span style="font-size:.78rem;color:var(--text-muted);">Nenhuma categoria.</span>';
@@ -281,13 +283,13 @@ document.getElementById('btnAddCat').addEventListener('click',function(){
     var name=input.value.trim().toLowerCase().replace(/\s+/g,'-');
     if(!name)return;
     var cats=getCategories();
-    if(cats.indexOf(name)>=0){showToast('&#9888; Categoria já existe.');return}
+    if(cats.indexOf(name)>=0){showToast('Categoria já existe.');return}
     cats.push(name);
     save(CATEGORIES_KEY,cats);
     input.value='';
     renderCategories();
     renderStock();
-    showToast('&#9989; Categoria "'+name+'" adicionada!');
+    showToast('Categoria "'+name+'" adicionada!');
 });
 document.getElementById('catInput').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('btnAddCat').click()});
 window.editCat=function(el){
@@ -296,22 +298,22 @@ window.editCat=function(el){
     var val=el.value.trim().toLowerCase().replace(/\s+/g,'-');
     if(!val||val===orig)return;
     var cats=getCategories();
-    if(cats.indexOf(val)>=0&&val!==orig){showToast('&#9888; Categoria já existe.');el.value=orig;return}
+    if(cats.indexOf(val)>=0&&val!==orig){showToast('Categoria já existe.');el.value=orig;return}
     cats[idx]=val;
     save(CATEGORIES_KEY,cats);
     el.setAttribute('data-cat-orig',val);
     renderCategories();
-    showToast('&#9989; Categoria renomeada: "'+orig+'" → "'+val+'"');
+    showToast('Categoria renomeada: "'+orig+'" → "'+val+'"');
 };
 window.removeCat=function(i){
     var cats=getCategories();
-    if(cats.length<=1){showToast('&#9888; Precisa de ao menos 1 categoria.');return}
+    if(cats.length<=1){showToast('Precisa de ao menos 1 categoria.');return}
     if(!confirm('Remover categoria "'+cats[i]+'"? Produtos com esta categoria serão afetados.'))return;
     cats.splice(i,1);
     save(CATEGORIES_KEY,cats);
     renderCategories();
     renderStock();
-    showToast('&#128465; Categoria removida.');
+    showToast('Categoria removida.');
 };
 
 
@@ -328,8 +330,8 @@ async function renderAnuncios(){
             '<div class="info">'+
                 '<input class="tbl-input" value="'+escAttr(a.nome||'')+'" placeholder="Nome do anúncio" data-idx="'+idx+'" data-field="nome" style="margin-bottom:4px;">'+
                 '<div class="actions">'+
-                    '<label class="tbl-img-upload" style="cursor:pointer;"><input type="file" accept="image/*" style="display:none;" onchange="uploadAnuncioImg(this,'+idx+')">&#128247; Trocar Imagem</label>'+
-                    '<button class="btn btn-outline btn-sm" onclick="removeAnuncio('+idx+')">&#128465; Remover</button>'+
+                    '<label class="tbl-img-upload" style="cursor:pointer;"><input type="file" accept="image/*" style="display:none;" onchange="uploadAnuncioImg(this,'+idx+')">Trocar Imagem</label>'+
+                    '<button class="btn btn-outline btn-sm" onclick="removeAnuncio('+idx+')">Remover</button>'+
                 '</div>'+
             '</div>'+
         '</div>';
@@ -350,23 +352,23 @@ window.uploadAnuncioImg=function(input,idx){
         var url=supabase.storage.from('anuncios').getPublicUrl(res.data.path).data.publicUrl;
         return supabase.from('anuncios').update({imagem_url:url}).eq('id',anunciosTemp[idx].id);
     }).then(function(res){
-        if(res&&res.error)showToast('&#9888; '+res.error.message);else{showToast('&#128247; Imagem carregada!');renderAnuncios()}
-    }).catch(function(err){showToast('&#9888; '+err.message)});
+        if(res&&res.error)showToast(''+res.error.message);else{showToast('Imagem carregada!');renderAnuncios()}
+    }).catch(function(err){showToast(''+err.message)});
 };
 
 window.removeAnuncio=function(idx){
     if(!confirm('Remover este anúncio?'))return;
-    supabase.from('anuncios').delete().eq('id',anunciosTemp[idx].id).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}renderAnuncios();showToast('&#128465; Anúncio removido.')});
+    supabase.from('anuncios').delete().eq('id',anunciosTemp[idx].id).then(function(res){if(res.error){showToast(''+res.error.message);return}renderAnuncios();showToast('Anúncio removido.')});
 };
 
 document.getElementById('btnAddAnuncio').addEventListener('click',function(){
-    supabase.from('anuncios').insert({nome:'Novo anúncio',tipo:'galeria',ativo:true,ordem:anunciosTemp.length}).then(function(res){if(res.error){showToast('&#9888; '+res.error.message);return}renderAnuncios();showToast('&#10133; Novo slot adicionado.')});
+    supabase.from('anuncios').insert({nome:'Novo anúncio',tipo:'galeria',ativo:true,ordem:anunciosTemp.length}).then(function(res){if(res.error){showToast(''+res.error.message);return}renderAnuncios();showToast(' Novo slot adicionado.')});
 });
 
 document.getElementById('btnSaveAnuncios').addEventListener('click',function(){
     renderAnuncios();
     document.getElementById('anuncioMsg').textContent='Salvos no Supabase.';document.getElementById('anuncioMsg').style.color='var(--success)';
-    showToast('&#9989; Anúncios salvos!');
+    showToast('Anúncios salvos!');
 });
 function loadBannerForm(){
     var b=load(BANNER_KEY,defaultBanner());
@@ -381,7 +383,7 @@ function loadBannerForm(){
 document.getElementById('btnSaveBanner').addEventListener('click',function(){
     save(BANNER_KEY,{title:document.getElementById('bannerTitle').value,title2:'',subtitle:document.getElementById('bannerSubtitle').value,bgUrl:document.getElementById('bannerBgUrl').value,bgColor:document.getElementById('bannerBgColor').value,btnText:document.getElementById('bannerBtnText').value});
     document.getElementById('bannerMsg').textContent='Salvo!';document.getElementById('bannerMsg').style.color='var(--success)';
-    showToast('&#9989; Banner salvo!');
+    showToast('Banner salvo!');
 });
 document.getElementById('btnResetBanner').addEventListener('click',function(){save(BANNER_KEY,defaultBanner());loadBannerForm();showToast('&#8635; Restaurado ao padrão.')});
 
@@ -402,7 +404,7 @@ function loadConfigForm(){
 document.getElementById('btnSaveConfig').addEventListener('click',function(){
     save(CONFIG_KEY,{company:document.getElementById('cfgCompany').value,brand:document.getElementById('cfgBrand').value,cnpj:document.getElementById('cfgCNPJ').value,phone:document.getElementById('cfgPhone').value,email:document.getElementById('cfgEmail').value,hours:document.getElementById('cfgHours').value,address:document.getElementById('cfgAddress').value,cep:document.getElementById('cfgCEP').value,cityState:document.getElementById('cfgCityState').value});
     document.getElementById('configMsg').textContent='Salvo!';document.getElementById('configMsg').style.color='var(--success)';
-    showToast('&#9989; Configurações salvas!');
+    showToast('Configurações salvas!');
 });
 
 
@@ -410,14 +412,14 @@ function renderUsers(){
     var users=load(USERS_KEY,[]),html='';
     users.forEach(function(u,i){
         var roleBadge=u.role==='admin'?'<span class="badge badge-green">Admin</span>':'<span class="badge" style="background:rgba(59,130,246,.15);color:var(--accent);">Usuário</span>';
-        html+='<tr><td>'+u.name+'</td><td>'+u.email+'</td><td>'+roleBadge+'</td>'+
+        html+='<tr><td>'+escHtml(u.name)+'</td><td>'+escHtml(u.username||'—')+'</td><td>'+escHtml(u.email)+'</td><td>'+roleBadge+'</td>'+
             '<td><div class="flex-row" style="gap:4px;">'+
                 '<button class="btn btn-outline btn-sm" onclick="editUser('+i+')" title="Editar">&#9998;</button>'+
                 '<button class="btn btn-outline btn-sm" onclick="showResetPass('+i+')" title="Resetar senha">&#128274;</button>'+
-                '<button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')" title="Remover">&#128465;</button>'+
+                '<button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')" title="Remover"></button>'+
             '</div></td></tr>';
     });
-    document.getElementById('usersBody').innerHTML=html||'<tr><td colspan="4" class="empty-state">Nenhum.</td></tr>';
+    document.getElementById('usersBody').innerHTML=html||'<tr><td colspan="5" class="empty-state">Nenhum.</td></tr>';
     renderDashboard();
 }
 
@@ -444,7 +446,7 @@ window.showResetPass=function(i){
 };
 
 document.getElementById('btnShowAddUser').addEventListener('click',function(){
-    document.getElementById('userFormTitle').textContent='&#10133; Adicionar Usuário';
+    document.getElementById('userFormTitle').textContent=' Adicionar Usuário';
     document.getElementById('userFormName').value='';
     document.getElementById('userFormEmail').value='';
     document.getElementById('userFormPass').value='';
@@ -467,13 +469,13 @@ document.getElementById('btnSaveUser').addEventListener('click',function(){
     var email=document.getElementById('userFormEmail').value.trim();
     var role=document.getElementById('userFormRole').value;
     var idx=parseInt(document.getElementById('userFormIdx').value);
-    if(!name||!email){showToast('&#9888; Nome e e-mail são obrigatórios.');return}
+    if(!name||!email){showToast('Nome e e-mail são obrigatórios.');return}
     var users=load(USERS_KEY,[]);
-    if(idx<0){showToast('&#9888; A conta deve ser criada pelo formulário público.');return}
+    if(idx<0){showToast('A conta deve ser criada pelo formulário público.');return}
     var user=users[idx];
     supabase.from('profiles').update({nome:name,email:email,role:role}).eq('id',user.id).then(function(res){
-        if(res.error){showToast('&#9888; '+res.error.message);return}
-        loadData().then(function(){document.getElementById('userFormCard').style.display='none';renderUsers();showToast('&#9989; Usuário atualizado!')});
+        if(res.error){showToast(''+res.error.message);return}
+        loadData().then(function(){document.getElementById('userFormCard').style.display='none';renderUsers();showToast('Usuário atualizado!')});
     });
 });
 
@@ -482,16 +484,23 @@ document.getElementById('btnConfirmReset').addEventListener('click',function(){
     var users=load(USERS_KEY,[]);
     if(!users[idx])return;
     var email=users[idx].email;
-    if(!email){showToast('&#9888; Usuário sem e-mail cadastrado.');return}
+    if(!email){showToast('Usuário sem e-mail cadastrado.');return}
+    var resetKey='bf_admin_reset_'+email.toLowerCase();
+    if(parseInt(localStorage.getItem(resetKey)||'0',10)>Date.now()){showToast('Aguarde antes de enviar outro link.');return}
+    var resetButton=document.getElementById('btnConfirmReset');
+    if(resetButton)resetButton.disabled=true;
     supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin + '/'}).then(function(res){
-        if(res.error){showToast('&#9888; '+res.error.message);return}
+        if(res.error){showToast(''+(/rate limit|email send/i.test(res.error.message||'')?'Limite temporário de e-mails atingido.':res.error.message));return}
         showToast('Link de recuperação enviado para '+email+'.');
         document.getElementById('resetPassCard').style.display='none';
+    }).finally(function(){
+        localStorage.setItem(resetKey,String(Date.now()+60000));
+        if(resetButton)resetButton.disabled=false;
     });
 });
 
 window.deleteUser=function(i){
-    showToast('&#9888; Contas são gerenciadas pelo Supabase Auth.');
+    showToast('Contas são gerenciadas pelo Supabase Auth.');
 };
 
 
@@ -511,16 +520,16 @@ function renderPedidos(){
         var statusText = p.status.charAt(0).toUpperCase() + p.status.slice(1);
         var entrega = p.dataEntrega || '—';
 
-        var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
+        var pagLabel = p.pagamento === 'quote' ? 'Orçamento' : p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
 
         html += '<tr>' +
-            '<td><strong>' + p.id + '</strong></td>' +
-            '<td>' + (p.cliente || p.name || '—') + '</td>' +
-            '<td>' + p.data + '</td>' +
+             '<td><strong>' + escHtml(p.id) + '</strong></td>' +
+             '<td>' + escHtml(p.cliente || p.name || '—') + '</td>' +
+             '<td>' + escHtml(p.data) + '</td>' +
             '<td>R$ ' + parseFloat(p.total).toFixed(2).replace('.', ',') + '</td>' +
             '<td>' + pagLabel + '</td>' +
             '<td><span class="badge ' + statusClass + '">' + statusText + '</span></td>' +
-            '<td>' + entrega + '</td>' +
+             '<td>' + escHtml(entrega) + '</td>' +
             '<td>' +
                 '<div class="flex-row" style="gap:6px;flex-wrap:nowrap;">' +
                     '<select class="tbl-input" onchange="alterarStatusPedido(' + i + ', this.value)" style="width:100px;">' +
@@ -528,7 +537,7 @@ function renderPedidos(){
                         '<option value="entregue"' + (p.status === 'entregue' ? ' selected' : '') + '>Entregue</option>' +
                         '<option value="cancelado"' + (p.status === 'cancelado' ? ' selected' : '') + '>Cancelado</option>' +
                     '</select>' +
-                    '<button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + (p.id || '') + '\')" title="Ver detalhes">&#128065;</button>' +
+                     '<button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + escAttr(p.id || '') + '\')" title="Ver detalhes">&#128065;</button>' +
                 '</div>' +
             '</td>' +
         '</tr>';
@@ -550,7 +559,7 @@ window.alterarStatusPedido = function(idx, novoStatus){
     }
     save(PEDIDOS_KEY, pedidos);
     renderPedidos();
-    showToast('&#9989; Pedido ' + pedidos[idx].id + ' atualizado para "' + novoStatus + '"');
+    showToast('Pedido ' + pedidos[idx].id + ' atualizado para "' + novoStatus + '"');
 };
 
 document.querySelectorAll('.filter-pedido').forEach(function(btn){
@@ -594,11 +603,11 @@ function renderPedidosPendentes(){
         .slice(0, 5);
     var html = '';
     pendentes.forEach(function(p){
-        html += '<tr>' +
-            '<td><strong>' + p.id + '</strong></td>' +
-            '<td>' + (p.cliente || '—') + '</td>' +
+         html += '<tr>' +
+             '<td><strong>' + escHtml(p.id) + '</strong></td>' +
+             '<td>' + escHtml(p.cliente || '—') + '</td>' +
             '<td>R$ ' + (parseFloat(p.total) || 0).toFixed(2).replace('.', ',') + '</td>' +
-            '<td><button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + (p.id || '') + '\')" title="Ver detalhes">&#128065;</button></td>' +
+             '<td><button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + escAttr(p.id || '') + '\')" title="Ver detalhes">&#128065;</button></td>' +
         '</tr>';
     });
     tbody.innerHTML = html;
@@ -721,7 +730,7 @@ function downloadCSV(filename, header, rows){
 
 function exportStockCSV(){
     supabase.from('produtos').select('*').order('nome',{ascending:true}).then(function(res){
-        if(res.error){ showToast('&#9888; '+res.error.message); return; }
+        if(res.error){ showToast(''+res.error.message); return; }
         var produtos=res.data||[];
         var term = (document.getElementById('searchStock').value || '').trim().toLowerCase();
         var header = ['Nome','Categoria','Preço','Estoque','Status'];
@@ -733,7 +742,7 @@ function exportStockCSV(){
             if(term && hay.indexOf(term) === -1) return;
             rows.push([p.nome, p.categoria || '', formatPrice(p.preco), stock, status]);
         });
-        if(!rows.length){ showToast('&#9888; Nenhum produto para exportar.'); return; }
+        if(!rows.length){ showToast('Nenhum produto para exportar.'); return; }
         downloadCSV('estoque.csv', header, rows);
         showToast('&#128190; Estoque exportado em CSV!');
     });
@@ -746,13 +755,13 @@ function exportPedidosCSV(){
     var rows = [];
     pedidos.forEach(function(p){
         if(pedidosFilterAtual !== 'todos' && p.status !== pedidosFilterAtual) return;
-        var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
+         var pagLabel = p.pagamento === 'quote' ? 'Orçamento' : p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
         var statusText = p.status.charAt(0).toUpperCase() + p.status.slice(1);
         var hay = (p.id + ' ' + (p.cliente || '') + ' ' + statusText).toLowerCase();
         if(term && hay.indexOf(term) === -1) return;
         rows.push([p.id, p.cliente || '—', p.data, 'R$ ' + (parseFloat(p.total)||0).toFixed(2).replace('.',','), pagLabel, statusText, p.dataEntrega || '—']);
     });
-    if(!rows.length){ showToast('&#9888; Nenhum pedido para exportar.'); return; }
+    if(!rows.length){ showToast('Nenhum pedido para exportar.'); return; }
     downloadCSV('pedidos.csv', header, rows);
     showToast('&#128190; Pedidos exportados em CSV!');
 }
@@ -767,21 +776,21 @@ window.verDetalhesPedido = function(id){
     pedidos.forEach(function(o){ if(o.id === id) p = o; });
     if(!p) return;
 
-    var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
+    var pagLabel = p.pagamento === 'quote' ? 'Orçamento' : p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
     var itensHtml = '';
     (p.itens || []).forEach(function(item){
-        itensHtml += '<tr><td>' + item.titulo + '</td><td class="qtd">' + item.qtd + '</td><td class="num">' + item.preco + '</td></tr>';
+         itensHtml += '<tr><td>' + escHtml(item.titulo) + '</td><td class="qtd">' + Number(item.qtd || 0) + '</td><td class="num">' + escHtml(item.preco) + '</td></tr>';
     });
 
     var html = '';
-    html += '<div class="detail-row"><span class="lbl">Pedido</span><span>' + p.id + '</span></div>';
-    html += '<div class="detail-row"><span class="lbl">Data</span><span>' + p.data + '</span></div>';
+     html += '<div class="detail-row"><span class="lbl">Pedido</span><span>' + escHtml(p.id) + '</span></div>';
+     html += '<div class="detail-row"><span class="lbl">Data</span><span>' + escHtml(p.data) + '</span></div>';
     html += '<div class="detail-row"><span class="lbl">Pagamento</span><span>' + pagLabel + '</span></div>';
     html += '<div class="detail-row"><span class="lbl">Total</span><span>R$ ' + (parseFloat(p.total) || 0).toFixed(2).replace('.', ',') + '</span></div>';
-    html += '<div class="detail-row"><span class="lbl">Cliente</span><span>' + (p.cliente || '—') + '</span></div>';
-    html += '<div class="detail-row"><span class="lbl">E-mail</span><span>' + (p.email || '—') + '</span></div>';
-    html += '<div class="detail-row"><span class="lbl">Telefone</span><span>' + (p.phone || '—') + '</span></div>';
-    html += '<div class="detail-row" style="align-items:flex-start;"><span class="lbl">Endereço</span><span style="max-width:60%;">' + (p.endereco || '—') + '</span></div>';
+     html += '<div class="detail-row"><span class="lbl">Cliente</span><span>' + escHtml(p.cliente || '—') + '</span></div>';
+     html += '<div class="detail-row"><span class="lbl">E-mail</span><span>' + escHtml(p.email || '—') + '</span></div>';
+     html += '<div class="detail-row"><span class="lbl">Telefone</span><span>' + escHtml(p.phone || '—') + '</span></div>';
+     html += '<div class="detail-row" style="align-items:flex-start;"><span class="lbl">Endereço</span><span style="max-width:60%;">' + escHtml(p.endereco || '—') + '</span></div>';
     html += '<h4 class="detail-sub">Itens do Pedido</h4>';
     html += '<table class="detail-table"><thead><tr><th>Produto</th><th style="width:50px;text-align:center;">Qtd</th><th style="width:90px;text-align:right;">Preço</th></tr></thead><tbody>' +
         (itensHtml || '<tr><td colspan="3" class="empty-state">Sem itens.</td></tr>') +
@@ -819,7 +828,7 @@ document.getElementById('btnToggleProductForm').addEventListener('click', functi
     var card = document.getElementById('productFormCard');
     var showing = card.style.display !== 'none';
     card.style.display = showing ? 'none' : 'block';
-    this.innerHTML = showing ? '&#10133; Novo Produto' : '&#10005; Fechar Formulário';
+    this.innerHTML = showing ? ' Novo Produto' : ' Fechar Formulário';
     if(!showing){
         card.scrollIntoView({behavior:'smooth'});
         document.getElementById('prodName').focus();
@@ -890,8 +899,8 @@ window.updateStock = function(el){
     var id = el.getAttribute('data-id');
     var val = parseInt(el.value) || 0;
     supabase.from('produtos').update({estoque: val}).eq('id', id).then(function(res){
-        if(res.error){ showToast('&#9888; '+res.error.message); return; }
-        showToast('&#9989; Estoque atualizado para ' + val + ' un.');
+        if(res.error){ showToast(''+res.error.message); return; }
+        showToast('Estoque atualizado para ' + val + ' un.');
         setTimeout(renderStock, 300);
         setTimeout(refreshPreview, 500);
     });
