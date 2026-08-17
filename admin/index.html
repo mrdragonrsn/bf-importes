@@ -276,13 +276,12 @@
                 </div>
 
                 <div id="resetPassCard" class="card" style="display:none;background:var(--bg-input);margin-bottom:14px;">
-                    <h3>&#128274; Redefinir Senha: <span id="resetPassUser"></span></h3>
+                    <h3>Enviar recuperação de senha: <span id="resetPassUser"></span></h3>
                     <div class="form-row">
-                        <div class="fg" style="flex:1;"><label>Nova Senha</label><input type="password" id="resetNewPass" placeholder="Mínimo 4 caracteres"></div>
-                        <div class="fg" style="flex:1;"><label>Confirmar</label><input type="password" id="resetNewPass2" placeholder="Repita a senha"></div>
+                        <p style="margin:0;color:var(--text-muted);font-size:.82rem;">O usuário receberá um link do Supabase para criar uma nova senha.</p>
                     </div>
                     <div class="flex-row" style="margin-top:10px;">
-                        <button class="btn btn-primary btn-sm" id="btnConfirmReset">Confirmar</button>
+                        <button class="btn btn-primary btn-sm" id="btnConfirmReset">Enviar link</button>
                         <button class="btn btn-outline btn-sm" id="btnCancelReset">Cancelar</button>
                         <input type="hidden" id="resetPassIdx" value="-1">
                     </div>

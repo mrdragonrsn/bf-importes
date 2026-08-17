@@ -439,8 +439,6 @@ window.showResetPass=function(i){
     if(!users[i])return;
     document.getElementById('resetPassUser').textContent=users[i].name+' ('+users[i].email+')';
     document.getElementById('resetPassIdx').value=i;
-    document.getElementById('resetNewPass').value='';
-    document.getElementById('resetNewPass2').value='';
     document.getElementById('userFormCard').style.display='none';
     document.getElementById('resetPassCard').style.display='block';
 };
@@ -483,8 +481,13 @@ document.getElementById('btnConfirmReset').addEventListener('click',function(){
     var idx=parseInt(document.getElementById('resetPassIdx').value);
     var users=load(USERS_KEY,[]);
     if(!users[idx])return;
-    showToast('&#128231; Use a recuperação de senha do Supabase para este usuário.');
-    document.getElementById('resetPassCard').style.display='none';
+    var email=users[idx].email;
+    if(!email){showToast('&#9888; Usuário sem e-mail cadastrado.');return}
+    supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin + '/'}).then(function(res){
+        if(res.error){showToast('&#9888; '+res.error.message);return}
+        showToast('Link de recuperação enviado para '+email+'.');
+        document.getElementById('resetPassCard').style.display='none';
+    });
 });
 
 window.deleteUser=function(i){
