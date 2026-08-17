@@ -631,8 +631,12 @@ function openLightbox(src){
     if (authOverlay && boxLogin && boxRegister) {
         function updateAuthUI(){
             if (currentUser && btnLoginHeader) {
-                var adminBtn = currentProfile && currentProfile.role === 'admin' ? '<a href="/admin" class="user-menu-link" style="display:flex;align-items:center;gap:6px;padding:10px 18px;font-size:0.84rem;color:#334155;text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background=\'var(--cinza-claro)\'" onmouseout="this.style.background=\'none\'">&#128736; Painel Admin</a>' : '';
-                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + (currentProfile ? currentProfile.nome : currentUser.email) + '</button><div class="user-menu" id="userMenu"><button id="btnPerfil">&#9881; Perfil</button><button id="btnMeusPedidos">&#128230; Meus Pedidos</button>'+adminBtn+'<button id="btnLogout">&#128682; Sair</button></div></div>';
+                var userIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>';
+                var adminIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4"/><path d="m16.2 3.8-2.8 2.8"/><path d="M22 12h-4"/><path d="m20.2 16.2-2.8-2.8"/><path d="M12 22v-4"/><path d="m7.8 20.2 2.8-2.8"/><path d="M2 12h4"/><path d="m3.8 7.8 2.8 2.8"/><circle cx="12" cy="12" r="3"/></svg>';
+                var packageIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M3 12l9 5 9-5"/><path d="M3 16l9 5 9-5"/></svg>';
+                var logoutIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>';
+                var adminBtn = currentProfile && currentProfile.role === 'admin' ? '<a href="/admin" class="user-menu-link">'+adminIcon+'<span>Painel Admin</span></a>' : '';
+                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">'+userIcon+'<span>' + (currentProfile ? currentProfile.nome : currentUser.email) + '</span></button><div class="user-menu" id="userMenu"><a href="/perfil" class="user-menu-link">'+userIcon+'<span>Perfil</span></a><a href="/pedidos" class="user-menu-link">'+packageIcon+'<span>Meus Pedidos</span></a>'+adminBtn+'<button id="btnLogout">'+logoutIcon+'<span>Sair</span></button></div></div>';
                 var unameBtn = document.getElementById('userNameBtn');
                 if (unameBtn) unameBtn.addEventListener('click', function(e){ e.stopPropagation(); var m = document.getElementById('userMenu'); if (m) m.classList.toggle('open'); });
                 var logoutBtn = document.getElementById('btnLogout');
@@ -1369,14 +1373,6 @@ function openLightbox(src){
             if(overlay){ overlay.classList.remove('active'); document.body.style.overflow = ''; }
         }
 
-        var btnMeusPedidos = document.getElementById('btnMeusPedidos');
-        if(btnMeusPedidos) btnMeusPedidos.addEventListener('click', function(e){
-            e.stopPropagation();
-            var m = document.getElementById('userMenu');
-            if(m) m.classList.remove('open');
-            openMeusPedidos();
-        });
-
         var closePedidosBtn = document.getElementById('pedidosClose');
         if(closePedidosBtn) closePedidosBtn.addEventListener('click', closeMeusPedidos);
 
@@ -1576,14 +1572,6 @@ function openLightbox(src){
             document.getElementById('cartaoForm').style.display = 'none';
             document.getElementById('btnAddCartao').style.display = 'block';
             showToast('&#9989; Cartão salvo!');
-        });
-
-        var btnPerfil = document.getElementById('btnPerfil');
-        if(btnPerfil) btnPerfil.addEventListener('click', function(e){
-            e.stopPropagation();
-            var m = document.getElementById('userMenu');
-            if(m) m.classList.remove('open');
-            openPerfil();
         });
 
         var perfilCloseBtn = document.getElementById('perfilClose');
