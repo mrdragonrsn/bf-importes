@@ -201,10 +201,17 @@ function openLightbox(src){
     renderProductImages();
 
 
-    var CART_KEY = 'bf_cart';
-    function loadCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
-    function saveCart(arr){ localStorage.setItem(CART_KEY, JSON.stringify(arr)); }
-    var cart = loadCart();
+    var cart = [];
+    function loadCart(){
+        if(!currentUser) return Promise.resolve([]);
+        return supabase.from('carrinhos').select('itens').eq('user_id', currentUser.id).maybeSingle().then(function(res){
+            return res.error || !res.data ? [] : (Array.isArray(res.data.itens) ? res.data.itens : []);
+        });
+    }
+    function saveCart(arr){
+        if(!currentUser) return Promise.resolve();
+        return supabase.from('carrinhos').upsert({user_id: currentUser.id, itens: arr, updated_at: new Date().toISOString()});
+    }
 
     var cartSidebar = document.getElementById('cartSidebar');
     var cartOverlay = document.getElementById('cartOverlay');
@@ -355,7 +362,7 @@ function openLightbox(src){
             if(currentUser){
                 var coName = document.getElementById('coName');
                 var coEmail = document.getElementById('coEmail');
-                if(coName && !coName.value) coName.value = currentUser.name || '';
+                if(coName && !coName.value) coName.value = (currentProfile && currentProfile.nome) || currentUser.user_metadata && currentUser.user_metadata.nome || '';
                 if(coEmail && !coEmail.value) coEmail.value = currentUser.email || '';
             }
             checkoutOverlay.classList.add('active');
@@ -402,9 +409,10 @@ function openLightbox(src){
     (function(){
         var filterBar = document.getElementById('filterBar');
         if(!filterBar) return;
-        try {
-            var cats = JSON.parse(localStorage.getItem('bf_categories')||'[]');
-            cats.forEach(function(cat){
+        if(!supabase) return;
+            supabase.from('categorias').select('nome').eq('ativo',true).order('ordem',{ascending:true}).then(function(res){
+                var cats = (res.data || []).map(function(cat){ return cat.nome; });
+                cats.forEach(function(cat){
                 if(!filterBar.querySelector('.filter-btn[data-filter="'+cat+'"]')) {
                     var btn = document.createElement('button');
                     btn.className = 'filter-btn';
@@ -412,8 +420,8 @@ function openLightbox(src){
                     btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g,' ');
                     filterBar.appendChild(btn);
                 }
+                });
             });
-        } catch(e) {}
     })();
 
         var btnConfirm = document.getElementById('btnConfirmOrder');
@@ -489,32 +497,23 @@ function openLightbox(src){
                 document.getElementById('btnConfirmOrder').style.display = 'none';
 
 
-                try {
-                    var orders = JSON.parse(localStorage.getItem('bf_orders')||'[]');
-                    orders.push({
-                        id: orderId,
-                        cliente: name,
-                        email: email,
-                        phone: phone,
-                        cpf: cpf,
-                        endereco: addrFull,
-                        data: dateStr,
-                        timestamp: Date.now(),
-                        total: total,
-                        pagamento: payMethod,
-                        status: 'pendente',
-                        dataEntrega: '',
-                        itens: cart.map(function(item){
-                            return {titulo: item.title, qtd: item.qty, preco: item.price};
-                        })
-                    });
-                    localStorage.setItem('bf_orders', JSON.stringify(orders));
-                } catch(e){}
-
-                showToast('&#9989; Pedido ' + orderId + ' confirmado! (' + payLabel + ')');
-                cart = [];
-                renderCart();
-                saveCart(cart);
+                supabase.from('pedidos').insert({
+                    codigo: orderId,
+                    user_id: currentUser.id,
+                    cliente: {nome:name,email:email,phone:phone,cpf:cpf,endereco:addrFull},
+                    itens: cart.map(function(item){ return {titulo:item.title,qtd:item.qty,preco:item.price}; }),
+                    subtotal: subtotal,
+                    frete: shipping,
+                    total: total,
+                    pagamento: payMethod,
+                    status: 'pendente',
+                    data_entrega: ''
+                }).then(function(res){
+                    if(res.error){ showToast('&#9888; Não foi possível registrar o pedido.'); return; }
+                    showToast('&#9989; Pedido ' + orderId + ' confirmado! (' + payLabel + ')');
+                    cart = [];
+                    renderCart();
+                });
             });
         }
 
@@ -620,32 +619,8 @@ function openLightbox(src){
     })();
 
 
-    function sha256(text){
-        try {
-            var enc = new TextEncoder();
-            return crypto.subtle.digest('SHA-256', enc.encode(text)).then(function(buf){
-                var arr = Array.from(new Uint8Array(buf));
-                return arr.map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
-            });
-        } catch(e) {
-            return Promise.resolve(String(text));
-        }
-    }
-
-
-    var USERS_KEY = 'bf_users';
-    var SESSION_KEY = 'bf_session';
-    function loadUsers(){ try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; } catch(e){ return []; } }
-    function saveUsers(arr){ localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
-    function getSession(){ try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e){ return null; } }
-
-    var users = loadUsers();
-    if (users.length === 0) {
-        users.push({name:'Admin', email:'admin', pass:'admin', role:'admin'});
-        saveUsers(users);
-    }
-
-    var currentUser = getSession();
+    var currentUser = null;
+    var currentProfile = null;
     var authOverlay = document.getElementById('authOverlay');
     var boxLogin = document.getElementById('authBoxLogin');
     var boxRegister = document.getElementById('authBoxRegister');
@@ -654,15 +629,13 @@ function openLightbox(src){
     if (authOverlay && boxLogin && boxRegister) {
         function updateAuthUI(){
             if (currentUser && btnLoginHeader) {
-                var adminBtn = currentUser.role === 'admin' ? '<a href="/admin" class="user-menu-link" style="display:flex;align-items:center;gap:6px;padding:10px 18px;font-size:0.84rem;color:#334155;text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background=\'var(--cinza-claro)\'" onmouseout="this.style.background=\'none\'">&#128736; Painel Admin</a>' : '';
-                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + currentUser.name + '</button><div class="user-menu" id="userMenu"><button id="btnPerfil">&#9881; Perfil</button><button id="btnMeusPedidos">&#128230; Meus Pedidos</button>'+adminBtn+'<button id="btnLogout">&#128682; Sair</button></div></div>';
+                var adminBtn = currentProfile && currentProfile.role === 'admin' ? '<a href="/admin" class="user-menu-link" style="display:flex;align-items:center;gap:6px;padding:10px 18px;font-size:0.84rem;color:#334155;text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background=\'var(--cinza-claro)\'" onmouseout="this.style.background=\'none\'">&#128736; Painel Admin</a>' : '';
+                btnLoginHeader.outerHTML = '<div class="user-dropdown" id="userDropdown"><button class="user-name-header" id="userNameBtn">&#128100; ' + (currentProfile ? currentProfile.nome : currentUser.email) + '</button><div class="user-menu" id="userMenu"><button id="btnPerfil">&#9881; Perfil</button><button id="btnMeusPedidos">&#128230; Meus Pedidos</button>'+adminBtn+'<button id="btnLogout">&#128682; Sair</button></div></div>';
                 var unameBtn = document.getElementById('userNameBtn');
                 if (unameBtn) unameBtn.addEventListener('click', function(e){ e.stopPropagation(); var m = document.getElementById('userMenu'); if (m) m.classList.toggle('open'); });
                 var logoutBtn = document.getElementById('btnLogout');
                 if (logoutBtn) logoutBtn.addEventListener('click', function(){
-                    localStorage.removeItem(SESSION_KEY);
-                    currentUser = null;
-                    location.reload();
+                    supabase.auth.signOut().then(function(){ location.reload(); });
                 });
                 document.addEventListener('click', function(){
                     var m = document.getElementById('userMenu');
@@ -670,8 +643,6 @@ function openLightbox(src){
                 });
             }
         }
-        updateAuthUI();
-
         if (btnLoginHeader && btnLoginHeader.parentNode) {
             btnLoginHeader.addEventListener('click', function(){
                 authOverlay.classList.add('active');
@@ -702,22 +673,13 @@ function openLightbox(src){
         function doLogin(){
             var login = document.getElementById('loginEmail').value.trim();
             var pass = document.getElementById('loginPass').value;
-            var u = users.find(function(u){ return (u.email === login || u.name === login); });
-            if (!u) {
-                var le = document.getElementById('loginError'); if (le) le.textContent = 'Usuário ou senha inválidos.';
-                return;
-            }
-            sha256(pass).then(function(hash){
-                var ok = (u.pass === hash) || (u.pass === pass);
-                if (!ok) {
+            supabase.auth.signInWithPassword({email:login,password:pass}).then(function(res){
+                if(res.error){
                     var le = document.getElementById('loginError'); if (le) le.textContent = 'Usuário ou senha inválidos.';
                     return;
                 }
-                if (u.pass !== hash) { u.pass = hash; saveUsers(users); }
-                currentUser = u;
-                localStorage.setItem(SESSION_KEY, JSON.stringify(u));
                 authOverlay.classList.remove('active');
-                showToast('&#128100; Bem-vindo, ' + u.name + '!');
+                showToast('&#128100; Bem-vindo!');
                 setTimeout(function(){ location.reload(); }, 600);
             });
         }
@@ -747,13 +709,8 @@ function openLightbox(src){
             var pass = document.getElementById('regPass').value;
             if (!name || !email || !pass) { var re = document.getElementById('regError'); if (re) re.textContent = 'Preencha todos os campos.'; return; }
             if (pass.length < 4) { var re = document.getElementById('regError'); if (re) re.textContent = 'Senha deve ter ao menos 4 caracteres.'; return; }
-            if (users.find(function(u){ return u.email === email; })) { var re = document.getElementById('regError'); if (re) re.textContent = 'Este e-mail já está cadastrado.'; return; }
-            sha256(pass).then(function(hash){
-                var newUser = {name: name, email: email, pass: hash, role: 'user'};
-                users.push(newUser);
-                saveUsers(users);
-                currentUser = newUser;
-                localStorage.setItem(SESSION_KEY, JSON.stringify(newUser));
+            supabase.auth.signUp({email:email,password:pass,options:{data:{nome:name}}}).then(function(res){
+                if(res.error){ var re = document.getElementById('regError'); if (re) re.textContent = res.error.message; return; }
                 authOverlay.classList.remove('active');
                 showToast('&#127881; Conta criada com sucesso!');
                 setTimeout(function(){ location.reload(); }, 600);
@@ -762,11 +719,6 @@ function openLightbox(src){
 
 
         var boxReset = document.getElementById('authBoxReset');
-        var RESET_KEY = 'bf_reset';
-
-        function getReset(){ try { return JSON.parse(localStorage.getItem(RESET_KEY)) || {}; } catch(e){ return {}; } }
-        function saveReset(r){ localStorage.setItem(RESET_KEY, JSON.stringify(r)); }
-
         function showResetPanel(cur, next){
             document.querySelectorAll('.reset-steps').forEach(function(el){ el.classList.remove('active'); });
             if(document.getElementById(next)) document.getElementById(next).classList.add('active');
@@ -796,22 +748,13 @@ function openLightbox(src){
             var email = (document.getElementById('resetEmail')||{}).value.trim();
             var err = document.getElementById('resetError');
             if (!email) { if(err) err.textContent = 'Informe o e-mail.'; return; }
-            var u = users.find(function(u){ return u.email === email; });
-            if (!u) { if(err) err.textContent = 'E-mail não encontrado.'; return; }
-            if(err) err.textContent = '';
-            var code = String(Math.floor(100000 + Math.random() * 900000));
-            var rd = getReset();
-            rd[email] = {code: code, ts: Date.now()};
-            saveReset(rd);
-            document.getElementById('resetEmailDisplay').textContent = email;
-            showResetPanel('resetStep1', 'resetStep2');
-            showToast('&#128231; Código de 6 dígitos: ' + code + ' (enviado para ' + email + ')');
-            var ci = document.getElementById('resetCodeInputs');
-            if(ci) {
-                ci.querySelectorAll('input').forEach(function(inp){ inp.value = ''; });
-                var first = ci.querySelector('input');
-                if(first) first.focus();
-            }
+            supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin + window.location.pathname}).then(function(res){
+                if(res.error){ if(err) err.textContent = res.error.message; return; }
+                if(err) err.textContent = '';
+                showToast('&#128231; Link de recuperação enviado para ' + email + '.');
+                boxLogin.style.display = 'block';
+                if(boxReset) boxReset.style.display = 'none';
+            });
         });
 
         var resetCodeInputs = document.getElementById('resetCodeInputs');
@@ -834,49 +777,28 @@ function openLightbox(src){
         var btnVerify = document.getElementById('btnVerifyCode');
         if(btnVerify) btnVerify.addEventListener('click', function(){
             var email = document.getElementById('resetEmailDisplay').textContent.trim();
-            var rd = getReset();
-            var entry = rd[email];
             var err = document.getElementById('resetCodeError');
-            if(!entry) { if(err) err.textContent = 'Código expirado. Solicite novamente.'; return; }
-            if(Date.now() - entry.ts > 600000) { if(err) err.textContent = 'Código expirado (10 min). Solicite novo.'; return; }
-            var inputs = document.querySelectorAll('#resetCodeInputs input');
-            var entered = '';
-            inputs.forEach(function(inp){ entered += inp.value; });
-            if(entered.length !== 6) { if(err) err.textContent = 'Digite os 6 dígitos.'; return; }
-            if(entered !== entry.code) { if(err) err.textContent = 'Código incorreto.'; return; }
-            if(err) err.textContent = '';
-            showResetPanel('resetStep2', 'resetStep3');
-            document.getElementById('resetNewPass').value = '';
-            document.getElementById('resetNewPass2').value = '';
+            if(err) err.textContent = 'Use o link enviado por e-mail para definir uma nova senha.';
         });
 
         var btnResend = document.getElementById('btnResendCode');
         if(btnResend) btnResend.addEventListener('click', function(){
-            var email = document.getElementById('resetEmailDisplay').textContent.trim();
-            var code = String(Math.floor(100000 + Math.random() * 900000));
-            var rd = getReset();
-            rd[email] = {code: code, ts: Date.now()};
-            saveReset(rd);
-            showToast('&#128231; Novo código: ' + code);
-            var ci = document.getElementById('resetCodeInputs');
-            if(ci) ci.querySelectorAll('input').forEach(function(inp){ inp.value = ''; });
+            var email = document.getElementById('resetEmail').value.trim();
+            supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin + window.location.pathname}).then(function(res){
+                showToast(res.error ? '&#9888; ' + res.error.message : '&#128231; Novo link enviado.');
+            });
         });
 
         var btnResetPass = document.getElementById('btnResetPassword');
         if(btnResetPass) btnResetPass.addEventListener('click', function(){
-            var email = document.getElementById('resetEmailDisplay').textContent.trim();
             var p1 = document.getElementById('resetNewPass').value;
             var p2 = document.getElementById('resetNewPass2').value;
             var err = document.getElementById('resetPassError');
             if(!p1 || p1.length < 4) { if(err) err.textContent = 'Senha deve ter ao menos 4 caracteres.'; return; }
             if(p1 !== p2) { if(err) err.textContent = 'Senhas não conferem.'; return; }
             if(err) err.textContent = '';
-            var u = users.find(function(u){ return u.email === email; });
-            sha256(p1).then(function(hash){
-                if(u) { u.pass = hash; saveUsers(users); }
-                var rd = getReset();
-                delete rd[email];
-                saveReset(rd);
+            supabase.auth.updateUser({password:p1}).then(function(res){
+                if(res.error){ if(err) err.textContent = res.error.message; return; }
                 authOverlay.classList.remove('active');
                 if(boxReset) boxReset.style.display = 'none';
                 showToast('&#9989; Senha redefinida com sucesso!');
@@ -884,6 +806,31 @@ function openLightbox(src){
             });
         });
     }
+
+    supabase.auth.getSession().then(function(res){
+        currentUser = res.data && res.data.session ? res.data.session.user : null;
+        if(currentUser){
+            return supabase.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
+        }
+        return {data:null};
+    }).then(function(res){
+        currentProfile = res.data || null;
+        updateAuthUI();
+        return loadCart();
+    }).then(function(items){
+        cart = items || [];
+        renderCart();
+    });
+    supabase.auth.onAuthStateChange(function(event, session){
+        currentUser = session ? session.user : null;
+        if(event === 'PASSWORD_RECOVERY' && authOverlay && boxReset){
+            authOverlay.classList.add('active');
+            boxLogin.style.display = 'none';
+            boxRegister.style.display = 'none';
+            boxReset.style.display = 'block';
+            showResetPanel('', 'resetStep3');
+        }
+    });
 
 
     function showToast(msg){
@@ -1090,7 +1037,6 @@ function openLightbox(src){
                 closeModal();
                 if (!currentUser) {
                     showToast('&#128274; Faça login para finalizar a compra.');
-                    localStorage.setItem('bf_pending_checkout', '1');
                     if (authOverlay) authOverlay.classList.add('active');
                 } else {
                     setTimeout(openCheckout, 300);
@@ -1202,15 +1148,6 @@ function openLightbox(src){
     updateBadge();
 
 
-    try {
-        if (currentUser && localStorage.getItem('bf_pending_checkout')) {
-            localStorage.removeItem('bf_pending_checkout');
-            var co = document.getElementById('checkoutOverlay');
-            if (co) setTimeout(openCheckout, 500);
-        }
-    } catch(e) {}
-
-
     (function(){
         var wrap = document.getElementById('headerSearchWrap');
         if(!wrap) return;
@@ -1219,23 +1156,21 @@ function openLightbox(src){
         var dropdown = document.getElementById('searchDropdown');
         var searchBtn = document.getElementById('headerSearchBtn');
 
-        var RECENT_KEY = 'bf_search_recent';
+        var recentSearches = [];
         var activeIndex = -1;
         var items = [];
         var debounceTimer = null;
 
         function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-        function getRecent(){
-            try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch(e){ return []; }
-        }
+        function getRecent(){ return recentSearches.slice(); }
         function saveRecent(term){
             var list = getRecent().filter(function(t){ return t.toLowerCase() !== term.toLowerCase(); });
             list.unshift(term);
             list = list.slice(0, 6);
-            localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+            recentSearches = list;
         }
-        function clearRecent(){ localStorage.removeItem(RECENT_KEY); }
+        function clearRecent(){ recentSearches = []; }
 
         function closeDropdown(){ if(dropdown) dropdown.classList.remove('open'); activeIndex = -1; items = []; }
 
@@ -1398,25 +1333,23 @@ function openLightbox(src){
             var overlay = document.getElementById('pedidosOverlay');
             if(!overlay) return;
 
-            var orders = JSON.parse(localStorage.getItem('bf_orders')||'[]');
-            var myOrders = currentUser ? orders.filter(function(o){ return o.email === currentUser.email; }) : [];
-            myOrders.sort(function(a,b){ return b.timestamp - a.timestamp; });
-
             var tbody = document.getElementById('pedidosBodyCliente');
             if(!tbody) return;
-
-            if(myOrders.length === 0){
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#94a3b8;">Nenhum pedido encontrado.</td></tr>';
-            } else {
+            supabase.from('pedidos').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).then(function(res){
+                var myOrders = res.data || [];
+                if(myOrders.length === 0){
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#94a3b8;">Nenhum pedido encontrado.</td></tr>';
+                    return;
+                }
                 var html = '';
                 myOrders.forEach(function(p){
                     var statusClass = p.status === 'entregue' ? 'badge-verde' : p.status === 'cancelado' ? 'badge-vermelho' : 'badge-amarelo';
                     var statusText = p.status.charAt(0).toUpperCase() + p.status.slice(1);
                     var pagLabel = p.pagamento === 'card' ? 'Cartão' : p.pagamento === 'pix' ? 'PIX' : 'Boleto';
-                    var entrega = p.dataEntrega || '—';
+                    var entrega = p.data_entrega || '—';
                     html += '<tr>' +
-                        '<td><strong>' + p.id + '</strong></td>' +
-                        '<td>' + p.data + '</td>' +
+                        '<td><strong>' + p.codigo + '</strong></td>' +
+                        '<td>' + new Date(p.created_at).toLocaleString('pt-BR') + '</td>' +
                         '<td>R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + '</td>' +
                         '<td>' + pagLabel + '</td>' +
                         '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
@@ -1424,7 +1357,7 @@ function openLightbox(src){
                     '</tr>';
                 });
                 tbody.innerHTML = html;
-            }
+            });
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
@@ -1453,33 +1386,27 @@ function openLightbox(src){
 
 
     (function(){
-        var PERFIL_KEY = 'bf_profiles';
-
-        function getPerfilKey(){ return currentUser ? ('bf_profile_' + currentUser.email) : null; }
-        function loadPerfil(){
-            var key = getPerfilKey();
-            if(!key) return null;
-            try { return JSON.parse(localStorage.getItem(key)) || {}; } catch(e){ return {}; }
-        }
+        function loadPerfil(){ return currentProfile || {}; }
         function savePerfil(data){
-            var key = getPerfilKey();
-            if(!key) return;
             var current = loadPerfil() || {};
             Object.keys(data).forEach(function(k){ current[k] = data[k]; });
-            localStorage.setItem(key, JSON.stringify(current));
+            currentProfile = current;
+            return supabase.from('profiles').update({nome:current.nome || '',telefone:current.telefone || current.phone || '',foto_url:current.foto_url || current.foto || null,endereco:current.endereco || {},cartoes:current.cartoes || []}).eq('id',currentUser.id);
         }
 
-        function openPerfil(){
+        async function openPerfil(){
             var overlay = document.getElementById('perfilOverlay');
             if(!overlay || !currentUser) return;
-            var perfil = loadPerfil();
+            var result = await supabase.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
+            var perfil = result.data || loadPerfil();
+            currentProfile = perfil;
 
-            document.getElementById('perfilNome').value = perfil.nome || currentUser.name || '';
+            document.getElementById('perfilNome').value = perfil.nome || currentUser.user_metadata && currentUser.user_metadata.nome || '';
             document.getElementById('perfilEmail').value = currentUser.email || '';
-            document.getElementById('perfilPhone').value = perfil.phone || '';
+            document.getElementById('perfilPhone').value = perfil.telefone || perfil.phone || '';
 
-            if(perfil.foto){
-                document.getElementById('perfilFoto').innerHTML = '<img src="'+perfil.foto+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+            if(perfil.foto_url || perfil.foto){
+                document.getElementById('perfilFoto').innerHTML = '<img src="'+(perfil.foto_url || perfil.foto)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
             } else {
                 document.getElementById('perfilFoto').innerHTML = '&#128100;';
             }
@@ -1552,8 +1479,7 @@ function openLightbox(src){
             if(!confirm('Remover este cartão?')) return;
             var perfil = loadPerfil() || {};
             if(perfil.cartoes) perfil.cartoes.splice(idx,1);
-            savePerfil({cartoes: perfil.cartoes || []});
-            renderCartoes(perfil);
+            savePerfil({cartoes: perfil.cartoes || []}).then(function(){ renderCartoes(currentProfile); });
             showToast('&#128465; Cartão removido.');
         };
 
@@ -1565,7 +1491,7 @@ function openLightbox(src){
                 var reader = new FileReader();
                 reader.onload = function(e){
                     document.getElementById('perfilFoto').innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-                    savePerfil({foto: e.target.result});
+                    savePerfil({foto_url: e.target.result});
                     showToast('&#128247; Foto atualizada!');
                 };
                 reader.readAsDataURL(file);
@@ -1576,16 +1502,17 @@ function openLightbox(src){
             var nome = document.getElementById('perfilNome').value.trim();
             var phone = document.getElementById('perfilPhone').value.trim();
             if(!nome){ showToast('&#9888; Informe seu nome.'); return; }
-            savePerfil({nome: nome, phone: phone});
-            currentUser.name = nome;
-            localStorage.setItem('bf_session', JSON.stringify(currentUser));
+            savePerfil({nome: nome, telefone: phone}).then(function(){
+                currentUser.user_metadata = currentUser.user_metadata || {};
+                currentUser.user_metadata.nome = nome;
+            });
             var btn = document.getElementById('userNameBtn');
             if(btn) btn.innerHTML = '&#128100; ' + nome;
             showToast('&#9989; Dados salvos!');
         });
 
         var adminLink = document.getElementById('perfilAdminLink');
-        if(adminLink && currentUser && currentUser.role === 'admin'){
+        if(adminLink && currentProfile && currentProfile.role === 'admin'){
             adminLink.style.display = 'block';
         }
 
@@ -1628,8 +1555,7 @@ function openLightbox(src){
             var perfil = loadPerfil() || {};
             if(!perfil.cartoes) perfil.cartoes = [];
             perfil.cartoes.push({numero: numero, nome: nome, validade: validade, bandeira: bandeira, cvv: cvv});
-            savePerfil({cartoes: perfil.cartoes});
-            renderCartoes(perfil);
+            savePerfil({cartoes: perfil.cartoes}).then(function(){ renderCartoes(currentProfile); });
             document.getElementById('cartaoForm').style.display = 'none';
             document.getElementById('btnAddCartao').style.display = 'block';
             showToast('&#9989; Cartão salvo!');
@@ -1708,7 +1634,7 @@ function openLightbox(src){
             var coCity = document.getElementById('coCity');
             var coState = document.getElementById('coState');
             var coComplement = document.getElementById('coComplement');
-            if(coName && !coName.value) coName.value = perfil.nome || currentUser.name || '';
+            if(coName && !coName.value) coName.value = perfil.nome || currentUser.user_metadata && currentUser.user_metadata.nome || '';
             if(coPhone && !coPhone.value) coPhone.value = perfil.phone || '';
             if(end.cep && coCEP && !coCEP.value) coCEP.value = end.cep;
             if(end.rua && coAddress && !coAddress.value) coAddress.value = end.rua;
@@ -1766,38 +1692,39 @@ function openLightbox(src){
         var btnWpp = document.getElementById('btnWppShare');
         if(!btnWpp) return;
         btnWpp.addEventListener('click', function(){
-            var lastOrder = JSON.parse(localStorage.getItem('bf_orders')||'[]');
-            if(!lastOrder.length) return;
-            var o = lastOrder[lastOrder.length - 1];
+            if(!currentUser) return;
+            supabase.from('pedidos').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(1).maybeSingle().then(function(res){
+            if(res.error || !res.data) return;
+            var o = res.data;
             var msg = '🔹 *Pedido Confirmado* - B&F Importes\n\n';
-            msg += '📦 *Pedido:* ' + o.id + '\n';
-            msg += '📅 *Data:* ' + o.data + '\n';
+            msg += '📦 *Pedido:* ' + o.codigo + '\n';
+            msg += '📅 *Data:* ' + new Date(o.created_at).toLocaleString('pt-BR') + '\n';
             msg += '💳 *Pagamento:* ' + (o.pagamento === 'card' ? 'Cartão' : o.pagamento === 'pix' ? 'PIX' : 'Boleto') + '\n';
             msg += '💰 *Total:* R$ ' + parseFloat(o.total).toFixed(2).replace('.',',') + '\n\n';
-            msg += '👤 *Cliente:* ' + o.cliente + '\n';
-            msg += '📧 *E-mail:* ' + (o.email || '') + '\n\n';
+            msg += '👤 *Cliente:* ' + (o.cliente.nome || '') + '\n';
+            msg += '📧 *E-mail:* ' + (o.cliente.email || '') + '\n\n';
             msg += '📋 *Itens:*\n';
             o.itens.forEach(function(item, i){
                 msg += '  ' + (i+1) + '. ' + item.titulo + ' (' + item.qtd + 'x ' + item.preco + ')\n';
             });
             msg += '\nAcompanhe seus pedidos em: https://mrdragonrsn.github.io/bf-importes/';
             window.open('https://wa.me/5516981386747?text=' + encodeURIComponent(msg), '_blank');
+            });
         });
     })();
 
 })();
-(function(){
-    try {
-        var cfg = JSON.parse(localStorage.getItem('bf_config')||'{}');
+ (function(){
+    if(window.bfSupabase){
+        window.bfSupabase.from('site_settings').select('chave,valor').in('chave',['config','banner']).then(function(res){
+        var settings = {};
+        (res.data || []).forEach(function(row){ settings[row.chave] = row.valor || {}; });
+        var cfg = settings.config || {};
         if(cfg.company){
             var fi = document.getElementById('footerInfo');
             if(fi) fi.textContent = '\u00A9 2026 ' + cfg.company + ' CNPJ: ' + (cfg.cnpj||'');
         }
-    } catch(e) {}
-
-
-    try {
-        var banner = JSON.parse(localStorage.getItem('bf_banner')||'{}');
+        var banner = settings.banner || {};
         if(banner.title){
             var ht = document.getElementById('heroTitle');
             if(ht) ht.innerHTML = (banner.title2 ? banner.title + '<br>' + banner.title2 : banner.title);
@@ -1818,7 +1745,8 @@ function openLightbox(src){
             var heroSec = document.getElementById('heroSection');
             if(heroSec) heroSec.style.background = banner.bgColor;
         }
-    } catch(e) {}
+        });
+    }
 
 
      var grid = document.getElementById('anunciosGrid');

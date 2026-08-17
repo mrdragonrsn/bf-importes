@@ -150,7 +150,7 @@
                 setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 3500);
             }
 
-            /* toggle visibilidade da senha */
+
             var pass = document.getElementById('password');
             var eyeOpen = document.getElementById('eyeOpen');
             var eyeClosed = document.getElementById('eyeClosed');
@@ -162,7 +162,7 @@
                 this.setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha');
             });
 
-            /* se já estiver autenticado, vai direto para o painel */
+
             supabase.auth.getSession().then(function(res){
                 if(res.data && res.data.session){ window.location.replace('/admin'); }
             });

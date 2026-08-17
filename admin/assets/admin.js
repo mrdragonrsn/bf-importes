@@ -1,12 +1,24 @@
 (function(){
-var USERS_KEY='bf_users', BANNER_KEY='bf_banner', CONFIG_KEY='bf_config', CATEGORIES_KEY='bf_categories', PEDIDOS_KEY='bf_orders';
+var USERS_KEY='profiles', BANNER_KEY='banner', CONFIG_KEY='config', CATEGORIES_KEY='categorias', PEDIDOS_KEY='pedidos';
 
 var SUPABASE_URL = 'https://trirxmcalxktampbujyr.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaXJ4bWNhbHhrdGFtcGJ1anlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjU3MzEsImV4cCI6MjEwMjIwMTczMX0.sr6dx1qSK8cqV4e1g6-jMz99T2WTw9Q0jX1iHb-Vwy4';
 var supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-function load(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback}catch(e){return fallback||{}}}
-function save(key,obj){localStorage.setItem(key,JSON.stringify(obj))}
+var dataCache={profiles:[],banner:null,config:null,categorias:[],pedidos:[]};
+function load(key,fallback){return dataCache[key] == null ? fallback : dataCache[key]}
+function save(key,obj){
+    dataCache[key]=obj;
+    if(key==='banner'||key==='config') return supabase.from('site_settings').upsert({chave:key,valor:obj,updated_at:new Date().toISOString()});
+    if(key==='categorias') return supabase.from('categorias').select('id,nome').then(function(res){
+        var keep=obj;
+        var removed=(res.data||[]).filter(function(row){return keep.indexOf(row.nome)<0}).map(function(row){return row.id});
+        var remove=removed.length ? supabase.from('categorias').delete().in('id',removed) : Promise.resolve();
+        return remove.then(function(){return supabase.from('categorias').upsert(obj.map(function(nome,idx){return {nome:nome,ordem:idx+1,ativo:true}}),{onConflict:'nome'})});
+    });
+    if(key==='pedidos') return Promise.all(obj.map(function(p){return supabase.from('pedidos').update({status:p.status,data_entrega:p.dataEntrega||''}).eq('id',p.dbId)}));
+    return Promise.resolve();
+}
 
 function escAttr(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 function formatPrice(n){n=parseFloat(n)||0;return n.toFixed(2).replace('.',',');}
@@ -32,14 +44,36 @@ function sha256(text){
 }
 
 
-function defaultBanner(){return{title:'Impressoras, multifuncionais e peças',title2:'com garantia e procedência',subtitle:'Desde equipamentos e suprimentos até peças originais e genéricas.',bgUrl:'',bgColor:'linear-gradient(170deg, #0d2f5e 0%, #0a1f3f 100%)',btnText:'Ver Produtos'}}
-function defaultConfig(){return{company:'BIANCO & FERREIRA - COMERCIO DE EQUIPAMENTOS PARA INFORMATICA LTDA',brand:'B&F Importes',cnpj:'03.108.169/0001-58',phone:'(16) 98138-6747',email:'atendimento@biancoeferreira.com.br',hours:'Seg–Sex 8h às 18h | Sáb 8h às 13h',address:'R. Rui Barbosa, 363 — Centro, Jaboticabal — SP, 14870-090',cep:'14870-090',cityState:'Jaboticabal — SP'}}
-function defaultCategories(){return['impressoras','multifuncionais','pecas','suprimentos']}
+function defaultBanner(){return{}}
+function defaultConfig(){return{}}
+function defaultCategories(){return[]}
 
 
 var adminLayout=document.getElementById('adminLayout');
 
-function showDashboard(){adminLayout.classList.add('active');renderAll();setTimeout(initCharts,100);refreshPreview()}
+function showDashboard(){adminLayout.classList.add('active');loadData().then(function(){renderAll();setTimeout(initCharts,100);refreshPreview()})}
+async function loadData(){
+    var session=await supabase.auth.getSession();
+    var access=await supabase.from('profiles').select('role').eq('id',session.data.session.user.id).maybeSingle();
+    if(!access.data || access.data.role!=='admin'){
+        await supabase.auth.signOut();
+        window.location.replace('/admin/login');
+        return;
+    }
+    var results=await Promise.all([
+        supabase.from('profiles').select('*').order('created_at',{ascending:true}),
+        supabase.from('site_settings').select('chave,valor').in('chave',['banner','config']),
+        supabase.from('categorias').select('*').order('ordem',{ascending:true}),
+        supabase.from('pedidos').select('*').order('created_at',{ascending:false})
+    ]);
+    dataCache.profiles=(results[0].data||[]).map(function(row){return {id:row.id,name:row.nome,email:row.email||'',role:row.role,profile:row}});
+    (results[1].data||[]).forEach(function(row){dataCache[row.chave]=row.valor||{}});
+    dataCache.categorias=(results[2].data||[]).filter(function(row){return row.ativo}).map(function(row){return row.nome});
+    dataCache.pedidos=(results[3].data||[]).map(function(row){
+        var cliente=row.cliente||{};
+        return {dbId:row.id,id:row.codigo,cliente:cliente.nome,email:cliente.email,phone:cliente.phone,cpf:cliente.cpf,endereco:cliente.endereco,data:new Date(row.created_at).toLocaleString('pt-BR'),timestamp:new Date(row.created_at).getTime(),total:row.total,pagamento:row.pagamento,status:row.status,dataEntrega:row.data_entrega,itens:row.itens||[]};
+    });
+}
 function logout(){
     supabase.auth.signOut().then(function(){
         window.location.replace('/admin/login');
@@ -406,66 +440,28 @@ document.getElementById('btnCancelReset').addEventListener('click',function(){
 document.getElementById('btnSaveUser').addEventListener('click',function(){
     var name=document.getElementById('userFormName').value.trim();
     var email=document.getElementById('userFormEmail').value.trim();
-    var pass=document.getElementById('userFormPass').value;
     var role=document.getElementById('userFormRole').value;
     var idx=parseInt(document.getElementById('userFormIdx').value);
     if(!name||!email){showToast('&#9888; Nome e e-mail são obrigatórios.');return}
     var users=load(USERS_KEY,[]);
-
-    function persist(hashedPass){
-        if(idx>=0){
-            if(users[idx].email==='admin'&&email!=='admin'){showToast('&#9888; Não pode mudar o e-mail do admin.');return}
-            users[idx].name=name;
-            if(email!==users[idx].email){
-                if(users.find(function(u,i){return i!==idx&&u.email===email})){showToast('&#9888; E-mail já cadastrado.');return}
-                users[idx].email=email;
-            }
-            if(hashedPass)users[idx].pass=hashedPass;
-            if(users[idx].email==='admin')users[idx].role='admin';
-            else users[idx].role=role;
-            save(USERS_KEY,users);
-            showToast('&#9989; Usuário "'+name+'" atualizado!');
-        }else{
-            if(users.find(function(u){return u.email===email})){showToast('&#9888; E-mail já cadastrado.');return}
-            users.push({name:name,email:email,pass:hashedPass,role:role});
-            save(USERS_KEY,users);
-            showToast('&#9989; Usuário "'+name+'" adicionado!');
-        }
-        document.getElementById('userFormCard').style.display='none';
-        renderUsers();
-    }
-
-    if(idx>=0){
-        if(pass&&pass.length<4){showToast('&#9888; Senha mínima: 4 caracteres.');return}
-        if(pass){sha256(pass).then(function(h){persist(h)});}
-        else{persist(null);}
-    }else{
-        if(!pass||pass.length<4){showToast('&#9888; Senha mínima: 4 caracteres.');return}
-        sha256(pass).then(function(h){persist(h)});
-    }
+    if(idx<0){showToast('&#9888; A conta deve ser criada pelo formulário público.');return}
+    var user=users[idx];
+    supabase.from('profiles').update({nome:name,email:email,role:role}).eq('id',user.id).then(function(res){
+        if(res.error){showToast('&#9888; '+res.error.message);return}
+        loadData().then(function(){document.getElementById('userFormCard').style.display='none';renderUsers();showToast('&#9989; Usuário atualizado!')});
+    });
 });
 
 document.getElementById('btnConfirmReset').addEventListener('click',function(){
     var idx=parseInt(document.getElementById('resetPassIdx').value);
-    var p1=document.getElementById('resetNewPass').value;
-    var p2=document.getElementById('resetNewPass2').value;
-    if(!p1||p1.length<4){showToast('&#9888; Senha mínima: 4 caracteres.');return}
-    if(p1!==p2){showToast('&#9888; Senhas não conferem.');return}
     var users=load(USERS_KEY,[]);
     if(!users[idx])return;
-    sha256(p1).then(function(hash){
-        users[idx].pass=hash;
-        save(USERS_KEY,users);
-        showToast('&#9989; Senha de "'+users[idx].name+'" redefinida!');
-        document.getElementById('resetPassCard').style.display='none';
-    });
+    showToast('&#128231; Use a recuperação de senha do Supabase para este usuário.');
+    document.getElementById('resetPassCard').style.display='none';
 });
 
 window.deleteUser=function(i){
-    var users=load(USERS_KEY,[]);
-    if(users[i]&&users[i].email==='admin'){showToast('&#9888; Não pode remover admin.');return}
-    if(!confirm('Remover usuário "'+users[i].name+'"?'))return;
-    users.splice(i,1);save(USERS_KEY,users);renderUsers();showToast('&#9989; Removido.');
+    showToast('&#9888; Contas são gerenciadas pelo Supabase Auth.');
 };
 
 
@@ -566,13 +562,6 @@ function renderPedidosPendentes(){
         .filter(function(p){ return p.status === 'pendente'; })
         .sort(function(a,b){ return (b.timestamp || 0) - (a.timestamp || 0); })
         .slice(0, 5);
-    if(pendentes.length === 0){
-        pendentes = [
-            { id: 'BF-DEMO01', cliente: 'Maria Oliveira', total: 1149.00 },
-            { id: 'BF-DEMO02', cliente: 'João Pereira', total: 479.00 }
-        ];
-    }
-
     var html = '';
     pendentes.forEach(function(p){
         html += '<tr>' +
@@ -596,10 +585,13 @@ function initCharts(){
 
     if(!_vendasChart){
         var labels = [];
+        var sales = [];
         for(var i = 6; i >= 0; i--){
             var d = new Date();
             d.setDate(d.getDate() - i);
             labels.push(d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}));
+            var day=d.toISOString().slice(0,10);
+            sales.push(dataCache.pedidos.filter(function(p){return p.status !== 'cancelado' && new Date(p.timestamp).toISOString().slice(0,10) === day;}).reduce(function(sum,p){return sum + (parseFloat(p.total)||0)},0));
         }
         var ctx = canvasVendas.getContext('2d');
         var grad = ctx.createLinearGradient(0, 0, 0, 240);
@@ -611,7 +603,7 @@ function initCharts(){
                 labels: labels,
                 datasets: [{
                     label: 'Vendas (R$)',
-                    data: [1200, 1900, 1500, 2400, 2100, 3000, 2800],
+                    data: sales,
                     borderColor: '#3b82f6',
                     backgroundColor: grad,
                     fill: true,
