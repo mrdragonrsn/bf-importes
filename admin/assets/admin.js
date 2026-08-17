@@ -386,7 +386,7 @@ document.getElementById('btnSaveBanner').addEventListener('click',function(){
     document.getElementById('bannerMsg').textContent='Salvo!';document.getElementById('bannerMsg').style.color='var(--success)';
     showToast('Banner salvo!');
 });
-document.getElementById('btnResetBanner').addEventListener('click',function(){save(BANNER_KEY,defaultBanner());loadBannerForm();showToast('&#8635; Restaurado ao padrão.')});
+document.getElementById('btnResetBanner').addEventListener('click',function(){save(BANNER_KEY,defaultBanner());loadBannerForm();showToast('Restaurado ao padrao.')});
 
 
 function loadConfigForm(){
@@ -415,8 +415,8 @@ function renderUsers(){
         var roleBadge=u.role==='admin'?'<span class="badge badge-green">Admin</span>':'<span class="badge" style="background:rgba(59,130,246,.15);color:var(--accent);">Usuário</span>';
         html+='<tr><td>'+escHtml(u.name)+'</td><td>'+escHtml(u.username||'—')+'</td><td>'+escHtml(u.email)+'</td><td>'+roleBadge+'</td>'+
             '<td><div class="flex-row" style="gap:4px;">'+
-                '<button class="btn btn-outline btn-sm" onclick="editUser('+i+')" title="Editar">&#9998;</button>'+
-                '<button class="btn btn-outline btn-sm" onclick="showResetPass('+i+')" title="Resetar senha">&#128274;</button>'+
+                '<button class="btn btn-outline btn-sm" onclick="editUser('+i+')" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'+
+                '<button class="btn btn-outline btn-sm" onclick="showResetPass('+i+')" title="Resetar senha"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>'+
                 '<button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')" title="Remover"></button>'+
             '</div></td></tr>';
     });
@@ -427,7 +427,7 @@ function renderUsers(){
 window.editUser=function(i){
     var users=load(USERS_KEY,[]);
     if(!users[i])return;
-    document.getElementById('userFormTitle').textContent='&#9998; Editar Usuário';
+    document.getElementById('userFormTitle').textContent='Editar Usuário';
     document.getElementById('userFormName').value=users[i].name||'';
     document.getElementById('userFormEmail').value=users[i].email||'';
     document.getElementById('userFormPass').value='';
@@ -538,7 +538,7 @@ function renderPedidos(){
                         '<option value="entregue"' + (p.status === 'entregue' ? ' selected' : '') + '>Entregue</option>' +
                         '<option value="cancelado"' + (p.status === 'cancelado' ? ' selected' : '') + '>Cancelado</option>' +
                     '</select>' +
-                     '<button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + escAttr(p.id || '') + '\')" title="Ver detalhes">&#128065;</button>' +
+                     '<button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + escAttr(p.id || '') + '\')" title="Ver detalhes"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
                 '</div>' +
             '</td>' +
         '</tr>';
@@ -608,7 +608,7 @@ function renderPedidosPendentes(){
              '<td><strong>' + escHtml(p.id) + '</strong></td>' +
              '<td>' + escHtml(p.cliente || '—') + '</td>' +
             '<td>R$ ' + (parseFloat(p.total) || 0).toFixed(2).replace('.', ',') + '</td>' +
-             '<td><button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + escAttr(p.id || '') + '\')" title="Ver detalhes">&#128065;</button></td>' +
+              '<td><button class="btn btn-outline btn-sm" onclick="verDetalhesPedido(\'' + escAttr(p.id || '') + '\')" title="Ver detalhes"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>' +
         '</tr>';
     });
     tbody.innerHTML = html;
@@ -745,7 +745,7 @@ function exportStockCSV(){
         });
         if(!rows.length){ showToast('Nenhum produto para exportar.'); return; }
         downloadCSV('estoque.csv', header, rows);
-        showToast('&#128190; Estoque exportado em CSV!');
+        showToast('Estoque exportado em CSV!');
     });
 }
 
@@ -764,7 +764,7 @@ function exportPedidosCSV(){
     });
     if(!rows.length){ showToast('Nenhum pedido para exportar.'); return; }
     downloadCSV('pedidos.csv', header, rows);
-    showToast('&#128190; Pedidos exportados em CSV!');
+        showToast('Pedidos exportados em CSV!');
 }
 
 document.getElementById('btnExportStock').addEventListener('click', exportStockCSV);
