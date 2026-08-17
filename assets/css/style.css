@@ -2358,8 +2358,8 @@
             border-bottom: 1px solid #e2e8f0;
             background: #f8fafc;
         }
-        .perfil-header h3 { font-size: 1.15rem; font-weight: 800; color: var(--azul-escuro); }
-        .perfil-close { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #64748b; padding: 4px; line-height: 1; }
+        .perfil-header h3 { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; font-weight: 800; color: var(--azul-escuro); }
+        .perfil-close { display: grid; place-items: center; background: none; border: none; cursor: pointer; color: #64748b; padding: 4px; line-height: 1; }
         .perfil-close:hover { color: #1e293b; }
         .perfil-tabs { display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 20px; background: #f8fafc; gap: 4px; }
         .perfil-tab {

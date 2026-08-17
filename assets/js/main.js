@@ -1402,6 +1402,7 @@ function openLightbox(src){
             document.getElementById('perfilNome').value = perfil.nome || currentUser.user_metadata && currentUser.user_metadata.nome || '';
             document.getElementById('perfilEmail').value = currentUser.email || '';
             document.getElementById('perfilPhone').value = perfil.telefone || perfil.phone || '';
+            document.getElementById('perfilNivel').value = perfil.role === 'admin' ? 'Administrador' : 'Usuário';
 
             if(perfil.foto_url || perfil.foto){
                 document.getElementById('perfilFoto').innerHTML = '<img src="'+(perfil.foto_url || perfil.foto)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
@@ -1575,6 +1576,14 @@ function openLightbox(src){
         });
 
         var perfilCloseBtn = document.getElementById('perfilClose');
+        document.addEventListener('click', function(e){
+            var perfilBtn=e.target.closest ? e.target.closest('#btnPerfil') : null;
+            if(!perfilBtn)return;
+            e.preventDefault();
+            var menu=document.getElementById('userMenu');
+            if(menu)menu.classList.remove('open');
+            openPerfil();
+        });
         if(perfilCloseBtn) perfilCloseBtn.addEventListener('click', closePerfil);
 
         var perfilOverlay = document.getElementById('perfilOverlay');

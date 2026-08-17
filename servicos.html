@@ -396,8 +396,8 @@
     <div class="perfil-overlay" id="perfilOverlay">
         <div class="perfil-modal">
             <div class="perfil-header">
-                <h3>&#9881; Meu Perfil</h3>
-                <button class="perfil-close" id="perfilClose">&times;</button>
+                <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>Meu Perfil</h3>
+                <button class="perfil-close" id="perfilClose" aria-label="Fechar perfil"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
             </div>
             <div class="perfil-tabs">
                 <button class="perfil-tab active" data-ptab="perfil-dados">&#128100; Dados</button>
@@ -413,6 +413,7 @@
                     <div class="perfil-field"><label>Nome</label><input type="text" id="perfilNome" placeholder="Seu nome"></div>
                     <div class="perfil-field"><label>E-mail</label><input type="text" id="perfilEmail" placeholder="seu@email.com" readonly></div>
                     <div class="perfil-field"><label>Telefone</label><input type="text" id="perfilPhone" placeholder="(00) 00000-0000"></div>
+                    <div class="perfil-field"><label>Nível de acesso</label><input type="text" id="perfilNivel" readonly></div>
                     <button class="btn-perfil-salvar" id="btnSalvarDados">&#128190; Salvar Dados</button>
                     <div id="perfilAdminLink" style="display:none;margin-top:14px;text-align:center;">
                         <a href="/admin" class="btn-perfil-salvar" style="background:#0f172a;display:inline-block;width:auto;padding:10px 24px;text-decoration:none;">&#128736; Painel Admin</a>
