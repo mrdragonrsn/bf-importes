@@ -46,16 +46,19 @@ module.exports = async function handler(request, response) {
     requestLog.set(rateKey, now);
     for (var entry of requestLog) if (now - entry[1] > 3600000) requestLog.delete(entry[0]);
 
-    if (SUPABASE_SERVICE_KEY) {
-        try {
-            await supabaseAdmin('contato_mensagens', 'POST', {
-                nome: name,
-                email: email,
-                mensagem: message
-            });
-        } catch (err) {
-            console.error('Failed to save message to DB:', err.message);
-        }
+    if (!SUPABASE_SERVICE_KEY) {
+        console.error('SUPABASE_SERVICE_ROLE_KEY is not set');
+        return response.status(500).json({error:'Serviço temporariamente indisponível. Tente novamente mais tarde.'});
+    }
+    try {
+        await supabaseAdmin('contato_mensagens', 'POST', {
+            nome: name,
+            email: email,
+            mensagem: message
+        });
+    } catch (err) {
+        console.error('Failed to save message to DB:', err.message);
+        return response.status(500).json({error:'Não foi possível enviar sua mensagem. Tente novamente.'});
     }
 
     return response.status(200).json({ok:true, info:'Mensagem recebida. Entraremos em contato em breve.'});

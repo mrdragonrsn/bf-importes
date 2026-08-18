@@ -942,7 +942,7 @@ function renderMensagens(){
     });
 }
 
-window.verMensagens = verMensagem;
+window.verMensagem = verMensagem;
 
 function verMensagem(id){
     supabase.from('contato_mensagens').select('*').eq('id',id).single().then(function(res){
