@@ -1,6 +1,12 @@
 -- Keep the public catalog readable while restricting mutations to admins.
-alter table public.produtos
-  add column if not exists descricao_longa text;
+do $$
+begin
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'produtos') then
+    alter table public.produtos
+      add column if not exists descricao_longa text;
+  end if;
+end
+$$;
 
 drop policy if exists "Permitir inserção/edição autenticada" on public.produtos;
 drop policy if exists "Permitir leitura pública" on public.produtos;

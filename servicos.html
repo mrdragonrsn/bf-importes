@@ -22,7 +22,7 @@
             </span>
             <span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                atendimento@biancoeferreira.com.br
+                atendimento&#64;biancoeferreira&#46;com&#46;br
             </span>
             <span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -269,7 +269,7 @@
                             <div class="nf-section-title">Pagamento</div>
                             <p style="margin-bottom:8px;" id="nfPayment"></p>
                         </div>
-                        <div class="nf-footer">Agradecemos a preferência! | B&amp;F<br>atendimento@biancoeferreira.com.br | (16) 98138-6747</div>
+                        <div class="nf-footer">Agradecemos a preferência! | B&amp;F<br>atendimento&#64;biancoeferreira&#46;com&#46;br | (16) 98138-6747</div>
                     </div>
                     <button class="btn-print-nf" id="btnPrintNF">Imprimir resumo</button>
                     <button class="btn-wpp-share" id="btnWppShare">Compartilhar pedido no WhatsApp</button>
@@ -445,7 +445,7 @@
         <div style="margin-top:10px;font-size:0.85rem;color:#94a3b8;">Carregando...</div>
     </div>
 </div>
-<script>setTimeout(function(){var l=document.getElementById('pageLoader');if(l){l.style.opacity='0';setTimeout(function(){l.style.display='none'},300);}},50);</script>
+<script>function hidePageLoader(){var l=document.getElementById('pageLoader');if(l&&l.style.opacity!=='0'){l.style.opacity='0';setTimeout(function(){l.style.display='none';},300);}}window.addEventListener('load',hidePageLoader);setTimeout(hidePageLoader,2500);</script>
 <style>@keyframes pulseLoad{from{transform:scale(1);opacity:0.5;}to{transform:scale(1.15);opacity:1;}}</style>
 
 <script src="/assets/js/main.js"></script>

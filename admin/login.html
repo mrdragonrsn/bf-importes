@@ -163,8 +163,11 @@
             });
 
 
-            supabase.auth.getSession().then(function(res){
-                if(res.data && res.data.session){ window.location.replace('/admin'); }
+            supabase.auth.getSession().then(async function(res){
+                if(res.data && res.data.session){
+                    var adminCheck = await supabase.rpc('is_admin');
+                    if(adminCheck.data){ window.location.replace('/admin'); }
+                }
             });
 
             document.getElementById('loginForm').addEventListener('submit', async function(e){
@@ -185,6 +188,14 @@
                         ? 'E-mail ou senha incorretos.'
                         : 'Falha ao entrar: ' + res.error.message;
                     showToast(msg);
+                    return;
+                }
+                var adminCheck = await supabase.rpc('is_admin');
+                if(!adminCheck.data){
+                    await supabase.auth.signOut();
+                    btn.disabled = false;
+                    btn.textContent = 'Entrar';
+                    showToast('Acesso restrito a administradores.');
                     return;
                 }
                 window.location.replace('/admin');
